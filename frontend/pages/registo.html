@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESMAD</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.ico">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --laranja: #F15A24; --laranja-hover: #d94d1c; --laranja-light: #FEE8DF;
+      --preto: #1A1A1A; --cinza-bg: #F2F2F2; --cinza-input: #EEEEEE;
+      --cinza-texto: #888888; --cinza-note: #AAAAAA; --branco: #FFFFFF;
+      --vermelho: #C00000; --verde-texto: #375623;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--cinza-bg); min-height: 100vh; display: flex; flex-direction: column; }
+    .topbar { background: var(--laranja); padding: 14px 0; text-align: center; flex-shrink: 0; }
+    .topbar h1 { color: var(--branco); font-size: 2rem; font-weight: 800; letter-spacing: 2px; }
+    .wrapper { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 16px; }
+    .card { background: var(--branco); border-radius: 16px; box-shadow: 0 2px 24px rgba(0,0,0,0.08); padding: 44px 52px 48px; width: 100%; max-width: 456px; }
+
+    .alerta { display: none; border-radius: 8px; padding: 12px 14px; font-size: 0.83rem; font-weight: 500; margin-bottom: 20px; line-height: 1.4; }
+    .alerta.erro    { background: #FFDEDE; color: var(--vermelho); }
+    .alerta.sucesso { background: #DFF0D8; color: var(--verde-texto); }
+    .alerta.visivel { display: block; }
+
+    .campo { margin-bottom: 22px; }
+    .campo label { display: block; font-size: 0.72rem; font-weight: 700; color: var(--preto); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 9px; }
+    .campo .nota { font-size: 0.72rem; color: var(--cinza-note); font-style: italic; margin-top: 6px; }
+    .campo .nota.erro { color: var(--vermelho); }
+    .input-wrap { position: relative; }
+
+    .campo input, .campo select {
+      width: 100%; background: var(--cinza-input); border: 1.5px solid transparent;
+      border-radius: 10px; padding: 14px 18px; font-family: 'Inter', sans-serif;
+      font-size: 0.9rem; color: var(--preto); outline: none;
+      transition: border-color 0.18s, background 0.18s, box-shadow 0.18s; appearance: none;
+    }
+    .campo input::placeholder { color: #BBBBBB; }
+    .campo input:focus, .campo select:focus { background: var(--branco); border-color: var(--laranja); box-shadow: 0 0 0 3px rgba(241,90,36,0.12); }
+    .campo input.invalido { border-color: var(--vermelho); }
+    .campo input.invalido:focus { box-shadow: 0 0 0 3px rgba(192,0,0,0.10); }
+    .campo input.valido { border-color: var(--verde-texto); }
+
+    .select-wrap { position: relative; }
+    .select-wrap::after { content: ''; position: absolute; right: 18px; top: 50%; transform: translateY(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid var(--cinza-texto); pointer-events: none; }
+    .campo select { cursor: pointer; padding-right: 42px; }
+
+    .btn-olho { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--cinza-texto); font-family: 'Inter', sans-serif; font-size: 0.78rem; font-weight: 500; padding: 4px; transition: color 0.15s; }
+    .btn-olho:hover { color: var(--preto); }
+
+    .campo-extra { display: none; }
+    .campo-extra.visivel { display: block; }
+
+    .btn-principal { display: block; width: 100%; background: var(--laranja); color: var(--branco); border: none; border-radius: 10px; padding: 15px; font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; margin-top: 10px; transition: background 0.18s, transform 0.1s; }
+    .btn-principal:hover   { background: var(--laranja-hover); }
+    .btn-principal:active  { transform: scale(0.98); }
+    .btn-principal:disabled { opacity: 0.65; cursor: not-allowed; }
+
+    .spin { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: girar 0.6s linear infinite; vertical-align: middle; margin-right: 8px; }
+    @keyframes girar { to { transform: rotate(360deg); } }
+
+    .link-redirecao { text-align: center; margin-top: 18px; font-size: 0.84rem; color: var(--cinza-texto); }
+    .link-redirecao a { color: var(--laranja); font-weight: 700; text-decoration: none; }
+    .link-redirecao a:hover { text-decoration: underline; }
+
+    @media (max-width: 520px) { .card { padding: 28px 20px 32px; } .topbar h1 { font-size: 1.6rem; } }
+  </style>
+</head>
+<body>
+
+<div class="topbar"><h1>ESMAD</h1></div>
+
+<div class="wrapper">
+  <div class="card">
+
+    <div id="alerta" class="alerta" role="alert"></div>
+
+    <form id="formRegisto" novalidate>
+
+      <div class="campo">
+        <label for="nome">Nome Completo</label>
+        <input type="text" id="nome" placeholder="Gonçalo Pontes" autocomplete="name">
+      </div>
+
+      <div class="campo">
+        <label for="perfil">Perfil</label>
+        <div class="select-wrap">
+          <select id="perfil">
+            <option value="" disabled selected>Selecciona o teu perfil</option>
+            <option value="estudante">Estudante</option>
+            <option value="docente">Docente</option>
+            <option value="entidade">Entidade</option>
+          </select>
+        </div>
+        <p class="nota">Docentes membros da CCA são adicionados pela própria CCA.</p>
+      </div>
+
+      <div class="campo">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="exemplo@esmad.ipp.pt" autocomplete="email" inputmode="email">
+        <p class="nota" id="notaEmail">Introduz o teu email institucional.</p>
+      </div>
+
+      <div class="campo">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <input type="password" id="password" placeholder="••••••••" autocomplete="new-password">
+          <button type="button" class="btn-olho" id="btnOlho" tabindex="-1">ver</button>
+        </div>
+        <p class="nota">Mínimo 6 caracteres.</p>
+      </div>
+
+      <div class="campo campo-extra" id="campoCurso">
+        <label for="curso">Curso</label>
+        <div class="select-wrap">
+          <select id="curso">
+            <option value="TeSP DTAM">TeSP — Design e Tecnologias para Aplicações Móveis</option>
+            <option value="Lic. TSI Web">Licenciatura — Tecnologias e Sistemas de Informação para a Web</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="campo campo-extra" id="campoEntidade">
+        <label for="nomeEntidade">Nome da Empresa / Organização</label>
+        <input type="text" id="nomeEntidade" placeholder="Ex: TechLisboa, Lda.">
+      </div>
+
+      <button type="submit" class="btn-principal" id="btnRegisto">Criar conta</button>
+
+    </form>
+
+    <p class="link-redirecao">
+      Já tens conta? <a href="login.html">Inicia sessão aqui</a>
+    </p>
+
+  </div>
+</div>
+
+<script>
+  const API_URL = 'http://localhost:5000/api';
+
+  // Já autenticado → redirecionar
+  (() => {
+    const u = localStorage.getItem('esmad_user');
+    if (localStorage.getItem('esmad_token') && u) redirecionar(JSON.parse(u).perfil);
+  })();
+
+  function redirecionar(perfil) {
+    const destinos = { estudante:'dashboard-estudante.html', docente:'dashboard-docente.html', entidade:'dashboard-docente.html', comissao:'gestao-cca.html', admin:'gestao-cca.html' };
+    window.location.href = destinos[perfil] || 'login.html';
+  }
+
+  // Toggle password
+  const inputPass = document.getElementById('password');
+  document.getElementById('btnOlho').addEventListener('click', function () {
+    const ver = inputPass.type === 'password';
+    inputPass.type = ver ? 'text' : 'password';
+    this.textContent = ver ? 'ocultar' : 'ver';
+  });
+
+  // Mensagens e regexes de email por perfil
+  const emailConfig = {
+    estudante: {
+      placeholder: '40240310@esmad.ipp.pt',
+      nota:        'Usa o teu número de estudante: número@esmad.ipp.pt',
+      regex:       /^\d+@esmad\.ipp\.pt$/i,
+      erroFormato: 'O email de estudante deve ser: (ex: 00000000@esmad.ipp.pt)'
+    },
+    docente: {
+      placeholder: 'nome@esmad.ipp.pt',
+      nota:        'Usa o teu email institucional: nome@esmad.ipp.pt',
+      regex:       /^[a-zA-Z][a-zA-Z0-9.]+@esmad\.ipp\.pt$/i,
+      erroFormato: 'O email de docente deve ser: (ex: nome@esmad.ipp.pt)'
+    },
+    entidade: {
+      placeholder: 'contacto@empresa.pt',
+      nota:        'Usa o email de contacto da empresa.',
+      regex:       /^\S+@\S+\.\S+$/,
+      erroFormato: 'Introduz um email válido.'
+    }
+  };
+
+  const perfilSelect  = document.getElementById('perfil');
+  const emailInput    = document.getElementById('email');
+  const notaEmail     = document.getElementById('notaEmail');
+  const campoCurso    = document.getElementById('campoCurso');
+  const campoEntidade = document.getElementById('campoEntidade');
+
+  perfilSelect.addEventListener('change', () => {
+    const p = perfilSelect.value;
+    const cfg = emailConfig[p];
+
+    // Actualizar placeholder e nota do email
+    if (cfg) {
+      emailInput.placeholder = cfg.placeholder;
+      notaEmail.textContent  = cfg.nota;
+      notaEmail.className    = 'nota';
+    }
+
+    // Mostrar campos extra
+    campoCurso.classList.toggle('visivel',    p === 'estudante');
+    campoEntidade.classList.toggle('visivel', p === 'entidade');
+
+    // Limpar validação anterior do email
+    emailInput.className = '';
+    notaEmail.className  = 'nota';
+    emailInput.value     = '';
+  });
+
+  // Validar email em tempo real quando o utilizador sai do campo
+  emailInput.addEventListener('blur', () => {
+    const p = perfilSelect.value;
+    if (!p || !emailInput.value) return;
+    const cfg = emailConfig[p];
+    if (!cfg) return;
+
+    if (cfg.regex.test(emailInput.value.trim())) {
+      emailInput.className = 'valido';
+      notaEmail.textContent = '✔ Email válido';
+      notaEmail.className   = 'nota';
+    } else {
+      emailInput.className = 'invalido';
+      notaEmail.textContent = cfg.erroFormato;
+      notaEmail.className   = 'nota erro';
+    }
+  });
+
+  // Limpar validação ao começar a escrever
+  emailInput.addEventListener('input', () => {
+    emailInput.className = '';
+    const p = perfilSelect.value;
+    if (p && emailConfig[p]) {
+      notaEmail.textContent = emailConfig[p].nota;
+      notaEmail.className   = 'nota';
+    }
+  });
+
+  // Alerta
+  const alertaEl = document.getElementById('alerta');
+  function mostrarAlerta(msg, tipo = 'erro') {
+    alertaEl.textContent = msg;
+    alertaEl.className = `alerta ${tipo} visivel`;
+    alertaEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // Submit
+  const btnRegisto = document.getElementById('btnRegisto');
+  document.getElementById('formRegisto').addEventListener('submit', async e => {
+    e.preventDefault();
+    alertaEl.className = 'alerta';
+
+    const nome     = document.getElementById('nome').value.trim();
+    const email    = emailInput.value.trim();
+    const password = inputPass.value;
+    const perfil   = perfilSelect.value;
+
+    // Validações básicas
+    if (!nome)     { mostrarAlerta('Introduz o teu nome completo.'); return; }
+    if (!perfil)   { mostrarAlerta('Selecciona o teu perfil.'); return; }
+    if (!email)    { mostrarAlerta('Introduz o teu email.'); return; }
+    if (!password) { mostrarAlerta('Introduz uma password.'); return; }
+    if (password.length < 6) { mostrarAlerta('A password deve ter pelo menos 6 caracteres.'); return; }
+
+    // Validar formato de email conforme perfil (validação local antes de enviar)
+    const cfg = emailConfig[perfil];
+    if (cfg && !cfg.regex.test(email)) {
+      mostrarAlerta(cfg.erroFormato);
+      emailInput.className  = 'invalido';
+      notaEmail.textContent = cfg.erroFormato;
+      notaEmail.className   = 'nota erro';
+      return;
+    }
+
+    const corpo = { nome, email, password, perfil };
+    if (perfil === 'estudante') corpo.curso = document.getElementById('curso').value;
+    if (perfil === 'entidade') {
+      const nomeEnt = document.getElementById('nomeEntidade').value.trim();
+      if (!nomeEnt) { mostrarAlerta('Introduz o nome da empresa ou organização.'); return; }
+      corpo.nomeEntidade = nomeEnt;
+    }
+
+    btnRegisto.disabled = true;
+    btnRegisto.innerHTML = '<span class="spin"></span>A criar conta…';
+
+    try {
+      const res   = await fetch(`${API_URL}/auth/registo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(corpo)
+      });
+      const dados = await res.json();
+      if (!res.ok) throw new Error(dados.mensagem || 'Erro ao criar conta.');
+
+      mostrarAlerta('Conta criada com sucesso! Redirecionar para o login…', 'sucesso');
+      setTimeout(() => { window.location.href = 'login.html'; }, 1200);
+
+    } catch (err) {
+      mostrarAlerta(err.message);
+      btnRegisto.disabled = false;
+      btnRegisto.textContent = 'Criar conta';
+    }
+  });
+</script>
+</body>
+</html>

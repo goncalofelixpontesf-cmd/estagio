@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESMAD</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.ico">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --laranja: #F15A24; --laranja-hover: #d94d1c; --laranja-light: #FEE8DF;
+      --preto: #1A1A1A; --cinza-bg: #F4F4F4; --cinza-texto: #888888;
+      --cinza-linha: #EEEEEE; --cinza-input: #F5F5F5; --branco: #FFFFFF;
+      --azul: #2E75B6; --azul-light: #EBF3FB;
+      --verde: #70AD47; --verde-light: #E2EFDA;
+      --amarelo: #BF8F00; --amarelo-light: #FFF2CC;
+      --vermelho: #C00000; --vermelho-light: #FFDEDE;
+      --sidebar-w: 220px;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--cinza-bg); color: var(--preto); min-height: 100vh; display: flex; }
+
+    .sidebar { width: var(--sidebar-w); background: var(--laranja); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
+    .sidebar-logo { padding: 22px 0 18px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.18); }
+    .sidebar-logo span { color: var(--branco); font-size: 1.35rem; font-weight: 800; letter-spacing: 2px; }
+    .sidebar-nav { flex: 1; padding: 12px 0; }
+    .nav-item { display: block; padding: 13px 28px; color: rgba(255,255,255,0.82); font-size: 0.88rem; font-weight: 500; text-decoration: none; cursor: pointer; border: none; background: none; width: 100%; text-align: left; transition: background 0.15s, color 0.15s; }
+    .nav-item:hover  { background: rgba(0,0,0,0.12); color: var(--branco); }
+    .nav-item.activo { background: rgba(0,0,0,0.18); color: var(--branco); font-weight: 700; }
+    .sidebar-footer { padding: 18px 28px; border-top: 1px solid rgba(255,255,255,0.18); }
+    .sidebar-footer .nome   { color: var(--branco); font-size: 0.82rem; font-weight: 600; }
+    .sidebar-footer .perfil { color: rgba(255,255,255,0.65); font-size: 0.75rem; margin-top: 2px; }
+
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { background: var(--branco); padding: 18px 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--cinza-linha); position: sticky; top: 0; z-index: 50; }
+    .topbar-centro { text-align: center; flex: 1; }
+    .topbar-centro .titulo    { font-size: 1rem; font-weight: 700; }
+    .topbar-centro .subtitulo { font-size: 0.78rem; color: var(--cinza-texto); margin-top: 1px; }
+    .avatar { width: 38px; height: 38px; background: var(--laranja); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--branco); font-weight: 700; font-size: 0.95rem; cursor: pointer; flex-shrink: 0; }
+    .topbar-left { width: 38px; }
+    .content { padding: 24px 32px; flex: 1; }
+
+    .tabs { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+    .tab { padding: 9px 20px; border-radius: 8px; border: none; font-family: 'Inter', sans-serif; font-size: 0.83rem; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+    .tab.inactivo { background: var(--branco); color: var(--cinza-texto); box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .tab.inactivo:hover { background: #F0F0F0; }
+    .tab.activo { background: var(--laranja); color: var(--branco); }
+    .badge-count { background: var(--vermelho); color: var(--branco); border-radius: 10px; padding: 1px 7px; font-size: 0.7rem; font-weight: 700; margin-left: 6px; }
+
+    .painel { background: var(--branco); border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); overflow: hidden; }
+    .painel-header { padding: 18px 22px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--cinza-linha); flex-wrap: wrap; gap: 10px; }
+    .painel-header h2 { font-size: 0.92rem; font-weight: 700; }
+    .btn-adicionar { background: var(--laranja); color: var(--branco); border: none; border-radius: 8px; padding: 9px 18px; font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: background 0.15s; }
+    .btn-adicionar:hover { background: var(--laranja-hover); }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #F8F8F8; }
+    th { padding: 11px 18px; text-align: left; font-size: 0.71rem; font-weight: 700; color: var(--cinza-texto); text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid var(--cinza-linha); white-space: nowrap; }
+    td { padding: 13px 18px; font-size: 0.83rem; border-bottom: 1px solid var(--cinza-linha); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #FAFAFA; }
+
+    .curso-badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 4px; font-size: 0.71rem; font-weight: 700; margin-right: 4px; }
+    .curso-badge.ctesp { background: var(--laranja-light); color: var(--laranja); }
+    .curso-badge.lic   { background: var(--azul-light);    color: var(--azul); }
+    .badge-ativo { display: inline-flex; align-items: center; gap: 5px; background: var(--verde-light); color: var(--verde); border-radius: 4px; padding: 3px 10px; font-size: 0.72rem; font-weight: 700; }
+    .badge-ativo::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--verde); }
+
+    .btn-remover { background: var(--vermelho-light); color: var(--vermelho); border: none; border-radius: 6px; padding: 6px 12px; font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 700; cursor: pointer; }
+    .btn-remover:hover { opacity: 0.8; }
+    .btn-editar-cursos { background: var(--azul-light); color: var(--azul); border: none; border-radius: 6px; padding: 6px 12px; font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 700; cursor: pointer; margin-right: 4px; }
+    .btn-editar-cursos:hover { opacity: 0.8; }
+
+    .alerta-pendentes { background: var(--laranja-light); border: 1.5px solid var(--laranja); border-radius: 12px; padding: 14px 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .alerta-pendentes .texto { font-size: 0.9rem; font-weight: 700; color: var(--laranja); }
+    .alerta-pendentes .sub   { font-size: 0.78rem; color: #666; margin-top: 2px; }
+
+    .tag { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 0.72rem; font-weight: 600; }
+    .tag.estagio  { background: var(--laranja-light); color: var(--laranja); }
+    .tag.projecto { background: var(--azul-light);    color: var(--azul); }
+
+    .estado { display: inline-flex; align-items: center; gap: 5px; font-size: 0.78rem; font-weight: 600; }
+    .estado::before { content: ''; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .estado.aprovada::before  { background: var(--verde); }
+    .estado.pendente::before  { background: var(--amarelo); }
+    .estado.rejeitada::before { background: var(--vermelho); }
+    .estado.atribuida::before { background: var(--azul); }
+
+    .acoes { display: flex; gap: 6px; align-items: center; }
+    .btn-aprovar, .btn-rejeitar, .btn-atribuir, .btn-ver-votos { border: none; border-radius: 6px; padding: 6px 12px; font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .btn-aprovar    { background: var(--verde-light);    color: var(--verde); }
+    .btn-rejeitar   { background: var(--vermelho-light); color: var(--vermelho); }
+    .btn-atribuir   { background: var(--azul-light);     color: var(--azul); }
+    .btn-ver-votos  { background: var(--amarelo-light);  color: var(--amarelo); }
+    .btn-aprovar:hover, .btn-rejeitar:hover, .btn-atribuir:hover, .btn-ver-votos:hover { opacity: 0.8; }
+
+    /* Badge "Já votaste" */
+    .badge-votado { display: inline-flex; align-items: center; gap: 5px; background: var(--verde-light); color: var(--verde); border-radius: 6px; padding: 5px 12px; font-size: 0.76rem; font-weight: 700; }
+
+    .titulo-link { font-weight: 600; cursor: pointer; color: var(--laranja); transition: color 0.15s; text-decoration: underline; }
+    .titulo-link:hover { color: var(--laranja-hover); }
+
+    select.filtro-estado { background: var(--branco); border: 1.5px solid var(--cinza-linha); border-radius: 8px; padding: 7px 30px 7px 12px; font-family: 'Inter', sans-serif; font-size: 0.82rem; outline: none; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
+
+    .barra-prog-bg   { height: 8px; background: var(--cinza-linha); border-radius: 4px; overflow: hidden; margin: 10px 0 4px; }
+    .barra-prog-fill { height: 100%; background: var(--verde); border-radius: 4px; transition: width 0.4s; }
+    .barra-prog-label { font-size: 0.78rem; color: var(--cinza-texto); }
+    .votos-tabela th { padding: 10px 12px; font-size: 0.7rem; font-weight: 700; color: var(--cinza-texto); text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid var(--cinza-linha); text-align: left; }
+    .votos-tabela td { padding: 12px 12px; font-size: 0.82rem; border-bottom: 1px solid var(--cinza-linha); vertical-align: middle; }
+    .votos-tabela tr:last-child td { border-bottom: none; }
+    .voto-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 4px; font-size: 0.72rem; font-weight: 700; }
+    .voto-badge.aprovado  { background: var(--verde-light);    color: var(--verde); }
+    .voto-badge.rejeitado { background: var(--vermelho-light); color: var(--vermelho); }
+    .voto-badge.pendente  { background: var(--amarelo-light);  color: var(--amarelo); }
+
+    .datas-form { padding: 22px 24px; }
+    .datas-grupo { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--cinza-linha); }
+    .datas-grupo:last-of-type { border-bottom: none; margin-bottom: 0; }
+    .datas-grupo-titulo { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 14px; }
+    .datas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .data-campo label { display: block; font-size: 0.72rem; font-weight: 700; color: var(--cinza-texto); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 7px; }
+    .data-campo input[type="date"] { width: 100%; background: var(--cinza-input); border: 1.5px solid transparent; border-radius: 8px; padding: 11px 14px; font-family: 'Inter', sans-serif; font-size: 0.86rem; color: var(--preto); outline: none; transition: border-color 0.18s; }
+    .data-campo input[type="date"]:focus { background: var(--branco); border-color: var(--laranja); box-shadow: 0 0 0 3px rgba(241,90,36,0.10); }
+    .datas-footer { padding: 16px 24px; border-top: 1px solid var(--cinza-linha); display: flex; justify-content: flex-end; }
+    .btn-guardar-datas { background: var(--laranja); color: var(--branco); border: none; border-radius: 8px; padding: 10px 24px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; }
+    .btn-guardar-datas:hover { background: var(--laranja-hover); }
+    .alerta-datas { display: none; margin: 0 24px 14px; border-radius: 8px; padding: 10px 14px; font-size: 0.82rem; font-weight: 500; }
+    .alerta-datas.sucesso { background: var(--verde-light); color: var(--verde); display: block; }
+
+    .skeleton { background: linear-gradient(90deg,#ececec 25%,#f5f5f5 50%,#ececec 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 6px; }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+    .vazio { padding: 36px 18px; text-align: center; color: var(--cinza-texto); font-size: 0.86rem; }
+    .vazio .emoji { font-size: 1.8rem; margin-bottom: 8px; }
+
+    /* MODAIS */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.42); z-index: 400; align-items: center; justify-content: center; padding: 16px; }
+    .modal-overlay.aberto { display: flex; }
+    .modal { background: var(--branco); border-radius: 14px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.18); }
+    .modal-topo { height: 6px; background: var(--laranja); border-radius: 14px 14px 0 0; }
+    .modal-topo-vm { height: 6px; background: var(--vermelho); border-radius: 14px 14px 0 0; }
+    .modal-header { padding: 22px 26px 0; display: flex; align-items: flex-start; justify-content: space-between; }
+    .modal-header h2 { font-size: 1rem; font-weight: 700; }
+    .modal-header .sub { font-size: 0.78rem; color: var(--cinza-texto); margin-top: 3px; }
+    .btn-fechar { background: none; border: none; cursor: pointer; color: var(--cinza-texto); font-size: 1.2rem; padding: 2px 6px; flex-shrink: 0; }
+    .btn-fechar:hover { color: var(--preto); }
+    .modal-body { padding: 16px 26px 4px; }
+    .modal-footer { padding: 12px 26px 22px; display: flex; justify-content: flex-end; gap: 10px; }
+    .linha-modal { border: none; border-top: 1px solid var(--cinza-linha); margin: 10px 0 16px; }
+
+    .alerta-modal { display: none; border-radius: 8px; padding: 10px 13px; font-size: 0.8rem; font-weight: 500; margin-bottom: 12px; }
+    .alerta-modal.erro    { background: var(--vermelho-light); color: var(--vermelho); display: block; }
+    .alerta-modal.sucesso { background: var(--verde-light);    color: var(--verde);    display: block; }
+
+    .campo-label { display: block; font-size: 0.72rem; font-weight: 700; color: var(--preto); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .campo-input { width: 100%; background: var(--cinza-input); border: 1.5px solid transparent; border-radius: 8px; padding: 12px 14px; font-family: 'Inter', sans-serif; font-size: 0.86rem; color: var(--preto); outline: none; transition: border-color 0.18s, box-shadow 0.18s; margin-bottom: 4px; }
+    .campo-input::placeholder { color: #BBBBBB; }
+    .campo-input:focus { background: var(--branco); border-color: var(--laranja); box-shadow: 0 0 0 3px rgba(241,90,36,0.10); }
+    .campo-nota { font-size: 0.74rem; color: var(--cinza-texto); font-style: italic; }
+    .campo-select { width: 100%; background: var(--cinza-input); border: 1.5px solid transparent; border-radius: 8px; padding: 12px 36px 12px 14px; font-family: 'Inter', sans-serif; font-size: 0.86rem; color: var(--preto); outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; transition: border-color 0.18s; }
+    .campo-select:focus { background-color: var(--branco); border-color: var(--laranja); box-shadow: 0 0 0 3px rgba(241,90,36,0.10); }
+
+    .cursos-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+    .curso-check { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 13px 16px; border-radius: 8px; border: 1.5px solid var(--cinza-linha); background: #F9F9F9; transition: border-color 0.15s, background 0.15s; user-select: none; }
+    .curso-check:hover { border-color: var(--laranja); background: var(--laranja-light); }
+    .curso-check.marcada { border-color: var(--laranja); background: var(--laranja-light); }
+    .curso-check input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--laranja); cursor: pointer; flex-shrink: 0; margin: 0; padding: 0; }
+    .curso-check .cc-info .cc-nome  { font-size: 0.88rem; font-weight: 600; color: var(--preto); }
+    .curso-check .cc-info .cc-sigla { font-size: 0.75rem; color: var(--cinza-texto); margin-top: 2px; }
+
+    .modal-tabs { display: flex; gap: 8px; margin-bottom: 18px; }
+    .modal-tab { flex: 1; padding: 10px; border-radius: 8px; border: 1.5px solid var(--cinza-linha); background: #F5F5F5; color: var(--cinza-texto); font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+    .modal-tab:hover { border-color: var(--laranja); color: var(--laranja); }
+    .modal-tab.activo { background: var(--laranja); border-color: var(--laranja); color: var(--branco); font-weight: 700; }
+
+    .campo-textarea { width: 100%; background: var(--cinza-input); border: 1.5px solid transparent; border-radius: 8px; padding: 12px 14px; font-family: 'Inter', sans-serif; font-size: 0.86rem; color: var(--preto); outline: none; resize: vertical; min-height: 110px; transition: border-color 0.18s; }
+    .campo-textarea::placeholder { color: #BBBBBB; }
+    .campo-textarea:focus { background: var(--branco); border-color: var(--vermelho); box-shadow: 0 0 0 3px rgba(192,0,0,0.10); }
+
+    .btn-m-cancelar { background: #F0F0F0; color: #666; border: none; border-radius: 8px; padding: 10px 20px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 500; cursor: pointer; }
+    .btn-m-cancelar:hover { background: #E4E4E4; }
+    .btn-m-laranja  { background: var(--laranja); color: var(--branco); border: none; border-radius: 8px; padding: 10px 22px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; }
+    .btn-m-laranja:hover    { background: var(--laranja-hover); }
+    .btn-m-laranja:disabled { opacity: 0.65; cursor: not-allowed; }
+    .btn-m-vermelho { background: var(--vermelho); color: var(--branco); border: none; border-radius: 8px; padding: 10px 22px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; }
+    .btn-m-vermelho:disabled { opacity: 0.65; cursor: not-allowed; }
+    .btn-m-azul { background: var(--azul); color: var(--branco); border: none; border-radius: 8px; padding: 10px 22px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; }
+    .btn-m-azul:disabled { opacity: 0.65; cursor: not-allowed; }
+    .btn-m-verde { background: var(--verde); color: var(--branco); border: none; border-radius: 8px; padding: 10px 22px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; }
+
+    /* Detalhe proposta */
+    .detalhe-secao { margin-bottom: 20px; }
+    .detalhe-secao h3 { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--preto); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--cinza-linha); }
+    .detalhe-secao p { font-size: 0.87rem; color: #444; line-height: 1.7; }
+    .detalhe-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .detalhe-meta-item { background: var(--cinza-input); border-radius: 8px; padding: 10px 14px; }
+    .detalhe-meta-item .dm-label { font-size: 0.7rem; color: var(--cinza-texto); font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px; }
+    .detalhe-meta-item .dm-valor { font-size: 0.86rem; font-weight: 600; color: var(--preto); }
+    .area-tag-d { display: inline-block; background: var(--azul-light); color: var(--azul); border-radius: 4px; padding: 3px 10px; font-size: 0.72rem; font-weight: 700; margin-right: 5px; margin-bottom: 5px; }
+    .tipo-tag { display: inline-block; padding: 4px 12px; border-radius: 5px; font-size: 0.74rem; font-weight: 700; }
+    .tipo-tag.estagio  { background: var(--laranja-light); color: var(--laranja); }
+    .tipo-tag.projecto { background: var(--azul-light); color: var(--azul); }
+
+    .spin { display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: girar 0.6s linear infinite; vertical-align: middle; margin-right: 6px; }
+    @keyframes girar { to { transform: rotate(360deg); } }
+
+    .menu-toggle { display: none; position: fixed; top: 14px; left: 14px; z-index: 200; background: var(--laranja); border: none; border-radius: 8px; padding: 8px 10px; cursor: pointer; color: white; font-size: 1.1rem; }
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 90; }
+
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
+      .sidebar.aberta { transform: translateX(0); }
+      .sidebar-overlay.visivel { display: block; }
+      .main { margin-left: 0; }
+      .menu-toggle { display: block; }
+      .topbar { padding-left: 56px; }
+      .content { padding: 18px 14px; }
+      .tabs { gap: 6px; }
+      .tab { padding: 8px 12px; font-size: 0.77rem; }
+      .datas-grid { grid-template-columns: 1fr; }
+      .detalhe-meta { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="menu-toggle" id="menuToggle">☰</button>
+<div class="sidebar-overlay" id="overlay"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><span>ESMAD</span></div>
+  <nav class="sidebar-nav">
+    <a class="nav-item" onclick="mudarTab('todas')">Todas as Propostas</a>
+    <a class="nav-item activo" id="navGestao" onclick="mudarTab('docentes')">Gestão</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="nome" id="sidebarNome">—</div>
+    <div class="perfil">Comissão</div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left"></div>
+    <div class="topbar-centro">
+      <div class="titulo">Painel da CCA</div>
+      <div class="subtitulo" id="topbarSub">Gestão e aprovação de propostas</div>
+    </div>
+    <div class="avatar" id="avatar">?</div>
+  </div>
+
+  <div class="content">
+    <div class="tabs">
+      <button class="tab inactivo" id="tabTodas"     onclick="mudarTab('todas')">Todas as Propostas</button>
+      <button class="tab inactivo" id="tabPendentes" onclick="mudarTab('pendentes')">
+        Propostas Pendentes <span class="badge-count" id="badgePendentes" style="display:none">0</span>
+      </button>
+      <button class="tab activo"   id="tabDocentes"  onclick="mudarTab('docentes')">Docentes CCA</button>
+      <button class="tab inactivo" id="tabCursos"    onclick="mudarTab('cursos')">Cursos</button>
+      <button class="tab inactivo" id="tabAreas"     onclick="mudarTab('areas')">Áreas</button>
+      <button class="tab inactivo" id="tabDatas"     onclick="mudarTab('datas')">Datas do Processo</button>
+    </div>
+    <div id="conteudoTab"></div>
+  </div>
+</main>
+
+<!-- MODAL DETALHE DA PROPOSTA -->
+<div class="modal-overlay" id="modalDetalhe">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-topo"></div>
+    <div class="modal-header">
+      <div>
+        <h2 id="detalheTitulo">—</h2>
+        <div class="sub" id="detalheSub">—</div>
+      </div>
+      <button class="btn-fechar" onclick="fecharModal('modalDetalhe')">✕</button>
+    </div>
+    <div class="modal-body" id="detalheBody">
+      <div class="vazio"><div class="emoji">⏳</div>A carregar…</div>
+    </div>
+    <div class="modal-footer" id="detalheFooter">
+      <button class="btn-m-cancelar" onclick="fecharModal('modalDetalhe')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL APROVAR COM SUGESTÃO OPCIONAL -->
+<div class="modal-overlay" id="modalAprovar">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-topo"></div>
+    <div class="modal-header">
+      <div><h2>Aprovar Proposta</h2><div class="sub" id="aprovarSub">—</div></div>
+      <button class="btn-fechar" onclick="fecharModal('modalAprovar')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="alertaAprovar" class="alerta-modal"></div>
+      <div class="linha-modal"></div>
+      <label class="campo-label">Sugestão de melhoria <span style="color:var(--cinza-texto);font-weight:400;text-transform:none;font-size:0.72rem">(opcional)</span></label>
+      <textarea class="campo-textarea" id="sugestaoAprovar" placeholder="Podes deixar uma sugestão de melhoria para o proponente, mesmo aprovando…" style="border-color:transparent"></textarea>
+      <p class="campo-nota" style="margin-top:6px">A proposta será aprovada mesmo que não escrevas nada.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-m-cancelar" onclick="fecharModal('modalAprovar')">Cancelar</button>
+      <button class="btn-m-verde" id="btnConfirmarAprovar" onclick="confirmarAprovar()">✔ Aprovar Proposta</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL REJEITAR -->
+<div class="modal-overlay" id="modalRejeitar">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-topo-vm"></div>
+    <div class="modal-header">
+      <div><h2>Rejeitar Proposta</h2><div class="sub" id="rejeitarSub">—</div></div>
+      <button class="btn-fechar" onclick="fecharModal('modalRejeitar')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="alertaRejeitar" class="alerta-modal"></div>
+      <div class="linha-modal"></div>
+      <label class="campo-label">Motivo <span style="color:var(--laranja)">*</span></label>
+      <textarea class="campo-textarea" id="feedbackRejeitar" placeholder="Descreve o que deve ser melhorado…"></textarea>
+      <p class="campo-nota">O proponente receberá este feedback por notificação.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-m-cancelar" onclick="fecharModal('modalRejeitar')">Cancelar</button>
+      <button class="btn-m-vermelho" id="btnConfirmarRejeitar" onclick="confirmarRejeitar()">Enviar Feedback</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL APROVAÇÕES -->
+<div class="modal-overlay" id="modalAprovacoes">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-topo"></div>
+    <div class="modal-header">
+      <div><h2>Estado de Aprovação</h2><div class="sub" id="aprovacoesSub">—</div></div>
+      <button class="btn-fechar" onclick="fecharModal('modalAprovacoes')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="linha-modal"></div>
+      <div style="font-size:0.8rem;font-weight:700;color:var(--preto);margin-bottom:4px">Membros com acesso a este curso</div>
+      <div class="barra-prog-bg"><div class="barra-prog-fill" id="barraProgFill" style="width:0%"></div></div>
+      <div class="barra-prog-label" id="barraProgLabel">—</div>
+      <table class="votos-tabela" style="width:100%;border-collapse:collapse;margin-top:14px">
+        <thead><tr><th>Membro</th><th>Cursos CCA</th><th>Voto</th><th>Data</th></tr></thead>
+        <tbody id="tabelaVotos"><tr><td colspan="4" style="text-align:center;padding:20px;color:var(--cinza-texto)">A carregar…</td></tr></tbody>
+      </table>
+    </div>
+    <div class="modal-footer"><button class="btn-m-cancelar" onclick="fecharModal('modalAprovacoes')">Fechar</button></div>
+  </div>
+</div>
+
+<!-- MODAL ATRIBUIR -->
+<div class="modal-overlay" id="modalAtribuir">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-topo"></div>
+    <div class="modal-header">
+      <div><h2>Atribuir Orientador CCA</h2><div class="sub" id="atribuirSub">—</div></div>
+      <button class="btn-fechar" onclick="fecharModal('modalAtribuir')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="alertaAtribuir" class="alerta-modal"></div>
+      <div class="linha-modal"></div>
+      <label class="campo-label">Selecionar docente</label>
+      <select class="campo-select" id="selectOrientador"><option value="">Selecionar…</option></select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-m-cancelar" onclick="fecharModal('modalAtribuir')">Cancelar</button>
+      <button class="btn-m-azul" id="btnConfirmarAtribuir" onclick="confirmarAtribuir()">Atribuir Orientador</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ADICIONAR DOCENTE -->
+<div class="modal-overlay" id="modalDocente">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-topo"></div>
+    <div class="modal-header">
+      <div><h2>Adicionar Docente à CCA</h2><div class="sub">Define o docente e os cursos a que pertence</div></div>
+      <button class="btn-fechar" onclick="fecharModal('modalDocente')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="alertaDocente" class="alerta-modal"></div>
+      <div class="linha-modal"></div>
+      <div class="modal-tabs">
+        <button class="modal-tab activo" id="tabModalExistente" onclick="mudarTabDocente('existente')">👥 Com conta na app</button>
+        <button class="modal-tab"        id="tabModalConvite"   onclick="mudarTabDocente('convite')">✉️ Convidar por email</button>
+      </div>
+      <div id="painelExistente">
+        <label class="campo-label">Selecionar docente <span style="color:var(--laranja)">*</span></label>
+        <select class="campo-select" id="selectDocente" style="margin-bottom:18px"><option value="">A carregar…</option></select>
+      </div>
+      <div id="painelConvite" style="display:none">
+        <label class="campo-label">Email do docente <span style="color:var(--laranja)">*</span></label>
+        <input type="email" class="campo-input" id="emailConvite" placeholder="docente@esmad.ipp.pt" style="margin-bottom:10px">
+        <div style="background:var(--azul-light);border-radius:8px;padding:11px 14px;font-size:0.79rem;color:var(--azul);line-height:1.5;margin-bottom:18px">
+          📧 Se já tiver conta é adicionado diretamente. Caso contrário receberá um email de convite.
+        </div>
+      </div>
+      <label class="campo-label">Cursos na CCA <span style="color:var(--laranja)">*</span></label>
+      <div class="cursos-grid">
+        <label class="curso-check" id="checkDTAM">
+          <input type="checkbox" value="TeSP DTAM" class="curso-cb">
+          <div class="cc-info"><div class="cc-nome">CTeSP — Design e Tecnologias para Aplicações Móveis</div><div class="cc-sigla">TeSP DTAM</div></div>
+        </label>
+        <label class="curso-check" id="checkTSI">
+          <input type="checkbox" value="Lic. TSI Web" class="curso-cb">
+          <div class="cc-info"><div class="cc-nome">Licenciatura — Tecnologias e Sistemas de Informação para a Web</div><div class="cc-sigla">Lic. TSI Web</div></div>
+        </label>
+      </div>
+      <p class="campo-nota">Com ambos selecionados, pode aprovar propostas de qualquer curso.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-m-cancelar" onclick="fecharModal('modalDocente')">Cancelar</button>
+      <button class="btn-m-laranja" id="btnAdicionarDocente" onclick="confirmarAdicionarDocente()">Adicionar à CCA</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR CURSOS -->
+<div class="modal-overlay" id="modalEditarCursos">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-topo"></div>
+    <div class="modal-header">
+      <div><h2>Editar Cursos</h2><div class="sub" id="editarCursosSub">—</div></div>
+      <button class="btn-fechar" onclick="fecharModal('modalEditarCursos')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="alertaEditarCursos" class="alerta-modal"></div>
+      <div class="linha-modal"></div>
+      <label class="campo-label">Cursos na CCA <span style="color:var(--laranja)">*</span></label>
+      <div class="cursos-grid">
+        <label class="curso-check" id="editCheckDTAM">
+          <input type="checkbox" value="TeSP DTAM" class="edit-curso-cb">
+          <div class="cc-info"><div class="cc-nome">CTeSP DTAM</div><div class="cc-sigla">TeSP DTAM</div></div>
+        </label>
+        <label class="curso-check" id="editCheckTSI">
+          <input type="checkbox" value="Lic. TSI Web" class="edit-curso-cb">
+          <div class="cc-info"><div class="cc-nome">Licenciatura TSI Web</div><div class="cc-sigla">Lic. TSI Web</div></div>
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-m-cancelar" onclick="fecharModal('modalEditarCursos')">Cancelar</button>
+      <button class="btn-m-laranja" id="btnGuardarCursos" onclick="guardarCursosMembro()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CURSO -->
+<div class="modal-overlay" id="modalCurso">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-topo"></div>
+    <div class="modal-header"><div><h2>Adicionar Curso</h2></div><button class="btn-fechar" onclick="fecharModal('modalCurso')">✕</button></div>
+    <div class="modal-body">
+      <div id="alertaCurso" class="alerta-modal"></div>
+      <div class="linha-modal"></div>
+      <label class="campo-label">Nome do Curso <span style="color:var(--laranja)">*</span></label>
+      <input type="text" class="campo-input" id="nomeCurso" placeholder="Ex: Licenciatura em Design de Comunicação" style="margin-bottom:12px">
+      <label class="campo-label">Sigla <span style="color:var(--laranja)">*</span></label>
+      <input type="text" class="campo-input" id="siglaCurso" placeholder="Ex: Lic. DC">
+    </div>
+    <div class="modal-footer">
+      <button class="btn-m-cancelar" onclick="fecharModal('modalCurso')">Cancelar</button>
+      <button class="btn-m-laranja" onclick="confirmarAdicionarCurso()">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ÁREA -->
+<div class="modal-overlay" id="modalArea">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-topo"></div>
+    <div class="modal-header"><div><h2>Adicionar Área</h2></div><button class="btn-fechar" onclick="fecharModal('modalArea')">✕</button></div>
+    <div class="modal-body">
+      <div id="alertaArea" class="alerta-modal"></div>
+      <div class="linha-modal"></div>
+      <label class="campo-label">Nome da Área <span style="color:var(--laranja)">*</span></label>
+      <input type="text" class="campo-input" id="nomeArea" placeholder="Ex: Developer IoT">
+    </div>
+    <div class="modal-footer">
+      <button class="btn-m-cancelar" onclick="fecharModal('modalArea')">Cancelar</button>
+      <button class="btn-m-laranja" onclick="confirmarAdicionarArea()">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = 'http://localhost:5000/api';
+  const token = localStorage.getItem('esmad_token');
+  const user  = localStorage.getItem('esmad_user');
+  if (!token || !user) { window.location.href = 'login.html'; }
+  const utilizador = JSON.parse(user);
+  if (!['comissao','admin'].includes(utilizador.perfil)) { window.location.href = 'login.html'; }
+
+  document.getElementById('sidebarNome').textContent = utilizador.nome;
+  document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
+  document.getElementById('avatar').addEventListener('click', () => {
+    if (confirm('Tens a certeza que queres fazer logout?')) { localStorage.clear(); window.location.href = 'login.html'; }
+  });
+
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  document.getElementById('menuToggle').addEventListener('click', () => { sidebar.classList.toggle('aberta'); overlay.classList.toggle('visivel'); });
+  overlay.addEventListener('click', () => { sidebar.classList.remove('aberta'); overlay.classList.remove('visivel'); });
+
+  function req(endpoint, opts = {}) {
+    return fetch(`${API}${endpoint}`, {
+      ...opts,
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...(opts.headers||{}) }
+    }).then(r => r.json());
+  }
+
+  function formatarData(str) {
+    if (!str) return '—';
+    return new Date(str).toLocaleDateString('pt-PT', { day:'2-digit', month:'2-digit', year:'2-digit' });
+  }
+
+  function renderCursosBadge(cursos) {
+    if (!cursos || cursos.length === 0) return '<span style="color:var(--cinza-texto);font-size:0.8rem">Todos os cursos</span>';
+    return cursos.map(c => c === 'TeSP DTAM'
+      ? '<span class="curso-badge ctesp">TeSP DTAM</span>'
+      : '<span class="curso-badge lic">Lic. TSI Web</span>'
+    ).join('');
+  }
+
+  let tabActiva = 'docentes';
+  let propostaActiva = null;
+  let membroEditarId = null;
+  let tabDocenteActiva = 'existente';
+
+  document.querySelectorAll('.modal-overlay').forEach(el => {
+    el.addEventListener('click', e => { if (e.target === el) fecharModal(el.id); });
+  });
+
+  function fecharModal(id) {
+    document.getElementById(id).classList.remove('aberto');
+    document.body.style.overflow = '';
+    const al = document.getElementById(id).querySelector('.alerta-modal');
+    if (al) al.className = 'alerta-modal';
+  }
+  function abrirModal(id) {
+    document.getElementById(id).classList.add('aberto');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function bindCursoChecks(sel) {
+    document.querySelectorAll(sel).forEach(cb => {
+      cb.addEventListener('change', () => cb.closest('.curso-check').classList.toggle('marcada', cb.checked));
+    });
+  }
+  bindCursoChecks('.curso-cb');
+  bindCursoChecks('.edit-curso-cb');
+
+  function getCursosSeleccionados(sel) {
+    return [...document.querySelectorAll(sel + ':checked')].map(cb => cb.value);
+  }
+
+  // ══ NAVEGAÇÃO ══
+  function mudarTab(tab) {
+    tabActiva = tab;
+    ['pendentes','todas','docentes','cursos','areas','datas'].forEach(t => {
+      const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+      if (btn) btn.className = t === tab ? 'tab activo' : 'tab inactivo';
+    });
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('activo'));
+    if (tab === 'pendentes') document.querySelectorAll('.nav-item')[0].classList.add('activo');
+    else if (tab === 'todas') document.querySelectorAll('.nav-item')[0].classList.add('activo');
+    else document.getElementById('navGestao').classList.add('activo');
+
+    const subs = { pendentes:'Propostas pendentes de aprovação', todas:'Todas as propostas', docentes:'Gerir membros da CCA por curso', cursos:'Gerir cursos', areas:'Gerir áreas', datas:'Datas do processo' };
+    document.getElementById('topbarSub').textContent = subs[tab] || '';
+
+    const url = new URL(window.location);
+    url.searchParams.set('tab', tab);
+    window.history.replaceState({}, '', url);
+
+    sidebar.classList.remove('aberta'); overlay.classList.remove('visivel');
+
+    if (tab === 'pendentes') carregarPendentes();
+    if (tab === 'todas')     carregarTodas();
+    if (tab === 'docentes')  carregarDocentes();
+    if (tab === 'cursos')    renderCursos();
+    if (tab === 'areas')     renderAreas();
+    if (tab === 'datas')     renderDatas();
+  }
+
+  // ══ DETALHE DA PROPOSTA ══
+  async function abrirDetalhe(id, titulo, entidade) {
+    document.getElementById('detalheTitulo').textContent = titulo;
+    document.getElementById('detalheSub').textContent    = entidade || '—';
+    document.getElementById('detalheBody').innerHTML     = '<div class="vazio"><div class="emoji">⏳</div>A carregar…</div>';
+
+    // Footer com botões de acção (depende se já votou)
+    document.getElementById('detalheFooter').innerHTML = '<button class="btn-m-cancelar" onclick="fecharModal(\'modalDetalhe\')">Fechar</button>';
+
+    abrirModal('modalDetalhe');
+
+    try {
+      const [dadosProp, dadosAprov] = await Promise.all([
+        req(`/propostas/${id}`),
+        req(`/cca/propostas/${id}/aprovacoes`)
+      ]);
+
+      if (!dadosProp.sucesso) throw new Error(dadosProp.mensagem);
+      const p = dadosProp.proposta;
+
+      // Verificar se o utilizador já votou
+      let jaVotou = false;
+      let meuVoto = null;
+      if (dadosAprov.sucesso) {
+        const meuRegisto = dadosAprov.membros.find(m => m.membroId?.toString() === utilizador.id?.toString());
+        if (meuRegisto && meuRegisto.decisao !== 'pendente') {
+          jaVotou = true;
+          meuVoto = meuRegisto.decisao;
+        }
+      }
+
+      const estadoLabel = { aprovada:'Aprovada', pendente:'Pendente', rejeitada:'Rejeitada', atribuida:'Atribuída' };
+
+      document.getElementById('detalheBody').innerHTML = `
+        <div class="linha-modal"></div>
+
+        <div class="detalhe-meta">
+          <div class="detalhe-meta-item">
+            <div class="dm-label">Entidade</div>
+            <div class="dm-valor">${p.nomeEntidade || p.proponenteId?.nome || '—'}</div>
+          </div>
+          <div class="detalhe-meta-item">
+            <div class="dm-label">Tipo</div>
+            <div class="dm-valor"><span class="tipo-tag ${p.tipo}">${p.tipo === 'estagio' ? 'Estágio' : 'Projeto'}</span></div>
+          </div>
+          <div class="detalhe-meta-item">
+            <div class="dm-label">Curso</div>
+            <div class="dm-valor">${p.curso || '—'}</div>
+          </div>
+          <div class="detalhe-meta-item">
+            <div class="dm-label">Estado</div>
+            <div class="dm-valor">${estadoLabel[p.estado] || p.estado}</div>
+          </div>
+          ${p.tutorNome ? `
+          <div class="detalhe-meta-item">
+            <div class="dm-label">Tutor na Entidade</div>
+            <div class="dm-valor">${p.tutorNome}${p.tutorCargo ? ' · ' + p.tutorCargo : ''}</div>
+          </div>
+          <div class="detalhe-meta-item">
+            <div class="dm-label">Email do Tutor</div>
+            <div class="dm-valor">${p.tutorEmail || '—'}</div>
+          </div>` : ''}
+          ${p.moradaEntidade ? `
+          <div class="detalhe-meta-item" style="grid-column:1/-1">
+            <div class="dm-label">Morada da Entidade</div>
+            <div class="dm-valor">${p.moradaEntidade}</div>
+          </div>` : ''}
+        </div>
+
+        ${p.areas?.length ? `
+        <div class="detalhe-secao">
+          <h3>Áreas de Atuação</h3>
+          <div>${p.areas.map(a => `<span class="area-tag-d">${a}</span>`).join('')}</div>
+        </div>` : ''}
+
+        ${p.descricao || p.objetivos ? `
+        <div class="detalhe-secao">
+          <h3>Objetivos</h3>
+          <p>${(p.objetivos || p.descricao || '').replace(/\n/g, '<br>')}</p>
+        </div>` : ''}
+
+        ${p.resultadosEsperados ? `
+        <div class="detalhe-secao">
+          <h3>Resultados Esperados</h3>
+          <p>${p.resultadosEsperados.replace(/\n/g, '<br>')}</p>
+        </div>` : ''}
+
+        ${p.planoTrabalho ? `
+        <div class="detalhe-secao">
+          <h3>Plano Provisório de Trabalho</h3>
+          <p>${p.planoTrabalho.replace(/\n/g, '<br>')}</p>
+        </div>` : ''}
+
+        ${p.perfilCandidato ? `
+        <div class="detalhe-secao">
+          <h3>Perfil do Candidato</h3>
+          <p>${p.perfilCandidato.replace(/\n/g, '<br>')}</p>
+        </div>` : ''}
+
+        ${p.feedbackCCA ? `
+        <div class="detalhe-secao">
+          <h3>Feedback da CCA</h3>
+          <p style="color:var(--vermelho)">${p.feedbackCCA}</p>
+        </div>` : ''}
+
+        ${jaVotou ? `
+        <div style="background:var(--verde-light);border-radius:8px;padding:12px 16px;margin-top:8px;font-size:0.84rem;color:var(--verde);font-weight:600">
+          ✔ Já votaste nesta proposta — ${meuVoto === 'aprovado' ? 'Aprovaste' : 'Rejeitaste'}
+        </div>` : ''}
+      `;
+
+      // Footer com acções conforme estado e voto
+      const footer = document.getElementById('detalheFooter');
+      if (p.estado === 'pendente' && !jaVotou) {
+        footer.innerHTML = `
+          <button class="btn-m-cancelar" onclick="fecharModal('modalDetalhe')">Fechar</button>
+          <button class="btn-m-vermelho" onclick="fecharModal('modalDetalhe');abrirRejeitar('${p._id}','${p.titulo.replace(/'/g,"\\'")}','${(p.nomeEntidade||'').replace(/'/g,"\\'")}')">
+            Rejeitar
+          </button>
+          <button class="btn-m-verde" onclick="fecharModal('modalDetalhe');aprovar('${p._id}','${p.titulo.replace(/'/g,"\\'")}','${(p.nomeEntidade||'').replace(/'/g,"\\'")}')">
+            ✔ Aprovar
+          </button>`;
+      } else {
+        footer.innerHTML = `
+          <button class="btn-m-cancelar" onclick="fecharModal('modalDetalhe')">Fechar</button>
+          <button class="btn-m-laranja" onclick="fecharModal('modalDetalhe');abrirAprovacoes('${p._id}','${p.titulo.replace(/'/g,"\\'")}','')">
+            Ver Votos
+          </button>`;
+      }
+
+    } catch (err) {
+      document.getElementById('detalheBody').innerHTML = `<div class="vazio"><div class="emoji">⚠️</div>${err.message}</div>`;
+    }
+  }
+
+  // ══ PENDENTES ══
+  async function carregarPendentes() {
+    document.getElementById('conteudoTab').innerHTML = `
+      <div id="alertaPBox" style="display:none" class="alerta-pendentes">
+        <div><div class="texto" id="alertaPTexto">—</div><div class="sub">Clica no título para ver os detalhes e votar.</div></div>
+      </div>
+      <div class="painel">
+        <div class="painel-header"><h2>Propostas Pendentes <span class="badge-count" id="badgePTab">0</span></h2></div>
+        <table>
+          <thead><tr><th>Título</th><th>Tipo</th><th>Proponente</th><th>Submetida</th><th>Orientador</th><th>Ações</th></tr></thead>
+          <tbody id="tbPendentes"><tr><td colspan="6"><div class="vazio"><div class="emoji">⏳</div>A carregar…</div></td></tr></tbody>
+        </table>
+      </div>`;
+
+    try {
+      const dados = await req('/cca/propostas/pendentes');
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+      const total = dados.total;
+      document.getElementById('badgePTab').textContent = total;
+      const topBadge = document.getElementById('badgePendentes');
+      if (topBadge) { topBadge.textContent = total; topBadge.style.display = total > 0 ? '' : 'none'; }
+      if (total > 0) { document.getElementById('alertaPTexto').textContent = `${total} proposta${total !== 1 ? 's' : ''} aguarda${total === 1 ? '' : 'm'} aprovação`; document.getElementById('alertaPBox').style.display = 'flex'; }
+
+      const tbody = document.getElementById('tbPendentes');
+      if (!total) { tbody.innerHTML = `<tr><td colspan="6"><div class="vazio"><div class="emoji">✅</div>Não há propostas pendentes.</div></td></tr>`; return; }
+
+      // Verificar votos do utilizador actual para cada proposta
+      const votosMap = {};
+      await Promise.all(dados.propostas.map(async p => {
+        try {
+          const av = await req(`/cca/propostas/${p._id}/aprovacoes`);
+          if (av.sucesso) {
+            const meu = av.membros.find(m => m.membroId?.toString() === utilizador.id?.toString());
+            votosMap[p._id] = meu?.decisao || 'pendente';
+          }
+        } catch { votosMap[p._id] = 'pendente'; }
+      }));
+
+      tbody.innerHTML = dados.propostas.map(p => {
+        const jaVotou = votosMap[p._id] && votosMap[p._id] !== 'pendente';
+        const meuVoto = votosMap[p._id];
+
+        const botoesAcao = jaVotou
+          ? `<span class="badge-votado">✔ ${meuVoto === 'aprovado' ? 'Aprovaste' : 'Rejeitaste'}</span>`
+          : `<button class="btn-aprovar"  onclick="aprovar('${p._id}','${p.titulo.replace(/'/g,"\\'")}','${(p.nomeEntidade||p.proponenteId?.nome||'').replace(/'/g,"\\'")}')">Aprovar</button>
+             <button class="btn-rejeitar" onclick="abrirRejeitar('${p._id}','${p.titulo.replace(/'/g,"\\'")}','${(p.nomeEntidade||p.proponenteId?.nome||'').replace(/'/g,"\\'")}')">Rejeitar</button>`;
+
+        return `<tr>
+          <td>
+            <span class="titulo-link" onclick="abrirDetalhe('${p._id}','${p.titulo.replace(/'/g,"\\'")}','${(p.nomeEntidade||p.proponenteId?.nome||'').replace(/'/g,"\\'")}')">${p.titulo}</span>
+            <div style="font-size:0.72rem;color:var(--azul);margin-top:2px">${p.curso}</div>
+          </td>
+          <td><span class="tag ${p.tipo}">${p.tipo === 'estagio' ? 'Estágio' : 'Projeto'}</span></td>
+          <td>${p.nomeEntidade || p.proponenteId?.nome || '—'}</td>
+          <td>${formatarData(p.criadaEm)}</td>
+          <td><button class="btn-atribuir" onclick="abrirAtribuir('${p._id}','${p.titulo.replace(/'/g,"\\'")}')">Atribuir</button></td>
+          <td><div class="acoes">
+            ${botoesAcao}
+            <button class="btn-ver-votos" onclick="abrirAprovacoes('${p._id}','${p.titulo.replace(/'/g,"\\'")}','${(p.nomeEntidade||p.proponenteId?.nome||'').replace(/'/g,"\\'")}')">Votos</button>
+          </div></td>
+        </tr>`;
+      }).join('');
+
+    } catch (err) {
+      document.getElementById('tbPendentes').innerHTML = `<tr><td colspan="6"><div class="vazio"><div class="emoji">⚠️</div>${err.message}</div></td></tr>`;
+    }
+  }
+
+  // ══ TODAS ══
+  async function carregarTodas(estado = '') {
+    document.getElementById('conteudoTab').innerHTML = `
+      <div class="painel">
+        <div class="painel-header">
+          <h2>Todas as Propostas</h2>
+          <select class="filtro-estado" id="filtroEstado">
+            <option value="">Todos os estados</option>
+            <option value="pendente">Pendente</option>
+            <option value="aprovada">Aprovada</option>
+            <option value="rejeitada">Rejeitada</option>
+            <option value="atribuida">Atribuída</option>
+          </select>
+        </div>
+        <table>
+          <thead><tr><th>Título</th><th>Tipo</th><th>Proponente</th><th>Data</th><th>Estado</th><th>Ações</th></tr></thead>
+          <tbody id="tbTodas"><tr><td colspan="6"><div class="vazio"><div class="emoji">⏳</div>A carregar…</div></td></tr></tbody>
+        </table>
+      </div>`;
+
+    document.getElementById('filtroEstado').value = estado;
+    document.getElementById('filtroEstado').addEventListener('change', e => carregarTodas(e.target.value));
+
+    try {
+      const dados = await req('/cca/propostas' + (estado ? '?estado=' + estado : ''));
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+      const tbody = document.getElementById('tbTodas');
+      if (!dados.total) { tbody.innerHTML = `<tr><td colspan="6"><div class="vazio"><div class="emoji">📭</div>Sem propostas.</div></td></tr>`; return; }
+      const el = { aprovada:'Aprovada', pendente:'Pendente', rejeitada:'Rejeitada', atribuida:'Atribuída' };
+
+      // Verificar votos apenas nas propostas pendentes
+      const votosMap = {};
+      const pendentes = dados.propostas.filter(p => p.estado === 'pendente');
+      await Promise.all(pendentes.map(async p => {
+        try {
+          const av = await req(`/cca/propostas/${p._id}/aprovacoes`);
+          if (av.sucesso) {
+            const meu = av.membros.find(m => m.membroId?.toString() === utilizador.id?.toString());
+            votosMap[p._id] = meu?.decisao || 'pendente';
+          }
+        } catch { votosMap[p._id] = 'pendente'; }
+      }));
+
+      tbody.innerHTML = dados.propostas.map(p => {
+        const jaVotou = p.estado === 'pendente' && votosMap[p._id] && votosMap[p._id] !== 'pendente';
+        const meuVoto = votosMap[p._id];
+
+        let botoesAcao = '';
+        if (p.estado === 'pendente') {
+          botoesAcao = jaVotou
+            ? `<span class="badge-votado">✔ ${meuVoto === 'aprovado' ? 'Aprovaste' : 'Rejeitaste'}</span>`
+            : `<button class="btn-aprovar" onclick="aprovar('${p._id}','${p.titulo.replace(/'/g,"\\'")}','')">Aprovar</button><button class="btn-rejeitar" onclick="abrirRejeitar('${p._id}','${p.titulo.replace(/'/g,"\\'")}','')">Rejeitar</button>`;
+        }
+
+        return `<tr>
+          <td>
+            <span class="titulo-link" onclick="abrirDetalhe('${p._id}','${p.titulo.replace(/'/g,"\\'")}','${(p.nomeEntidade||p.proponenteId?.nome||'').replace(/'/g,"\\'")}')">${p.titulo}</span>
+            <div style="font-size:0.72rem;color:var(--azul);margin-top:2px">${p.curso}</div>
+          </td>
+          <td><span class="tag ${p.tipo}">${p.tipo === 'estagio' ? 'Estágio' : 'Projeto'}</span></td>
+          <td>${p.nomeEntidade || p.proponenteId?.nome || '—'}</td>
+          <td>${formatarData(p.criadaEm)}</td>
+          <td><span class="estado ${p.estado}">${el[p.estado] || p.estado}</span></td>
+          <td><div class="acoes">
+            ${botoesAcao}
+            <button class="btn-ver-votos" onclick="abrirAprovacoes('${p._id}','${p.titulo.replace(/'/g,"\\'")}','')">Votos</button>
+          </div></td>
+        </tr>`;
+      }).join('');
+    } catch (err) {
+      document.getElementById('tbTodas').innerHTML = `<tr><td colspan="6"><div class="vazio"><div class="emoji">⚠️</div>${err.message}</div></td></tr>`;
+    }
+  }
+
+  // ══ APROVAR ══
+  let propostaAprovarId = null;
+
+  function aprovar(id, titulo, entidade) {
+    propostaAprovarId = id;
+    document.getElementById('aprovarSub').textContent = (titulo || '') + (entidade ? ' · ' + entidade : '');
+    document.getElementById('sugestaoAprovar').value = '';
+    document.getElementById('alertaAprovar').className = 'alerta-modal';
+    abrirModal('modalAprovar');
+  }
+
+  async function confirmarAprovar() {
+    const sugestao = document.getElementById('sugestaoAprovar').value.trim();
+    const al  = document.getElementById('alertaAprovar');
+    const btn = document.getElementById('btnConfirmarAprovar');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin"></span>A aprovar…';
+    try {
+      const dados = await req('/cca/propostas/' + propostaAprovarId + '/aprovar', {
+        method: 'POST',
+        body: JSON.stringify({ sugestao: sugestao || null })
+      });
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+      al.textContent = dados.proposta.estado === 'aprovada'
+        ? '✅ Proposta aprovada por todos!'
+        : `✔ Voto registado. ${dados.totalAprovados}/${dados.totalMembros} aprovaram.`;
+      al.className = 'alerta-modal sucesso';
+      btn.innerHTML = '✔ Aprovado';
+      setTimeout(() => {
+        fecharModal('modalAprovar');
+        btn.disabled = false;
+        btn.textContent = '✔ Aprovar Proposta';
+        mudarTab(tabActiva);
+      }, 1300);
+    } catch (err) {
+      al.textContent = err.message;
+      al.className = 'alerta-modal erro';
+      btn.disabled = false;
+      btn.textContent = '✔ Aprovar Proposta';
+    }
+  }
+
+  // ══ REJEITAR ══
+  function abrirRejeitar(id, titulo, entidade) {
+    propostaActiva = { id };
+    document.getElementById('rejeitarSub').textContent = titulo + (entidade ? ' · ' + entidade : '');
+    document.getElementById('feedbackRejeitar').value = '';
+    document.getElementById('alertaRejeitar').className = 'alerta-modal';
+    abrirModal('modalRejeitar');
+    setTimeout(() => document.getElementById('feedbackRejeitar').focus(), 120);
+  }
+
+  async function confirmarRejeitar() {
+    const feedback = document.getElementById('feedbackRejeitar').value.trim();
+    const al = document.getElementById('alertaRejeitar');
+    if (!feedback) { al.textContent = 'O feedback é obrigatório.'; al.className = 'alerta-modal erro'; return; }
+    const btn = document.getElementById('btnConfirmarRejeitar');
+    btn.disabled = true; btn.innerHTML = '<span class="spin"></span>A enviar…';
+    try {
+      const dados = await req('/cca/propostas/' + propostaActiva.id + '/rejeitar', { method: 'POST', body: JSON.stringify({ feedback }) });
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+      al.textContent = 'Proposta rejeitada.'; al.className = 'alerta-modal sucesso';
+      btn.innerHTML = '✔ Enviado';
+      setTimeout(() => { fecharModal('modalRejeitar'); btn.disabled = false; btn.textContent = 'Enviar Feedback'; mudarTab(tabActiva); }, 1200);
+    } catch (err) { al.textContent = err.message; al.className = 'alerta-modal erro'; btn.disabled = false; btn.textContent = 'Enviar Feedback'; }
+  }
+
+  // ══ APROVAÇÕES ══
+  async function abrirAprovacoes(id, titulo, entidade) {
+    propostaActiva = { id };
+    document.getElementById('aprovacoesSub').textContent = titulo + (entidade ? ' · ' + entidade : '');
+    document.getElementById('tabelaVotos').innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--cinza-texto)">A carregar…</td></tr>';
+    document.getElementById('barraProgFill').style.width = '0%';
+    document.getElementById('barraProgLabel').textContent = '—';
+    abrirModal('modalAprovacoes');
+    try {
+      const dados = await req('/cca/propostas/' + id + '/aprovacoes');
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+      const pct = dados.total > 0 ? Math.round((dados.aprovados / dados.total) * 100) : 0;
+      document.getElementById('barraProgFill').style.width = pct + '%';
+      document.getElementById('barraProgLabel').textContent = `${dados.aprovados} de ${dados.total} membros aprovaram`;
+      const vB = d => ({ aprovado:'<span class="voto-badge aprovado">✔ Aprovado</span>', rejeitado:'<span class="voto-badge rejeitado">✕ Rejeitado</span>', pendente:'<span class="voto-badge pendente">⏳ Pendente</span>' }[d] || d);
+      document.getElementById('tabelaVotos').innerHTML = dados.membros.map(m =>
+        `<tr><td style="font-weight:500">${m.nome}</td><td>${renderCursosBadge(m.cursosCCA)}</td><td>${vB(m.decisao)}</td><td style="font-size:0.78rem;color:var(--cinza-texto)">${formatarData(m.decididoEm)}</td></tr>`
+      ).join('');
+    } catch (err) {
+      document.getElementById('tabelaVotos').innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--vermelho);padding:16px">${err.message}</td></tr>`;
+    }
+  }
+
+  // ══ ATRIBUIR ══
+  async function abrirAtribuir(id, titulo) {
+    propostaActiva = { id };
+    document.getElementById('atribuirSub').textContent = titulo;
+    document.getElementById('selectOrientador').innerHTML = '<option value="">A carregar…</option>';
+    document.getElementById('alertaAtribuir').className = 'alerta-modal';
+    abrirModal('modalAtribuir');
+    try {
+      const dados = await req('/cca/docentes');
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+      document.getElementById('selectOrientador').innerHTML = '<option value="">Selecionar docente…</option>' +
+        dados.docentes.map(d => `<option value="${d._id}">${d.nome} — ${d.email}</option>`).join('');
+    } catch (err) { document.getElementById('selectOrientador').innerHTML = `<option value="">Erro: ${err.message}</option>`; }
+  }
+
+  async function confirmarAtribuir() {
+    const orientadorId = document.getElementById('selectOrientador').value;
+    const al = document.getElementById('alertaAtribuir');
+    if (!orientadorId) { al.textContent = 'Seleciona um docente.'; al.className = 'alerta-modal erro'; return; }
+    const btn = document.getElementById('btnConfirmarAtribuir');
+    btn.disabled = true; btn.innerHTML = '<span class="spin"></span>A atribuir…';
+    try {
+      const dados = await req('/cca/propostas/' + propostaActiva.id + '/orientador', { method: 'PUT', body: JSON.stringify({ orientadorId }) });
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+      al.textContent = 'Orientador atribuído!'; al.className = 'alerta-modal sucesso';
+      btn.innerHTML = '✔ Atribuído';
+      setTimeout(() => { fecharModal('modalAtribuir'); btn.disabled = false; btn.textContent = 'Atribuir Tutor'; mudarTab(tabActiva); }, 1200);
+    } catch (err) { al.textContent = err.message; al.className = 'alerta-modal erro'; btn.disabled = false; btn.textContent = 'Atribuir Tutor'; }
+  }
+
+  // ══ DOCENTES ══
+  async function carregarDocentes() {
+    try {
+      const dads = await req('/cca/docentes-disponiveis');
+      const sel = document.getElementById('selectDocente');
+      if (sel && dads.sucesso) {
+        sel.innerHTML = dads.docentes.length
+          ? '<option value="">Selecionar docente…</option>' + dads.docentes.map(d => `<option value="${d._id}">${d.nome} — ${d.email}</option>`).join('')
+          : '<option value="">Sem docentes disponíveis</option>';
+      }
+    } catch {}
+
+    document.getElementById('conteudoTab').innerHTML = `
+      <div class="painel">
+        <div class="painel-header"><h2>Docentes da CCA</h2><button class="btn-adicionar" onclick="abrirModalDocente()">+ Adicionar Docente</button></div>
+        <table>
+          <thead><tr><th>Nome</th><th>Email</th><th>Cursos na CCA</th><th>Estado</th><th>Ações</th></tr></thead>
+          <tbody id="tbDocentes"><tr><td colspan="5"><div class="vazio"><div class="emoji">⏳</div>A carregar…</div></td></tr></tbody>
+        </table>
+      </div>`;
+    try {
+      const dados = await req('/cca/membros');
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+      const tbody = document.getElementById('tbDocentes');
+      if (!dados.membros.length) { tbody.innerHTML = `<tr><td colspan="5"><div class="vazio"><div class="emoji">👥</div>Sem membros na CCA.</div></td></tr>`; return; }
+      tbody.innerHTML = dados.membros.map(m => `
+        <tr>
+          <td style="font-weight:600">${m.nome}</td>
+          <td style="color:var(--cinza-texto)">${m.email}</td>
+          <td>${renderCursosBadge(m.cursosCCA)}</td>
+          <td><span class="badge-ativo">Ativo</span></td>
+          <td>
+            <button class="btn-editar-cursos" onclick="abrirEditarCursos('${m._id}','${m.nome.replace(/'/g,"\\'")}',${JSON.stringify(m.cursosCCA||[])})">✏️ Cursos</button>
+            <button class="btn-remover" onclick="removerMembro('${m._id}','${m.nome.replace(/'/g,"\\'")}')">Remover</button>
+          </td>
+        </tr>`).join('');
+    } catch (err) {
+      document.getElementById('tbDocentes').innerHTML = `<tr><td colspan="5"><div class="vazio"><div class="emoji">⚠️</div>${err.message}</div></td></tr>`;
+    }
+  }
+
+  function mudarTabDocente(tab) {
+    tabDocenteActiva = tab;
+    document.getElementById('tabModalExistente').className = tab === 'existente' ? 'modal-tab activo' : 'modal-tab';
+    document.getElementById('tabModalConvite').className   = tab === 'convite'   ? 'modal-tab activo' : 'modal-tab';
+    document.getElementById('painelExistente').style.display = tab === 'existente' ? '' : 'none';
+    document.getElementById('painelConvite').style.display   = tab === 'convite'   ? '' : 'none';
+    document.getElementById('btnAdicionarDocente').textContent = tab === 'existente' ? 'Adicionar à CCA' : 'Enviar Convite';
+    document.getElementById('alertaDocente').className = 'alerta-modal';
+  }
+
+  function abrirModalDocente() {
+    tabDocenteActiva = 'existente';
+    mudarTabDocente('existente');
+    document.querySelectorAll('.curso-cb').forEach(cb => { cb.checked = false; cb.closest('.curso-check').classList.remove('marcada'); });
+    document.getElementById('emailConvite').value = '';
+    document.getElementById('alertaDocente').className = 'alerta-modal';
+    abrirModal('modalDocente');
+  }
+
+  async function confirmarAdicionarDocente() {
+    const al  = document.getElementById('alertaDocente');
+    const btn = document.getElementById('btnAdicionarDocente');
+    al.className = 'alerta-modal';
+    const cursosCCA = getCursosSeleccionados('.curso-cb');
+    if (!cursosCCA.length) { al.textContent = 'Seleciona pelo menos um curso.'; al.className = 'alerta-modal erro'; return; }
+    if (tabDocenteActiva === 'existente') {
+      const docenteId = document.getElementById('selectDocente').value;
+      if (!docenteId) { al.textContent = 'Seleciona um docente.'; al.className = 'alerta-modal erro'; return; }
+      btn.disabled = true; btn.innerHTML = '<span class="spin"></span>A adicionar…';
+      try {
+        const dados = await req('/cca/membros/adicionar', { method: 'POST', body: JSON.stringify({ docenteId, cursosCCA }) });
+        if (!dados.sucesso) throw new Error(dados.mensagem);
+        al.textContent = `${dados.utilizador.nome} foi adicionado à CCA.`; al.className = 'alerta-modal sucesso';
+        btn.innerHTML = '✔ Adicionado';
+        setTimeout(() => { fecharModal('modalDocente'); btn.disabled = false; btn.textContent = 'Adicionar à CCA'; carregarDocentes(); }, 1200);
+      } catch (err) { al.textContent = err.message; al.className = 'alerta-modal erro'; btn.disabled = false; btn.textContent = 'Adicionar à CCA'; }
+    } else {
+      const email = document.getElementById('emailConvite').value.trim();
+      if (!email || !email.includes('@')) { al.textContent = 'Introduz um email válido.'; al.className = 'alerta-modal erro'; return; }
+      btn.disabled = true; btn.innerHTML = '<span class="spin"></span>A enviar convite…';
+      try {
+        const dados = await req('/cca/convite', { method: 'POST', body: JSON.stringify({ email, cursosCCA }) });
+        if (!dados.sucesso) throw new Error(dados.mensagem);
+        al.textContent = dados.mensagem; al.className = 'alerta-modal sucesso';
+        btn.innerHTML = '✔ Enviado';
+        setTimeout(() => { fecharModal('modalDocente'); btn.disabled = false; btn.textContent = 'Enviar Convite'; carregarDocentes(); }, 1800);
+      } catch (err) { al.textContent = err.message; al.className = 'alerta-modal erro'; btn.disabled = false; btn.textContent = 'Enviar Convite'; }
+    }
+  }
+
+  function abrirEditarCursos(id, nome, cursosActuais) {
+    membroEditarId = id;
+    document.getElementById('editarCursosSub').textContent = nome;
+    document.getElementById('alertaEditarCursos').className = 'alerta-modal';
+    document.querySelectorAll('.edit-curso-cb').forEach(cb => {
+      cb.checked = cursosActuais.includes(cb.value);
+      cb.closest('.curso-check').classList.toggle('marcada', cb.checked);
+    });
+    abrirModal('modalEditarCursos');
+  }
+
+  async function guardarCursosMembro() {
+    const cursosCCA = getCursosSeleccionados('.edit-curso-cb');
+    const al  = document.getElementById('alertaEditarCursos');
+    const btn = document.getElementById('btnGuardarCursos');
+    if (!cursosCCA.length) { al.textContent = 'Seleciona pelo menos um curso.'; al.className = 'alerta-modal erro'; return; }
+    btn.disabled = true; btn.innerHTML = '<span class="spin"></span>A guardar…';
+    try {
+      const dados = await req('/cca/membros/' + membroEditarId + '/cursos', { method: 'PUT', body: JSON.stringify({ cursosCCA }) });
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+      al.textContent = 'Cursos actualizados.'; al.className = 'alerta-modal sucesso';
+      btn.innerHTML = '✔ Guardado';
+      setTimeout(() => { fecharModal('modalEditarCursos'); btn.disabled = false; btn.textContent = 'Guardar'; carregarDocentes(); }, 1100);
+    } catch (err) { al.textContent = err.message; al.className = 'alerta-modal erro'; btn.disabled = false; btn.textContent = 'Guardar'; }
+  }
+
+  async function removerMembro(id, nome) {
+    if (!confirm(`Remover ${nome} da CCA?`)) return;
+    try {
+      const dados = await req('/cca/membros/' + id, { method: 'DELETE' });
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+      carregarDocentes();
+    } catch (err) { alert('Erro: ' + err.message); }
+  }
+
+  // ══ CURSOS ══
+  const CURSOS_DEFAULT = [{ id:'c1', nome:'TeSP Design e Tecnologias para Aplicações Móveis', sigla:'TeSP DTAM' },{ id:'c2', nome:'Licenciatura em Tecnologias e Sistemas de Informação para a Web', sigla:'Lic. TSI Web' }];
+  const getCursos = () => { const s = localStorage.getItem('esmad_cursos'); return s ? JSON.parse(s) : [...CURSOS_DEFAULT]; };
+  const saveCursos = l => localStorage.setItem('esmad_cursos', JSON.stringify(l));
+  function renderCursos() {
+    const cursos = getCursos();
+    document.getElementById('conteudoTab').innerHTML = `<div class="painel"><div class="painel-header"><h2>Cursos Disponíveis</h2><button class="btn-adicionar" onclick="abrirModal('modalCurso')">+ Adicionar</button></div><table><thead><tr><th>Nome do Curso</th><th>Sigla</th><th>Acções</th></tr></thead><tbody>${cursos.length?cursos.map(c=>`<tr><td style="font-weight:500">${c.nome}</td><td style="font-weight:700">${c.sigla}</td><td><button class="btn-remover" onclick="removerCurso('${c.id}')">Remover</button></td></tr>`).join(''):`<tr><td colspan="3"><div class="vazio"><div class="emoji">🎓</div>Sem cursos.</div></td></tr>`}</tbody></table></div>`;
+  }
+  function confirmarAdicionarCurso() {
+    const nome=document.getElementById('nomeCurso').value.trim(),sigla=document.getElementById('siglaCurso').value.trim(),al=document.getElementById('alertaCurso');
+    if(!nome||!sigla){al.textContent='Preenche o nome e a sigla.';al.className='alerta-modal erro';return;}
+    const cursos=getCursos();cursos.push({id:'c'+Date.now(),nome,sigla});saveCursos(cursos);
+    al.textContent='Curso adicionado.';al.className='alerta-modal sucesso';
+    setTimeout(()=>{fecharModal('modalCurso');renderCursos();},900);
+  }
+  function removerCurso(id){if(!confirm('Remover este curso?'))return;saveCursos(getCursos().filter(c=>c.id!==id));renderCursos();}
+
+  // ══ ÁREAS ══
+  const AREAS_DEFAULT=['UI/UX','Developer Front-end','Developer Back-end','Developer Full-stack','Developer Mobile','Developer Games/Graphics','Marketing Digital','Outro'];
+  const getAreas=()=>{const s=localStorage.getItem('esmad_areas');return s?JSON.parse(s):[...AREAS_DEFAULT];};
+  const saveAreas=l=>localStorage.setItem('esmad_areas',JSON.stringify(l));
+  function renderAreas(){
+    const areas=getAreas();
+    document.getElementById('conteudoTab').innerHTML=`<div class="painel"><div class="painel-header"><h2>Áreas de Atuação</h2><button class="btn-adicionar" onclick="abrirModal('modalArea')">+ Adicionar</button></div><table><thead><tr><th>Área de Atuação</th><th>Acções</th></tr></thead><tbody>${areas.length?areas.map((a,i)=>`<tr><td style="font-weight:500">${a}</td><td><button class="btn-remover" onclick="removerArea(${i},'${a.replace(/'/g,"\\'")}')">Remover</button></td></tr>`).join(''):`<tr><td colspan="2"><div class="vazio"><div class="emoji">🏷️</div>Sem áreas.</div></td></tr>`}</tbody></table></div>`;
+  }
+  function confirmarAdicionarArea(){
+    const nome=document.getElementById('nomeArea').value.trim(),al=document.getElementById('alertaArea');
+    if(!nome){al.textContent='Introduz o nome.';al.className='alerta-modal erro';return;}
+    const areas=getAreas();if(areas.includes(nome)){al.textContent='Área já existe.';al.className='alerta-modal erro';return;}
+    areas.push(nome);saveAreas(areas);al.textContent='Área adicionada.';al.className='alerta-modal sucesso';
+    setTimeout(()=>{fecharModal('modalArea');renderAreas();},900);
+  }
+  function removerArea(idx,nome){if(!confirm(`Remover "${nome}"?`))return;const areas=getAreas();areas.splice(idx,1);saveAreas(areas);renderAreas();}
+
+  // ══ DATAS ══
+  const getDatas=()=>{const s=localStorage.getItem('esmad_datas');return s?JSON.parse(s):{};};
+  const saveDatas=o=>localStorage.setItem('esmad_datas',JSON.stringify(o));
+  function renderDatas(){
+    const d=getDatas();
+    document.getElementById('conteudoTab').innerHTML=`<div class="painel"><div class="painel-header"><h2>Datas do Processo</h2></div><div id="alertaDatas" class="alerta-datas"></div><div class="datas-form"><div class="datas-grupo"><div class="datas-grupo-titulo">📋 Aceitação de Propostas</div><div class="datas-grid"><div class="data-campo"><label>Início</label><input type="date" id="d_prop_inicio" value="${d.prop_inicio||''}"></div><div class="data-campo"><label>Fim</label><input type="date" id="d_prop_fim" value="${d.prop_fim||''}"></div></div></div><div class="datas-grupo"><div class="datas-grupo-titulo">🙋 Manifestação de Interesse</div><div class="datas-grid"><div class="data-campo"><label>Início</label><input type="date" id="d_int_inicio" value="${d.int_inicio||''}"></div><div class="data-campo"><label>Fim</label><input type="date" id="d_int_fim" value="${d.int_fim||''}"></div></div></div><div class="datas-grupo"><div class="datas-grupo-titulo">👨‍🏫 Atribuição de Tutores</div><div class="datas-grid"><div class="data-campo"><label>Início</label><input type="date" id="d_tut_inicio" value="${d.tut_inicio||''}"></div><div class="data-campo"><label>Fim</label><input type="date" id="d_tut_fim" value="${d.tut_fim||''}"></div></div></div></div><div class="datas-footer"><button class="btn-guardar-datas" onclick="guardarDatas()">Guardar Datas</button></div></div>`;
+  }
+  function guardarDatas(){
+    saveDatas({prop_inicio:document.getElementById('d_prop_inicio').value,prop_fim:document.getElementById('d_prop_fim').value,int_inicio:document.getElementById('d_int_inicio').value,int_fim:document.getElementById('d_int_fim').value,tut_inicio:document.getElementById('d_tut_inicio').value,tut_fim:document.getElementById('d_tut_fim').value});
+    const al=document.getElementById('alertaDatas');al.textContent='Datas guardadas!';al.className='alerta-datas sucesso';
+    setTimeout(()=>{al.className='alerta-datas';},3000);
+  }
+
+  // ── Iniciar ──
+  const urlParams = new URLSearchParams(window.location.search);
+  const tabParam  = urlParams.get('tab');
+  mudarTab(['pendentes','todas','docentes','cursos','areas','datas'].includes(tabParam) ? tabParam : 'pendentes');
+</script>
+</body>
+</html>

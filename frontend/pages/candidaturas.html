@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESMAD</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.ico">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --laranja:       #F15A24;
+      --laranja-hover: #d94d1c;
+      --laranja-light: #FEE8DF;
+      --preto:         #1A1A1A;
+      --cinza-bg:      #F4F4F4;
+      --cinza-texto:   #888888;
+      --cinza-linha:   #EEEEEE;
+      --branco:        #FFFFFF;
+      --azul:          #2E75B6;
+      --azul-light:    #EBF3FB;
+      --verde:         #70AD47;
+      --verde-light:   #E2EFDA;
+      --amarelo:       #BF8F00;
+      --amarelo-light: #FFF2CC;
+      --vermelho:      #C00000;
+      --vermelho-light:#FFDEDE;
+      --sidebar-w:     220px;
+    }
+
+    body { font-family: 'Inter', sans-serif; background: var(--cinza-bg); color: var(--preto); min-height: 100vh; display: flex; }
+
+    /* ══ SIDEBAR ══ */
+    .sidebar { width: var(--sidebar-w); background: var(--laranja); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
+    .sidebar-logo { padding: 22px 0 18px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.18); }
+    .sidebar-logo span { color: var(--branco); font-size: 1.35rem; font-weight: 800; letter-spacing: 2px; }
+    .sidebar-nav { flex: 1; padding: 12px 0; }
+    .nav-item { display: block; padding: 13px 28px; color: rgba(255,255,255,0.82); font-size: 0.88rem; font-weight: 500; text-decoration: none; cursor: pointer; border: none; background: none; width: 100%; text-align: left; transition: background 0.15s, color 0.15s; }
+    .nav-item:hover  { background: rgba(0,0,0,0.12); color: var(--branco); }
+    .nav-item.activo { background: rgba(0,0,0,0.18); color: var(--branco); font-weight: 700; }
+    .sidebar-footer { padding: 18px 28px; border-top: 1px solid rgba(255,255,255,0.18); }
+    .sidebar-footer .nome   { color: var(--branco); font-size: 0.82rem; font-weight: 600; }
+    .sidebar-footer .perfil { color: rgba(255,255,255,0.65); font-size: 0.75rem; margin-top: 2px; }
+
+    /* ══ MAIN ══ */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    .topbar { background: var(--branco); padding: 18px 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--cinza-linha); position: sticky; top: 0; z-index: 50; }
+    .topbar-centro { text-align: center; flex: 1; }
+    .topbar-centro .titulo    { font-size: 1rem; font-weight: 700; }
+    .topbar-centro .subtitulo { font-size: 0.78rem; color: var(--cinza-texto); margin-top: 1px; }
+    .avatar { width: 38px; height: 38px; background: var(--laranja); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--branco); font-weight: 700; font-size: 0.95rem; cursor: pointer; flex-shrink: 0; }
+    .topbar-left { width: 38px; }
+
+    .content { padding: 24px 32px; flex: 1; }
+
+    /* ══ ALERTA ACEITE ══ */
+    .alerta-aceite {
+      background: var(--verde-light); border: 1.5px solid var(--verde);
+      border-radius: 12px; padding: 18px 22px; margin-bottom: 22px;
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+    .alerta-aceite .icone { font-size: 1.6rem; flex-shrink: 0; }
+    .alerta-aceite .texto strong { display: block; font-size: 0.94rem; color: var(--verde); margin-bottom: 4px; }
+    .alerta-aceite .texto p { font-size: 0.82rem; color: #555; line-height: 1.5; }
+    .alerta-aceite .texto .detalhe { margin-top: 10px; background: var(--branco); border-radius: 8px; padding: 10px 14px; font-size: 0.84rem; }
+    .alerta-aceite .texto .detalhe span { font-weight: 700; color: var(--preto); }
+
+    /* ══ STATS ══ */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+    .stat-card { background: var(--branco); border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); padding: 16px 20px; text-align: center; }
+    .stat-card .num   { font-size: 1.8rem; font-weight: 800; line-height: 1; margin-bottom: 5px; }
+    .stat-card .label { font-size: 0.74rem; color: var(--cinza-texto); }
+    .stat-card.laranja { background: var(--laranja-light); }
+    .stat-card.laranja .num { color: var(--laranja); }
+    .stat-card.azul    { background: var(--azul-light); }
+    .stat-card.azul    .num { color: var(--azul); }
+    .stat-card.amarelo { background: var(--amarelo-light); }
+    .stat-card.amarelo .num { color: var(--amarelo); }
+    .stat-card.verde   { background: var(--verde-light); }
+    .stat-card.verde   .num { color: var(--verde); }
+
+    /* Skeleton */
+    .skeleton { background: linear-gradient(90deg,#ececec 25%,#f5f5f5 50%,#ececec 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 6px; }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    /* ══ FILTROS ══ */
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
+    .section-title { font-size: 1rem; font-weight: 700; }
+
+    .filtros { display: flex; gap: 8px; flex-wrap: wrap; }
+    .filtro-btn {
+      padding: 7px 16px; border-radius: 20px; border: 1.5px solid var(--cinza-linha);
+      background: var(--branco); font-family: 'Inter', sans-serif; font-size: 0.78rem;
+      font-weight: 600; color: var(--cinza-texto); cursor: pointer; transition: all 0.15s;
+    }
+    .filtro-btn:hover { border-color: var(--laranja); color: var(--laranja); }
+    .filtro-btn.activo { background: var(--laranja); border-color: var(--laranja); color: var(--branco); }
+
+    /* ══ CARDS DE CANDIDATURA ══ */
+    .candidaturas-lista { display: flex; flex-direction: column; gap: 14px; }
+
+    .cand-card {
+      background: var(--branco); border-radius: 12px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+      overflow: hidden; transition: box-shadow 0.18s;
+    }
+    .cand-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10); }
+
+    .cand-card-topo { height: 5px; }
+    .cand-card-topo.pendente           { background: var(--amarelo); }
+    .cand-card-topo.entrevista_agendada{ background: var(--azul); }
+    .cand-card-topo.aceite             { background: var(--verde); }
+    .cand-card-topo.rejeitada          { background: var(--vermelho); }
+
+    .cand-card-body { padding: 18px 22px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+    .cand-info { flex: 1; min-width: 200px; }
+    .cand-titulo { font-size: 0.96rem; font-weight: 700; color: var(--preto); margin-bottom: 4px; cursor: pointer; transition: color 0.15s; }
+    .cand-titulo:hover { color: var(--laranja); }
+    .cand-meta { font-size: 0.78rem; color: var(--cinza-texto); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+    .cand-meta span { display: flex; align-items: center; gap: 4px; }
+
+    .tag-tipo { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 0.72rem; font-weight: 700; }
+    .tag-tipo.estagio  { background: var(--laranja-light); color: var(--laranja); }
+    .tag-tipo.projecto { background: var(--azul-light); color: var(--azul); }
+
+    .cand-areas { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
+    .area-tag { background: var(--azul-light); color: var(--azul); border-radius: 4px; padding: 2px 8px; font-size: 0.7rem; font-weight: 600; }
+
+    /* Status coluna direita */
+    .cand-status { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; }
+
+    .badge-estado { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; }
+    .badge-estado::before { content: ''; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .badge-estado.pendente            { background: var(--amarelo-light); color: var(--amarelo); }
+    .badge-estado.pendente::before    { background: var(--amarelo); }
+    .badge-estado.entrevista_agendada { background: var(--azul-light); color: var(--azul); }
+    .badge-estado.entrevista_agendada::before { background: var(--azul); }
+    .badge-estado.aceite              { background: var(--verde-light); color: var(--verde); }
+    .badge-estado.aceite::before      { background: var(--verde); }
+    .badge-estado.rejeitada           { background: var(--vermelho-light); color: var(--vermelho); }
+    .badge-estado.rejeitada::before   { background: var(--vermelho); }
+
+    .cand-data { font-size: 0.76rem; color: var(--cinza-texto); }
+
+    /* Info entrevista */
+    .entrevista-box {
+      margin: 0 22px 16px; background: var(--azul-light);
+      border-radius: 8px; padding: 12px 16px;
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    }
+    .entrevista-box .ei-label { font-size: 0.72rem; color: var(--azul); font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 2px; }
+    .entrevista-box .ei-valor { font-size: 0.84rem; font-weight: 600; color: var(--preto); }
+    .entrevista-box .ei-link  { color: var(--azul); text-decoration: none; font-size: 0.84rem; font-weight: 600; }
+    .entrevista-box .ei-link:hover { text-decoration: underline; }
+    .entrevista-box .ei-sep { width: 1px; height: 32px; background: rgba(46,117,182,0.25); flex-shrink: 0; }
+
+    /* Info aceite */
+    .aceite-box {
+      margin: 0 22px 16px; background: var(--verde-light);
+      border-radius: 8px; padding: 12px 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .aceite-box .icone { font-size: 1.2rem; }
+    .aceite-box p { font-size: 0.83rem; color: #375623; font-weight: 500; }
+
+    /* Botão ver proposta */
+    .btn-ver-proposta {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: none; border: 1.5px solid var(--cinza-linha); border-radius: 6px;
+      padding: 6px 14px; font-family: 'Inter', sans-serif; font-size: 0.76rem;
+      font-weight: 600; color: var(--cinza-texto); cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-ver-proposta:hover { border-color: var(--laranja); color: var(--laranja); }
+
+    /* Favorita */
+    .btn-fav { background: none; border: none; cursor: pointer; font-size: 1.1rem; padding: 4px; transition: transform 0.15s; color: var(--cinza-linha); }
+    .btn-fav:hover { transform: scale(1.2); }
+    .btn-fav.fav { color: var(--laranja); }
+
+    /* Vazio */
+    .vazio { padding: 60px 20px; text-align: center; color: var(--cinza-texto); }
+    .vazio .emoji { font-size: 2.5rem; margin-bottom: 12px; }
+    .vazio p { font-size: 0.88rem; margin-bottom: 16px; }
+    .btn-ir-propostas { display: inline-flex; align-items: center; gap: 6px; background: var(--laranja); color: var(--branco); border: none; border-radius: 8px; padding: 11px 22px; font-family: 'Inter', sans-serif; font-size: 0.86rem; font-weight: 700; cursor: pointer; text-decoration: none; transition: background 0.15s; }
+    .btn-ir-propostas:hover { background: var(--laranja-hover); }
+
+    /* Mobile */
+    .menu-toggle { display: none; position: fixed; top: 14px; left: 14px; z-index: 200; background: var(--laranja); border: none; border-radius: 8px; padding: 8px 10px; cursor: pointer; color: white; font-size: 1.1rem; }
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 90; }
+
+    @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
+      .sidebar.aberta { transform: translateX(0); }
+      .sidebar-overlay.visivel { display: block; }
+      .main { margin-left: 0; }
+      .menu-toggle { display: block; }
+      .topbar { padding-left: 56px; }
+      .content { padding: 18px 14px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .cand-card-body { flex-direction: column; }
+      .cand-status { align-items: flex-start; flex-direction: row; flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="menu-toggle" id="menuToggle">☰</button>
+<div class="sidebar-overlay" id="overlay"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><span>ESMAD</span></div>
+  <nav class="sidebar-nav">
+    <a class="nav-item" href="dashboard-estudante.html">Início</a>
+    <a class="nav-item" href="lista-propostas.html">Propostas</a>
+    <a class="nav-item activo">As Minhas Candidaturas</a>
+    <a class="nav-item" href="perfil-estudante.html">O Meu Perfil</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="nome" id="sidebarNome">—</div>
+    <div class="perfil">Estudante</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left"></div>
+    <div class="topbar-centro">
+      <div class="titulo">As Minhas Candidaturas</div>
+      <div class="subtitulo">Acompanha o estado das tuas candidaturas</div>
+    </div>
+    <div class="avatar" id="avatar">?</div>
+  </div>
+
+  <div class="content">
+
+    <!-- Alerta aceite (oculto por defeito) -->
+    <div class="alerta-aceite" id="alertaAceite" style="display:none">
+      <div class="icone">🎉</div>
+      <div class="texto">
+        <strong>Foste aceite numa proposta!</strong>
+        <p>Parabéns! O proponente escolheu-te para esta proposta. Aguarda contacto para os próximos passos.</p>
+        <div class="detalhe" id="alertaAceiteDetalhe">
+          <span id="alertaAceiteTitulo">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card laranja">
+        <div class="skeleton" style="height:28px;width:40px;margin:0 auto 6px"></div>
+        <div class="skeleton" style="height:11px;width:80px;margin:0 auto"></div>
+      </div>
+      <div class="stat-card azul">
+        <div class="skeleton" style="height:28px;width:40px;margin:0 auto 6px"></div>
+        <div class="skeleton" style="height:11px;width:80px;margin:0 auto"></div>
+      </div>
+      <div class="stat-card amarelo">
+        <div class="skeleton" style="height:28px;width:40px;margin:0 auto 6px"></div>
+        <div class="skeleton" style="height:11px;width:80px;margin:0 auto"></div>
+      </div>
+      <div class="stat-card verde">
+        <div class="skeleton" style="height:28px;width:40px;margin:0 auto 6px"></div>
+        <div class="skeleton" style="height:11px;width:80px;margin:0 auto"></div>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="section-header">
+      <h2 class="section-title">Candidaturas</h2>
+      <div class="filtros" id="filtros">
+        <button class="filtro-btn activo" onclick="filtrar('todas',this)">Todas</button>
+        <button class="filtro-btn" onclick="filtrar('pendente',this)">Pendentes</button>
+        <button class="filtro-btn" onclick="filtrar('entrevista_agendada',this)">Entrevistas</button>
+        <button class="filtro-btn" onclick="filtrar('aceite',this)">Aceites</button>
+        <button class="filtro-btn" onclick="filtrar('rejeitada',this)">Rejeitadas</button>
+      </div>
+    </div>
+
+    <!-- Lista -->
+    <div class="candidaturas-lista" id="lista">
+      <div style="background:var(--branco);border-radius:12px;padding:32px;box-shadow:0 1px 6px rgba(0,0,0,0.06)">
+        <div class="skeleton" style="height:16px;width:60%;margin-bottom:10px"></div>
+        <div class="skeleton" style="height:12px;width:40%;margin-bottom:20px"></div>
+        <div class="skeleton" style="height:12px;width:100%;margin-bottom:6px"></div>
+        <div class="skeleton" style="height:12px;width:80%"></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  const API = 'http://localhost:5000/api';
+  const token = localStorage.getItem('esmad_token');
+  const user  = localStorage.getItem('esmad_user');
+  if (!token || !user) { window.location.href = 'login.html'; }
+
+  const utilizador = JSON.parse(user);
+  if (utilizador.perfil !== 'estudante') { window.location.href = 'login.html'; }
+
+  const primeiroNome = utilizador.nome.split(' ')[0];
+  document.getElementById('sidebarNome').textContent = utilizador.nome;
+  document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
+
+  document.getElementById('avatar').addEventListener('click', () => {
+    if (confirm('Tens a certeza que queres fazer logout?')) { localStorage.clear(); window.location.href = 'login.html'; }
+  });
+
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  document.getElementById('menuToggle').addEventListener('click', () => { sidebar.classList.toggle('aberta'); overlay.classList.toggle('visivel'); });
+  overlay.addEventListener('click', () => { sidebar.classList.remove('aberta'); overlay.classList.remove('visivel'); });
+
+  function req(endpoint, opts = {}) {
+    return fetch(`${API}${endpoint}`, {
+      ...opts,
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...(opts.headers||{}) }
+    }).then(r => r.json());
+  }
+
+  function formatarData(str) {
+    if (!str) return '—';
+    return new Date(str).toLocaleDateString('pt-PT', { day:'2-digit', month:'2-digit', year:'2-digit' });
+  }
+  function formatarDataHora(str) {
+    if (!str) return '—';
+    return new Date(str).toLocaleString('pt-PT', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' });
+  }
+
+  function isLink(str) {
+    return str && (str.startsWith('http') || str.includes('meet.') || str.includes('zoom.') || str.includes('teams.'));
+  }
+
+  const estadoLabels = {
+    pendente: 'Pendente',
+    entrevista_agendada: 'Entrevista Agendada',
+    aceite: 'Aceite',
+    rejeitada: 'Rejeitada'
+  };
+
+  // Propostas guardadas (favoritas)
+  const guardadas = JSON.parse(localStorage.getItem('esmad_guardadas') || '[]');
+
+  let todasCandidaturas = [];
+  let filtroActivo = 'todas';
+
+  async function carregar() {
+    try {
+      const dados = await req('/propostas/stats/estudante');
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+
+      const { stats, candidaturas } = dados;
+      todasCandidaturas = candidaturas;
+
+      // Stats
+      document.getElementById('statsGrid').innerHTML = `
+        <div class="stat-card laranja">
+          <div class="num">${stats.totalCandidaturas}</div>
+          <div class="label">Total de Candidaturas</div>
+        </div>
+        <div class="stat-card azul">
+          <div class="num">${stats.entrevistasAgendadas}</div>
+          <div class="label">Entrevistas Agendadas</div>
+        </div>
+        <div class="stat-card amarelo">
+          <div class="num">${candidaturas.filter(c => c.estado === 'pendente').length}</div>
+          <div class="label">Aguardam Resposta</div>
+        </div>
+        <div class="stat-card verde">
+          <div class="num">${stats.aceite}</div>
+          <div class="label">Aceite</div>
+        </div>`;
+
+      // Alerta aceite
+      if (stats.aceite > 0) {
+        const aceite = candidaturas.find(c => c.estado === 'aceite');
+        if (aceite) {
+          document.getElementById('alertaAceiteTitulo').textContent = aceite.propostaId?.titulo || '—';
+          document.getElementById('alertaAceite').style.display = 'flex';
+        }
+      }
+
+      renderLista(candidaturas);
+
+    } catch (err) {
+      document.getElementById('lista').innerHTML = `
+        <div style="background:var(--branco);border-radius:12px;padding:40px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,0.06)">
+          <div style="font-size:2rem;margin-bottom:10px">⚠️</div>
+          <p style="color:var(--cinza-texto);font-size:0.88rem">${err.message}</p>
+        </div>`;
+    }
+  }
+
+  function renderLista(lista) {
+    const container = document.getElementById('lista');
+    if (!lista.length) {
+      container.innerHTML = `
+        <div class="vazio">
+          <div class="emoji">📭</div>
+          <p>${filtroActivo === 'todas'
+            ? 'Ainda não te candidataste a nenhuma proposta.'
+            : 'Não há candidaturas com este estado.'}</p>
+          ${filtroActivo === 'todas'
+            ? `<a href="lista-propostas.html" class="btn-ir-propostas">Ver Propostas Disponíveis →</a>`
+            : ''}
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = lista.map(cand => {
+      const p      = cand.propostaId;
+      const titulo = p?.titulo || '—';
+      const tipo   = p?.tipo   || 'estagio';
+      const entidade = p?.nomeEntidade || p?.proponenteId?.nome || '—';
+      const areas  = p?.areas || [];
+      const estado = cand.estado;
+      const fav    = guardadas.includes(p?._id);
+
+      // Bloco de entrevista (se agendada)
+      const entrevistaHtml = estado === 'entrevista_agendada' && cand.dataEntrevista
+        ? `<div class="entrevista-box">
+            <div>
+              <div class="ei-label">Data</div>
+              <div class="ei-valor">📅 ${formatarDataHora(cand.dataEntrevista)}</div>
+            </div>
+            ${cand.localEntrevista ? `
+            <div class="ei-sep"></div>
+            <div>
+              <div class="ei-label">Local / Link</div>
+              ${isLink(cand.localEntrevista)
+                ? `<a class="ei-link" href="${cand.localEntrevista}" target="_blank">🔗 Entrar na reunião</a>`
+                : `<div class="ei-valor">📍 ${cand.localEntrevista}</div>`}
+            </div>` : ''}
+          </div>` : '';
+
+      // Bloco aceite
+      const aceiteHtml = estado === 'aceite'
+        ? `<div class="aceite-box">
+            <div class="icone">🎉</div>
+            <p>Foste aceite nesta proposta! Aguarda contacto do orientador para os próximos passos.</p>
+          </div>` : '';
+
+      return `
+        <div class="cand-card">
+          <div class="cand-card-topo ${estado}"></div>
+          <div class="cand-card-body">
+            <div class="cand-info">
+              <div class="cand-titulo" onclick="window.location.href='detalhe-proposta.html?id=${p?._id}'">${titulo}</div>
+              <div class="cand-meta">
+                <span>🏢 ${entidade}</span>
+                <span class="tag-tipo ${tipo}">${tipo === 'estagio' ? 'Estágio' : 'Projecto'}</span>
+                <span>📅 Candidatura em ${formatarData(cand.criadaEm)}</span>
+              </div>
+              ${areas.length ? `
+              <div class="cand-areas">
+                ${areas.slice(0,3).map(a => `<span class="area-tag">${a}</span>`).join('')}
+                ${areas.length > 3 ? `<span class="area-tag">+${areas.length - 3}</span>` : ''}
+              </div>` : ''}
+            </div>
+            <div class="cand-status">
+              <span class="badge-estado ${estado}">${estadoLabels[estado] || estado}</span>
+              <div class="cand-data">Candidatura: ${formatarData(cand.criadaEm)}</div>
+              <div style="display:flex;gap:6px;align-items:center">
+                <button class="btn-ver-proposta" onclick="window.location.href='detalhe-proposta.html?id=${p?._id}'">
+                  Ver proposta →
+                </button>
+                <button class="btn-fav ${fav ? 'fav' : ''}" onclick="toggleFav('${p?._id}',this)" title="${fav ? 'Remover dos favoritos' : 'Guardar proposta'}">
+                  ${fav ? '★' : '☆'}
+                </button>
+              </div>
+            </div>
+          </div>
+          ${entrevistaHtml}
+          ${aceiteHtml}
+        </div>`;
+    }).join('');
+  }
+
+  function filtrar(estado, btn) {
+    filtroActivo = estado;
+    document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('activo'));
+    if (btn) btn.classList.add('activo');
+
+    const filtradas = estado === 'todas'
+      ? todasCandidaturas
+      : todasCandidaturas.filter(c => c.estado === estado);
+
+    renderLista(filtradas);
+  }
+
+  function toggleFav(propostaId, btn) {
+    if (!propostaId) return;
+    const idx = guardadas.indexOf(propostaId);
+    if (idx === -1) {
+      guardadas.push(propostaId);
+      btn.textContent = '★';
+      btn.classList.add('fav');
+    } else {
+      guardadas.splice(idx, 1);
+      btn.textContent = '☆';
+      btn.classList.remove('fav');
+    }
+    localStorage.setItem('esmad_guardadas', JSON.stringify(guardadas));
+  }
+
+  carregar();
+</script>
+</body>
+</html>

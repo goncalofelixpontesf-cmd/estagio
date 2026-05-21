@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESMAD</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.ico">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --laranja:       #F15A24;
+      --laranja-hover: #d94d1c;
+      --laranja-light: #FEE8DF;
+      --preto:         #1A1A1A;
+      --cinza-bg:      #F4F4F4;
+      --cinza-texto:   #888888;
+      --cinza-linha:   #EEEEEE;
+      --branco:        #FFFFFF;
+      --azul:          #2E75B6;
+      --azul-light:    #EBF3FB;
+      --verde:         #70AD47;
+      --verde-light:   #E2EFDA;
+      --amarelo:       #BF8F00;
+      --amarelo-light: #FFF2CC;
+      --vermelho:      #C00000;
+      --sidebar-w:     220px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--cinza-bg);
+      color: var(--preto);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ══ SIDEBAR ══ */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--laranja);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0;
+      height: 100vh;
+      z-index: 100;
+    }
+    .sidebar-logo {
+      padding: 22px 0 18px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,0.18);
+    }
+    .sidebar-logo span {
+      color: var(--branco);
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+    .sidebar-nav { flex: 1; padding: 12px 0; }
+    .nav-item {
+      display: block;
+      padding: 13px 28px;
+      color: rgba(255,255,255,0.82);
+      font-size: 0.88rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-item:hover  { background: rgba(0,0,0,0.12); color: var(--branco); }
+    .nav-item.activo { background: rgba(0,0,0,0.18); color: var(--branco); font-weight: 700; }
+    .sidebar-footer {
+      padding: 18px 28px;
+      border-top: 1px solid rgba(255,255,255,0.18);
+    }
+    .sidebar-footer .nome   { color: var(--branco); font-size: 0.82rem; font-weight: 600; }
+    .sidebar-footer .perfil { color: rgba(255,255,255,0.65); font-size: 0.75rem; margin-top: 2px; }
+
+    /* ══ MAIN ══ */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Topbar */
+    .topbar {
+      background: var(--branco);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--cinza-linha);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .topbar-centro { text-align: center; flex: 1; }
+    .topbar-centro .titulo    { font-size: 0.98rem; font-weight: 700; }
+    .topbar-centro .subtitulo { font-size: 0.76rem; color: var(--cinza-texto); margin-top: 1px; }
+    .avatar {
+      width: 38px; height: 38px;
+      background: var(--laranja);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--branco);
+      font-weight: 700; font-size: 0.95rem;
+      cursor: pointer; flex-shrink: 0;
+    }
+    .topbar-left { width: 38px; }
+
+    /* ══ CONTENT ══ */
+    .content { padding: 24px 32px; flex: 1; }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      font-size: 0.82rem;
+      color: var(--cinza-texto);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .breadcrumb a {
+      color: var(--laranja);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .breadcrumb .sep { color: var(--cinza-texto); }
+
+    /* Skeleton */
+    .skeleton {
+      background: linear-gradient(90deg,#ececec 25%,#f5f5f5 50%,#ececec 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      border-radius: 6px;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    /* ══ LAYOUT 2 COLUNAS ══ */
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* ══ PAINEL ESQUERDO ══ */
+    .painel-esq {
+      background: var(--branco);
+      border-radius: 12px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+      overflow: hidden;
+    }
+    .painel-topo {
+      height: 8px;
+      background: var(--laranja);
+    }
+    .painel-esq-body { padding: 24px 28px; }
+
+    /* Tags */
+    .tags-linha {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .tag {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 5px;
+      font-size: 0.74rem;
+      font-weight: 700;
+    }
+    .tag.estagio  { background: var(--laranja-light); color: var(--laranja); }
+    .tag.projecto { background: var(--azul-light); color: var(--azul); }
+    .tag.aprovada { background: var(--verde-light); color: var(--verde); }
+    .tag.pendente { background: var(--amarelo-light); color: var(--amarelo); }
+    .tag.rejeitada{ background: #FFDEDE; color: var(--vermelho); }
+    .tag.area     { background: var(--azul-light); color: var(--azul); }
+
+    /* Título proposta */
+    .proposta-titulo {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--preto);
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+    .proposta-meta {
+      font-size: 0.8rem;
+      color: var(--cinza-texto);
+      margin-bottom: 22px;
+    }
+    .proposta-meta span { margin-right: 12px; }
+
+    /* Secções de conteúdo */
+    .secao { margin-bottom: 22px; }
+    .secao h3 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--preto);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .secao p {
+      font-size: 0.88rem;
+      color: #444;
+      line-height: 1.7;
+    }
+    .secao ul {
+      list-style: none;
+      padding: 0;
+    }
+    .secao ul li {
+      font-size: 0.88rem;
+      color: #444;
+      line-height: 1.6;
+      padding-left: 18px;
+      position: relative;
+      margin-bottom: 4px;
+    }
+    .secao ul li::before {
+      content: '•';
+      position: absolute;
+      left: 4px;
+      color: var(--laranja);
+      font-weight: 700;
+    }
+
+    .linha { border: none; border-top: 1px solid var(--cinza-linha); margin: 20px 0; }
+
+    /* Tags de áreas */
+    .areas-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    /* ══ PAINEL DIREITO ══ */
+    .painel-dir {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Card informações */
+    .card-info {
+      background: var(--branco);
+      border-radius: 12px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+      padding: 20px 22px;
+    }
+    .card-info h3 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--preto);
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .info-linha {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 10px;
+    }
+    .info-linha:last-child { margin-bottom: 0; }
+    .info-label {
+      font-size: 0.78rem;
+      color: var(--cinza-texto);
+      flex-shrink: 0;
+    }
+    .info-valor {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--preto);
+      text-align: right;
+    }
+    .info-estado {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+    .info-estado::before {
+      content: '';
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .info-estado.aprovada::before  { background: var(--verde); }
+    .info-estado.pendente::before  { background: var(--amarelo); }
+    .info-estado.rejeitada::before { background: var(--vermelho); }
+
+    /* Card de acções */
+    .card-acao {
+      background: var(--branco);
+      border-radius: 12px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+      padding: 20px 22px;
+    }
+    .card-acao h3 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--preto);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .card-acao p {
+      font-size: 0.78rem;
+      color: var(--cinza-texto);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+    .btn-interesse {
+      display: block;
+      width: 100%;
+      background: var(--laranja);
+      color: var(--branco);
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.15s, transform 0.1s;
+      margin-bottom: 10px;
+    }
+    .btn-interesse:hover   { background: var(--laranja-hover); }
+    .btn-interesse:active  { transform: scale(0.98); }
+    .btn-interesse:disabled { opacity: 0.65; cursor: not-allowed; }
+    .btn-interesse.ja-candidato {
+      background: var(--verde-light);
+      color: var(--verde);
+      cursor: default;
+    }
+    .btn-interesse.ja-candidato:hover { background: var(--verde-light); }
+
+    .btn-guardar {
+      display: block;
+      width: 100%;
+      background: var(--branco);
+      color: var(--preto);
+      border: 1.5px solid var(--cinza-linha);
+      border-radius: 8px;
+      padding: 11px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.86rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .btn-guardar:hover { border-color: var(--laranja); background: var(--laranja-light); }
+    .btn-guardar.guardada {
+      border-color: var(--verde);
+      background: var(--verde-light);
+      color: var(--verde);
+    }
+
+    /* Alerta inline */
+    .alerta {
+      display: none;
+      border-radius: 8px;
+      padding: 10px 13px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+    .alerta.erro    { background: #FFDEDE; color: var(--vermelho); display: block; }
+    .alerta.sucesso { background: var(--verde-light); color: var(--verde); display: block; }
+
+    /* Card aceite — aparece quando o estudante já foi aceite */
+    .card-aceite {
+      background: var(--verde-light);
+      border: 1.5px solid var(--verde);
+      border-radius: 12px;
+      padding: 18px 22px;
+      text-align: center;
+    }
+    .card-aceite .emoji { font-size: 1.6rem; margin-bottom: 8px; }
+    .card-aceite strong { display: block; font-size: 0.9rem; color: var(--verde); margin-bottom: 4px; }
+    .card-aceite p { font-size: 0.78rem; color: #555; }
+
+    /* Spin */
+    .spin {
+      display: inline-block;
+      width: 13px; height: 13px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: girar 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes girar { to { transform: rotate(360deg); } }
+
+    /* Loading state */
+    .loading-painel {
+      padding: 40px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Mobile */
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 14px; left: 14px;
+      z-index: 200;
+      background: var(--laranja);
+      border: none; border-radius: 8px;
+      padding: 8px 10px;
+      cursor: pointer; color: white; font-size: 1.1rem;
+    }
+    .sidebar-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 90;
+    }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .painel-dir { order: -1; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
+      .sidebar.aberta { transform: translateX(0); }
+      .sidebar-overlay.visivel { display: block; }
+      .main { margin-left: 0; }
+      .menu-toggle { display: block; }
+      .topbar { padding-left: 56px; }
+      .content { padding: 18px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="menu-toggle" id="menuToggle">☰</button>
+<div class="sidebar-overlay" id="overlay"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><span>ESMAD</span></div>
+  <nav class="sidebar-nav">
+    <a class="nav-item activo" href="lista-propostas.html">Propostas</a>
+    <a class="nav-item" href="perfil-estudante.html">O Meu Perfil</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="nome" id="sidebarNome">—</div>
+    <div class="perfil">Estudante</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-left"></div>
+    <div class="topbar-centro">
+      <div class="titulo" id="topbarTitulo">A carregar…</div>
+      <div class="subtitulo" id="topbarSub">—</div>
+    </div>
+    <div class="avatar" id="avatar">?</div>
+  </div>
+
+  <div class="content">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <a href="lista-propostas.html">Propostas</a>
+      <span class="sep">/</span>
+      <span id="breadcrumbTitulo">A carregar…</span>
+    </div>
+
+    <!-- Layout 2 colunas -->
+    <div class="layout" id="layout">
+
+      <!-- PAINEL ESQUERDO — skeleton enquanto carrega -->
+      <div class="painel-esq" id="painelEsq">
+        <div class="painel-topo"></div>
+        <div class="loading-painel">
+          <div class="skeleton" style="height:14px;width:120px"></div>
+          <div class="skeleton" style="height:22px;width:80%"></div>
+          <div class="skeleton" style="height:12px;width:200px"></div>
+          <div class="skeleton" style="height:1px;width:100%;margin:8px 0"></div>
+          <div class="skeleton" style="height:12px;width:100%"></div>
+          <div class="skeleton" style="height:12px;width:95%"></div>
+          <div class="skeleton" style="height:12px;width:88%"></div>
+          <div class="skeleton" style="height:12px;width:92%"></div>
+        </div>
+      </div>
+
+      <!-- PAINEL DIREITO — skeleton -->
+      <div class="painel-dir" id="painelDir">
+        <div class="card-info">
+          <div class="skeleton" style="height:13px;width:100px;margin-bottom:16px"></div>
+          <div class="skeleton" style="height:12px;width:100%;margin-bottom:10px"></div>
+          <div class="skeleton" style="height:12px;width:100%;margin-bottom:10px"></div>
+          <div class="skeleton" style="height:12px;width:100%;margin-bottom:10px"></div>
+          <div class="skeleton" style="height:12px;width:80%"></div>
+        </div>
+        <div class="card-acao">
+          <div class="skeleton" style="height:13px;width:120px;margin-bottom:12px"></div>
+          <div class="skeleton" style="height:40px;width:100%;margin-bottom:10px;border-radius:8px"></div>
+          <div class="skeleton" style="height:40px;width:100%;border-radius:8px"></div>
+        </div>
+      </div>
+
+    </div><!-- /layout -->
+  </div>
+</main>
+
+<script>
+  const API = 'http://localhost:5000/api';
+  const token = localStorage.getItem('esmad_token');
+  const user  = localStorage.getItem('esmad_user');
+  if (!token || !user) { window.location.href = 'login.html'; }
+
+  const utilizador = JSON.parse(user);
+  if (utilizador.perfil !== 'estudante') { window.location.href = 'login.html'; }
+
+  document.getElementById('sidebarNome').textContent = utilizador.nome;
+  document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
+
+  // Avatar logout
+  document.getElementById('avatar').addEventListener('click', () => {
+    if (confirm('Tens a certeza que queres fazer logout?')) {
+      localStorage.clear();
+      window.location.href = 'login.html';
+    }
+  });
+
+  // Mobile sidebar
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  document.getElementById('menuToggle').addEventListener('click', () => {
+    sidebar.classList.toggle('aberta');
+    overlay.classList.toggle('visivel');
+  });
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('aberta');
+    overlay.classList.remove('visivel');
+  });
+
+  // ── Obter ID da proposta da URL ──
+  const params = new URLSearchParams(window.location.search);
+  const propostaId = params.get('id');
+  if (!propostaId) { window.location.href = 'lista-propostas.html'; }
+
+  // ── Helpers ──
+  function req(endpoint, opts = {}) {
+    return fetch(`${API}${endpoint}`, {
+      ...opts,
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        ...(opts.headers || {})
+      }
+    }).then(r => r.json());
+  }
+
+  function formatarData(str) {
+    return new Date(str).toLocaleDateString('pt-PT', {
+      day: '2-digit', month: '2-digit', year: 'numeric'
+    });
+  }
+
+  const estadoLabels = {
+    aprovada: 'Aprovada', pendente: 'Pendente',
+    rejeitada: 'Rejeitada', atribuida: 'Atribuída'
+  };
+
+  // ── Estado local ──
+  let jaInteresse = false;
+  let guardada    = false;
+  const guardadas = JSON.parse(localStorage.getItem('esmad_guardadas') || '[]');
+  if (guardadas.includes(propostaId)) guardada = true;
+
+  // ── Carregar proposta e candidaturas ──
+  async function carregar() {
+    try {
+      const [dadosProp, dadosCands] = await Promise.all([
+        req(`/propostas/${propostaId}`),
+        req('/propostas/stats/estudante')
+      ]);
+
+      if (!dadosProp.sucesso) throw new Error(dadosProp.mensagem || 'Proposta não encontrada.');
+
+      const p = dadosProp.proposta;
+
+      // Verificar se já manifestou interesse nesta proposta
+      if (dadosCands.sucesso) {
+        const cand = dadosCands.candidaturas.find(c =>
+          c.propostaId?._id === propostaId || c.propostaId === propostaId
+        );
+        if (cand) {
+          jaInteresse = true;
+          if (cand.estado === 'aceite') renderAceite(p, cand);
+          else renderProposta(p, cand.estado);
+          return;
+        }
+      }
+
+      renderProposta(p, null);
+
+    } catch (err) {
+      document.getElementById('painelEsq').innerHTML = `
+        <div class="painel-topo"></div>
+        <div style="padding:40px 28px;text-align:center;color:var(--cinza-texto)">
+          <div style="font-size:2rem;margin-bottom:10px">⚠️</div>
+          <p>${err.message}</p>
+          <a href="lista-propostas.html" style="color:var(--laranja);font-weight:600;font-size:0.84rem;text-decoration:none;margin-top:12px;display:inline-block">← Voltar às propostas</a>
+        </div>`;
+    }
+  }
+
+  function renderProposta(p, estadoCandidatura) {
+    // Topbar
+    document.getElementById('topbarTitulo').textContent = p.titulo;
+    const sub = [p.nomeEntidade, p.tipo === 'estagio' ? 'Estágio' : 'Projeto', p.curso]
+      .filter(Boolean).join(' · ');
+    document.getElementById('topbarSub').textContent = sub;
+    document.getElementById('breadcrumbTitulo').textContent = p.titulo;
+    document.title = `ESMAD — ${p.titulo}`;
+
+    // ── PAINEL ESQUERDO ──
+    const tipoLabel = p.tipo === 'estagio' ? 'Estágio' : 'Projeto';
+    const areasHtml = (p.areas || []).map(a =>
+      `<span class="tag area">${a}</span>`
+    ).join('');
+
+    const objetivosHtml = p.objetivos
+      ? p.objetivos.split('\n').filter(l => l.trim()).map(l => `<li>${l}</li>`).join('')
+      : '<li>—</li>';
+
+    document.getElementById('painelEsq').innerHTML = `
+      <div class="painel-topo"></div>
+      <div class="painel-esq-body">
+
+        <div class="tags-linha">
+          <span class="tag ${p.tipo}">${tipoLabel}</span>
+          <span class="tag ${p.estado}">${estadoLabels[p.estado] || p.estado}</span>
+        </div>
+
+        <h1 class="proposta-titulo">${p.titulo}</h1>
+        <p class="proposta-meta">
+          <span>${p.nomeEntidade || p.proponenteId?.nome || '—'}</span>
+          <span>·</span>
+          <span>Publicada a ${formatarData(p.criadaEm)}</span>
+        </p>
+
+        ${areasHtml ? `
+        <div class="secao">
+          <h3>Áreas de Atuação</h3>
+          <div class="areas-tags">${areasHtml}</div>
+        </div>
+        <hr class="linha">` : ''}
+
+        <div class="secao">
+          <h3>Descrição do Trabalho</h3>
+          <p>${p.descricao || '—'}</p>
+        </div>
+
+        <hr class="linha">
+
+        <div class="secao">
+          <h3>Objetivos</h3>
+          <ul>${objetivosHtml}</ul>
+        </div>
+
+        ${p.resultadosEsperados ? `
+        <hr class="linha">
+        <div class="secao">
+          <h3>Resultados Esperados</h3>
+          <p>${p.resultadosEsperados}</p>
+        </div>` : ''}
+
+        ${p.planoTrabalho ? `
+        <hr class="linha">
+        <div class="secao">
+          <h3>Plano Provisório de Trabalho</h3>
+          <p>${p.planoTrabalho}</p>
+        </div>` : ''}
+
+        ${p.perfilCandidato ? `
+        <hr class="linha">
+        <div class="secao">
+          <h3>Perfil do Candidato</h3>
+          <p>${p.perfilCandidato}</p>
+        </div>` : ''}
+
+        ${p.feedbackCCA ? `
+        <hr class="linha">
+        <div class="secao">
+          <h3>Feedback da CCA</h3>
+          <p style="color:var(--vermelho)">${p.feedbackCCA}</p>
+        </div>` : ''}
+
+      </div>
+    `;
+
+    // ── PAINEL DIREITO ──
+    const btnInteresseHtml = jaInteresse
+      ? `<button class="btn-interesse ja-candidato" disabled>✔ Interesse Manifestado${estadoCandidatura ? ' — ' + estadoLabels[estadoCandidatura] || estadoCandidatura : ''}</button>`
+      : `<button class="btn-interesse" id="btnInteresse" onclick="manifestarInteresse()">Manifestar Interesse</button>`;
+
+    const btnGuardarHtml = `
+      <button class="btn-guardar ${guardada ? 'guardada' : ''}" id="btnGuardar" onclick="toggleGuardar()">
+        ${guardada ? '★ Proposta Guardada' : '☆ Guardar Proposta'}
+      </button>`;
+
+    document.getElementById('painelDir').innerHTML = `
+      <div class="card-info">
+        <h3>Informações</h3>
+        <div class="info-linha">
+          <span class="info-label">Entidade</span>
+          <span class="info-valor">${p.nomeEntidade || p.proponenteId?.nome || '—'}</span>
+        </div>
+        <div class="info-linha">
+          <span class="info-label">Tipo</span>
+          <span class="info-valor">${tipoLabel}</span>
+        </div>
+        <div class="info-linha">
+          <span class="info-label">Curso</span>
+          <span class="info-valor">${p.curso}</span>
+        </div>
+        <div class="info-linha">
+          <span class="info-label">Publicada</span>
+          <span class="info-valor">${formatarData(p.criadaEm)}</span>
+        </div>
+        <div class="info-linha">
+          <span class="info-label">Estado</span>
+          <span class="info-estado ${p.estado}">${estadoLabels[p.estado] || p.estado}</span>
+        </div>
+        ${p.tutorNome ? `
+        <hr style="border:none;border-top:1px solid var(--cinza-linha);margin:12px 0">
+        <div class="info-linha">
+          <span class="info-label">Tutor</span>
+          <span class="info-valor">${p.tutorNome}</span>
+        </div>` : ''}
+        ${p.plugIN ? `
+        <div class="info-linha">
+          <span class="info-label">Plug-IN</span>
+          <span class="info-valor" style="color:var(--verde)">✔ Sim</span>
+        </div>` : ''}
+      </div>
+
+      <div class="card-acao">
+        <h3>Tens interesse?</h3>
+        <p>Clica para manifestares o teu interesse nesta proposta.</p>
+        <div id="alertaAcao" class="alerta"></div>
+        ${btnInteresseHtml}
+        ${btnGuardarHtml}
+      </div>
+    `;
+  }
+
+  function renderAceite(p, cand) {
+    renderProposta(p, 'aceite');
+    // Substituir card de acção por card de parabéns
+    const cardAcao = document.querySelector('.card-acao');
+    if (cardAcao) {
+      cardAcao.outerHTML = `
+        <div class="card-aceite">
+          <div class="emoji">🎉</div>
+          <strong>Foste aceite nesta proposta!</strong>
+          <p>Aguarda contacto do orientador para os próximos passos.</p>
+        </div>`;
+    }
+  }
+
+  // ── Manifestar interesse ──
+  async function manifestarInteresse() {
+    const btn = document.getElementById('btnInteresse');
+    if (!btn) return;
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin"></span>A processar…';
+
+    try {
+      const dados = await req(`/propostas/${propostaId}/interesse`, { method: 'POST' });
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+
+      jaInteresse = true;
+      btn.className = 'btn-interesse ja-candidato';
+      btn.textContent = '✔ Interesse Manifestado';
+
+      const alerta = document.getElementById('alertaAcao');
+      if (alerta) {
+        alerta.textContent = 'Interesse registado com sucesso! O proponente foi notificado.';
+        alerta.className = 'alerta sucesso';
+        setTimeout(() => { alerta.className = 'alerta'; }, 4000);
+      }
+
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Manifestar Interesse';
+
+      const alerta = document.getElementById('alertaAcao');
+      if (alerta) {
+        alerta.textContent = err.message;
+        alerta.className = 'alerta erro';
+        setTimeout(() => { alerta.className = 'alerta'; }, 4000);
+      }
+    }
+  }
+
+  // ── Guardar proposta (local) ──
+  function toggleGuardar() {
+    const btn = document.getElementById('btnGuardar');
+    if (!btn) return;
+
+    const idx = guardadas.indexOf(propostaId);
+    if (idx === -1) {
+      guardadas.push(propostaId);
+      guardada = true;
+      btn.className = 'btn-guardar guardada';
+      btn.textContent = '★ Proposta Guardada';
+    } else {
+      guardadas.splice(idx, 1);
+      guardada = false;
+      btn.className = 'btn-guardar';
+      btn.textContent = '☆ Guardar Proposta';
+    }
+    localStorage.setItem('esmad_guardadas', JSON.stringify(guardadas));
+  }
+
+  // ── Iniciar ──
+  carregar();
+</script>
+</body>
+</html>

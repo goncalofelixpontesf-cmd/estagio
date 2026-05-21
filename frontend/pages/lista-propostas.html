@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESMAD</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.ico">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --laranja: #F15A24; --laranja-hover: #d94d1c; --laranja-light: #FEE8DF;
+      --preto: #1A1A1A; --cinza-bg: #F4F4F4; --cinza-texto: #888888;
+      --cinza-linha: #EEEEEE; --branco: #FFFFFF;
+      --azul: #2E75B6; --azul-light: #EBF3FB;
+      --verde: #70AD47; --verde-light: #E2EFDA;
+      --amarelo: #BF8F00; --amarelo-light: #FFF2CC;
+      --vermelho: #C00000; --sidebar-w: 220px;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--cinza-bg); color: var(--preto); min-height: 100vh; display: flex; }
+
+    /* SIDEBAR */
+    .sidebar { width: var(--sidebar-w); background: var(--laranja); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; flex-shrink: 0; }
+    .sidebar-logo { padding: 22px 0 18px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.18); }
+    .sidebar-logo span { color: var(--branco); font-size: 1.35rem; font-weight: 800; letter-spacing: 2px; }
+    .sidebar-nav { flex: 1; padding: 12px 0; }
+    .nav-item { display: block; padding: 13px 28px; color: rgba(255,255,255,0.82); font-size: 0.88rem; font-weight: 500; text-decoration: none; cursor: pointer; border: none; background: none; width: 100%; text-align: left; transition: background 0.15s, color 0.15s; }
+    .nav-item:hover  { background: rgba(0,0,0,0.12); color: var(--branco); }
+    .nav-item.activo { background: rgba(0,0,0,0.18); color: var(--branco); font-weight: 700; }
+    .sidebar-footer { padding: 18px 28px; border-top: 1px solid rgba(255,255,255,0.18); }
+    .sidebar-footer .nome   { color: var(--branco); font-size: 0.82rem; font-weight: 600; }
+    .sidebar-footer .perfil { color: rgba(255,255,255,0.65); font-size: 0.75rem; margin-top: 2px; }
+
+    /* MAIN */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { background: var(--branco); padding: 18px 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--cinza-linha); position: sticky; top: 0; z-index: 50; }
+    .topbar-info .titulo    { font-size: 1rem; font-weight: 700; }
+    .topbar-info .subtitulo { font-size: 0.78rem; color: var(--cinza-texto); margin-top: 1px; }
+    .avatar { width: 38px; height: 38px; background: var(--laranja); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--branco); font-weight: 700; font-size: 0.95rem; cursor: pointer; flex-shrink: 0; }
+    .content { padding: 24px 32px; flex: 1; }
+
+    /* PESQUISA E FILTROS */
+    .barra-pesquisa { position: relative; margin-bottom: 14px; }
+    .barra-pesquisa .icone-lupa { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--cinza-texto); font-size: 1rem; pointer-events: none; }
+    .barra-pesquisa input { width: 100%; background: var(--branco); border: 1.5px solid var(--cinza-linha); border-radius: 10px; padding: 13px 18px 13px 44px; font-family: 'Inter', sans-serif; font-size: 0.88rem; color: var(--preto); outline: none; transition: border-color 0.18s, box-shadow 0.18s; }
+    .barra-pesquisa input::placeholder { color: #BBBBBB; }
+    .barra-pesquisa input:focus { border-color: var(--laranja); box-shadow: 0 0 0 3px rgba(241,90,36,0.10); }
+    .filtros { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+    .filtros select { background: var(--branco); border: 1.5px solid var(--cinza-linha); border-radius: 8px; padding: 9px 36px 9px 14px; font-family: 'Inter', sans-serif; font-size: 0.82rem; color: var(--preto); cursor: pointer; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; transition: border-color 0.15s; }
+    .filtros select:focus { border-color: var(--laranja); }
+    .filtros .input-empresa { background: var(--branco); border: 1.5px solid var(--cinza-linha); border-radius: 8px; padding: 9px 14px; font-family: 'Inter', sans-serif; font-size: 0.82rem; color: var(--preto); outline: none; width: 180px; transition: border-color 0.15s; }
+    .filtros .input-empresa::placeholder { color: #BBBBBB; }
+    .filtros .input-empresa:focus { border-color: var(--laranja); }
+    .filtros .spacer { flex: 1; }
+    .btn-nova { display: flex; align-items: center; gap: 8px; background: var(--laranja); color: var(--branco); border: none; border-radius: 8px; padding: 9px 18px; font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+    .btn-nova:hover { background: var(--laranja-hover); }
+
+    /* CARDS */
+    .grelha { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .proposta-card { background: var(--branco); border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); overflow: hidden; display: flex; flex-direction: column; cursor: pointer; transition: transform 0.18s, box-shadow 0.18s; }
+    .proposta-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+    .card-topo { height: 6px; background: var(--laranja); position: relative; }
+    .card-tipo { position: absolute; top: -1px; right: 12px; background: var(--laranja); color: var(--branco); font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 0 0 6px 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .card-tipo.projecto { background: var(--azul); }
+    .card-body { padding: 18px 18px 14px; flex: 1; display: flex; flex-direction: column; }
+    .card-titulo { font-size: 0.92rem; font-weight: 700; color: var(--preto); margin-bottom: 4px; line-height: 1.3; }
+    .card-entidade { font-size: 0.78rem; color: var(--cinza-texto); margin-bottom: 8px; }
+    .card-area { display: inline-block; background: var(--azul-light); color: var(--azul); font-size: 0.68rem; font-weight: 600; padding: 3px 9px; border-radius: 4px; margin-bottom: 10px; }
+    .card-descricao { font-size: 0.78rem; color: #666; line-height: 1.5; flex: 1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+    .card-footer { display: flex; align-items: center; justify-content: space-between; padding: 10px 18px 14px; border-top: 1px solid var(--cinza-linha); margin-top: 12px; }
+    .estado { display: inline-flex; align-items: center; gap: 5px; font-size: 0.75rem; font-weight: 600; }
+    .estado::before { content: ''; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .estado.aprovada::before  { background: var(--verde); }
+    .estado.pendente::before  { background: var(--amarelo); }
+    .estado.rejeitada::before { background: var(--vermelho); }
+    .estado.entrevista_agendada::before { background: var(--azul); }
+    .card-data { font-size: 0.75rem; color: var(--cinza-texto); }
+    .skeleton { background: linear-gradient(90deg,#ececec 25%,#f5f5f5 50%,#ececec 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 6px; }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+    .vazio { grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--cinza-texto); }
+    .vazio .emoji { font-size: 2.5rem; margin-bottom: 12px; }
+    .vazio p { font-size: 0.9rem; }
+
+    /* ══ MODAL MULTI-PASSO ══ */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.42); z-index: 300; align-items: center; justify-content: center; padding: 16px; }
+    .modal-overlay.aberto { display: flex; }
+
+    /* Modal com layout fixo: header + progress + body scrollável + footer */
+    .modal {
+      background: var(--branco); border-radius: 14px; width: 100%; max-width: 640px;
+      max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    }
+    .modal-topo { height: 5px; background: var(--laranja); border-radius: 14px 14px 0 0; flex-shrink: 0; }
+
+    .modal-header { padding: 18px 26px 0; display: flex; align-items: flex-start; justify-content: space-between; flex-shrink: 0; }
+    .modal-header h2 { font-size: 1rem; font-weight: 700; margin-bottom: 2px; }
+    .modal-header .sub { font-size: 0.76rem; color: var(--cinza-texto); }
+    .modal-header .sub span { color: var(--laranja); }
+    .btn-fechar { background: none; border: none; cursor: pointer; color: var(--cinza-texto); font-size: 1.2rem; padding: 2px 6px; flex-shrink: 0; }
+    .btn-fechar:hover { color: var(--preto); }
+
+    /* Barra de progresso */
+    .modal-progress { padding: 12px 26px 0; flex-shrink: 0; }
+    .progress-info { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .progress-label   { font-size: 0.78rem; font-weight: 700; color: var(--preto); }
+    .progress-counter { font-size: 0.76rem; color: var(--cinza-texto); }
+    .progress-track { height: 5px; background: var(--cinza-linha); border-radius: 3px; overflow: hidden; }
+    .progress-fill  { height: 100%; background: var(--laranja); border-radius: 3px; transition: width 0.3s ease; }
+
+    /* Corpo scrollável */
+    .modal-body { padding: 18px 26px; overflow-y: auto; flex: 1; }
+
+    /* Alerta dentro do modal */
+    .alerta-modal { display: none; border-radius: 8px; padding: 10px 13px; font-size: 0.81rem; font-weight: 500; margin-bottom: 14px; }
+    .alerta-modal.erro    { background: #FFDEDE; color: var(--vermelho); display: block; }
+    .alerta-modal.sucesso { background: var(--verde-light); color: #375623; display: block; }
+
+    /* Footer fixo */
+    .modal-footer { padding: 12px 26px 18px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--cinza-linha); flex-shrink: 0; }
+    .btn-anterior { background: #F0F0F0; color: #555; border: none; border-radius: 8px; padding: 11px 22px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+    .btn-anterior:hover { background: #E4E4E4; }
+    .btn-anterior[style*="opacity:0"], .btn-anterior.invisivel { opacity: 0; pointer-events: none; }
+    .btn-seguinte { background: var(--laranja); color: var(--branco); border: none; border-radius: 8px; padding: 11px 26px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; transition: background 0.15s; }
+    .btn-seguinte:hover { background: var(--laranja-hover); }
+    .btn-seguinte:disabled { opacity: 0.65; cursor: not-allowed; }
+
+    /* Campos do formulário */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-campo { display: flex; flex-direction: column; gap: 7px; }
+    .form-campo label { font-size: 0.72rem; font-weight: 700; color: var(--preto); text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-campo label .obg { color: var(--laranja); }
+    .campo-nota { font-size: 0.72rem; color: var(--cinza-texto); font-style: italic; }
+
+    .campo-input { width: 100%; background: #F5F5F5; border: 1.5px solid transparent; border-radius: 8px; padding: 12px 14px; font-family: 'Inter', sans-serif; font-size: 0.86rem; color: var(--preto); outline: none; transition: border-color 0.18s, background 0.18s, box-shadow 0.18s; }
+    .campo-input::placeholder { color: #BBBBBB; }
+    .campo-input:focus { background: var(--branco); border-color: var(--laranja); box-shadow: 0 0 0 3px rgba(241,90,36,0.10); }
+    .campo-input.readonly { background: #EEEEEE; color: var(--cinza-texto); cursor: not-allowed; }
+    .campo-input.readonly:focus { border-color: transparent; box-shadow: none; background: #EEEEEE; }
+
+    .campo-select { width: 100%; background: #F5F5F5; border: 1.5px solid transparent; border-radius: 8px; padding: 12px 36px 12px 14px; font-family: 'Inter', sans-serif; font-size: 0.86rem; color: var(--preto); outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; transition: border-color 0.18s; }
+    .campo-select:focus { background-color: var(--branco); border-color: var(--laranja); box-shadow: 0 0 0 3px rgba(241,90,36,0.10); }
+
+    /* Textarea grande — página própria */
+    .campo-textarea { width: 100%; background: #F5F5F5; border: 1.5px solid transparent; border-radius: 8px; padding: 14px; font-family: 'Inter', sans-serif; font-size: 0.88rem; color: var(--preto); outline: none; resize: none; transition: border-color 0.18s, box-shadow 0.18s; }
+    .campo-textarea::placeholder { color: #BBBBBB; }
+    .campo-textarea:focus { background: var(--branco); border-color: var(--laranja); box-shadow: 0 0 0 3px rgba(241,90,36,0.10); }
+
+    /* Checkboxes de área */
+    .areas-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+    .area-check { display: flex; align-items: center; gap: 7px; cursor: pointer; font-size: 0.78rem; color: var(--preto); padding: 7px 9px; border-radius: 6px; border: 1.5px solid var(--cinza-linha); background: #F9F9F9; transition: border-color 0.15s, background 0.15s; user-select: none; }
+    .area-check:hover  { border-color: var(--laranja); background: var(--laranja-light); }
+    .area-check.marcada { border-color: var(--laranja); background: var(--laranja-light); }
+    .area-check input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--laranja); cursor: pointer; margin: 0; padding: 0; flex-shrink: 0; }
+
+    /* Radio Plug-IN */
+    .radio-grupo { display: flex; gap: 10px; }
+    .radio-item { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 20px; border-radius: 8px; border: 1.5px solid var(--cinza-linha); background: #F9F9F9; transition: border-color 0.15s, background 0.15s; user-select: none; font-size: 0.86rem; }
+    .radio-item:hover  { border-color: var(--laranja); background: var(--laranja-light); }
+    .radio-item.marcada { border-color: var(--laranja); background: var(--laranja-light); }
+    .radio-item input[type="radio"] { width: 15px; height: 15px; accent-color: var(--laranja); cursor: pointer; margin: 0; }
+
+    .separador { border: none; border-top: 1px solid var(--cinza-linha); margin: 16px 0; }
+
+    .spin { display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: girar 0.6s linear infinite; vertical-align: middle; margin-right: 6px; }
+    @keyframes girar { to { transform: rotate(360deg); } }
+
+    /* Mobile */
+    .menu-toggle { display: none; position: fixed; top: 14px; left: 14px; z-index: 200; background: var(--laranja); border: none; border-radius: 8px; padding: 8px 10px; cursor: pointer; color: white; font-size: 1.1rem; }
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 90; }
+    @media (max-width: 1100px) { .grelha { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
+      .sidebar.aberta { transform: translateX(0); }
+      .sidebar-overlay.visivel { display: block; }
+      .main { margin-left: 0; }
+      .menu-toggle { display: block; }
+      .topbar { padding-left: 56px; }
+      .content { padding: 20px 16px; }
+      .grelha { grid-template-columns: 1fr; }
+      .filtros .input-empresa { width: 140px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .areas-grid { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<button class="menu-toggle" id="menuToggle">☰</button>
+<div class="sidebar-overlay" id="overlay"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><span>ESMAD</span></div>
+  <nav class="sidebar-nav">
+    <a class="nav-item activo">Propostas</a>
+    <a class="nav-item" href="perfil-estudante.html">O Meu Perfil</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="nome" id="sidebarNome">—</div>
+    <div class="perfil">Estudante</div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-info">
+      <div class="titulo">Propostas Disponíveis</div>
+      <div class="subtitulo">Encontra o teu próximo projeto ou estágio</div>
+    </div>
+    <div class="avatar" id="avatar" title="Logout">?</div>
+  </div>
+  <div class="content">
+    <div class="barra-pesquisa">
+      <span class="icone-lupa">🔍</span>
+      <input type="text" id="inputPesquisa" placeholder="Pesquisar propostas…">
+    </div>
+    <div class="filtros">
+      <select id="filtroTipo">
+        <option value="">Todos os tipos</option>
+        <option value="estagio">Estágio</option>
+        <option value="projecto">Projeto</option>
+      </select>
+      <select id="filtroArea">
+        <option value="">Todas as áreas</option>
+        <option value="UI/UX">UI/UX</option>
+        <option value="Front-end">Front-end</option>
+        <option value="Back-end">Back-end</option>
+        <option value="Full-stack">Full-stack</option>
+        <option value="Mobile">Mobile</option>
+        <option value="Games/Graphics">Games/Graphics</option>
+        <option value="Marketing Digital">Marketing Digital</option>
+        <option value="Outro">Outro</option>
+      </select>
+      <input type="text" class="input-empresa" id="filtroEmpresa" placeholder="Todas as empresas">
+      <div class="spacer"></div>
+      <button class="btn-nova" onclick="abrirModal()">Nova Proposta <span>+</span></button>
+    </div>
+    <div class="grelha" id="grelha">
+      <div class="proposta-card" style="pointer-events:none">
+        <div class="card-topo"></div>
+        <div class="card-body">
+          <div class="skeleton" style="height:16px;width:80%;margin-bottom:8px"></div>
+          <div class="skeleton" style="height:12px;width:50%;margin-bottom:10px"></div>
+          <div class="skeleton" style="height:11px;width:100%;margin-bottom:5px"></div>
+          <div class="skeleton" style="height:11px;width:90%"></div>
+        </div>
+        <div class="card-footer">
+          <div class="skeleton" style="height:10px;width:70px"></div>
+          <div class="skeleton" style="height:10px;width:50px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL MULTI-PASSO -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-topo"></div>
+    <div class="modal-header">
+      <div>
+        <h2>Submeter Nova Proposta</h2>
+        <div class="sub"><span id="modalPassoLabel">Passo 1 de 7</span></div>
+      </div>
+      <button class="btn-fechar" onclick="fecharModal()">✕</button>
+    </div>
+    <div class="modal-progress">
+      <div class="progress-info">
+        <span class="progress-label" id="progressLabel">Sobre a Entidade</span>
+        <span class="progress-counter" id="progressCounter">1 / 7</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width:14%"></div>
+      </div>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn-anterior invisivel" id="btnAnterior" onclick="passo(-1)">&larr; Anterior</button>
+      <button class="btn-seguinte" id="btnSeguinte" onclick="passo(1)">Seguinte &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = 'http://localhost:5000/api';
+  const token = localStorage.getItem('esmad_token');
+  const user  = localStorage.getItem('esmad_user');
+  if (!token || !user) { window.location.href = 'login.html'; }
+  const utilizador = JSON.parse(user);
+  if (utilizador.perfil !== 'estudante') { window.location.href = 'login.html'; }
+
+  document.getElementById('sidebarNome').textContent = utilizador.nome;
+  document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
+
+  document.getElementById('avatar').addEventListener('click', () => {
+    if (confirm('Tens a certeza que queres fazer logout?')) { localStorage.clear(); window.location.href = 'login.html'; }
+  });
+
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  document.getElementById('menuToggle').addEventListener('click', () => { sidebar.classList.toggle('aberta'); overlay.classList.toggle('visivel'); });
+  overlay.addEventListener('click', () => { sidebar.classList.remove('aberta'); overlay.classList.remove('visivel'); });
+
+  function req(endpoint, opts = {}) {
+    return fetch(API + endpoint, { ...opts, headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', ...(opts.headers||{}) } }).then(r => r.json());
+  }
+  function formatarData(str) { return new Date(str).toLocaleDateString('pt-PT', { day:'2-digit', month:'2-digit', year:'2-digit' }); }
+
+  // Carregar propostas
+  let todasPropostas = [];
+  const estadoLabels = { aprovada:'Aprovada', pendente:'Pendente', rejeitada:'Rejeitada', entrevista_agendada:'Entrevista', aceite:'Aceite' };
+
+  async function carregarPropostas() {
+    try {
+      const dados = await req('/propostas');
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+      todasPropostas = dados.propostas || [];
+      renderPropostas(todasPropostas);
+    } catch {
+      document.getElementById('grelha').innerHTML = '<div class="vazio"><div class="emoji">⚠️</div><p>Erro ao carregar. Servidor ligado?</p></div>';
+    }
+  }
+
+  function renderPropostas(lista) {
+    const g = document.getElementById('grelha');
+    if (!lista.length) { g.innerHTML = '<div class="vazio"><div class="emoji">📭</div><p>Não há propostas disponíveis.</p></div>'; return; }
+    g.innerHTML = lista.map(p => {
+      const tipo = p.tipo === 'estagio' ? 'Estágio' : 'Projecto';
+      return '<div class="proposta-card" onclick="window.location.href=\'detalhe-proposta.html?id=' + p._id + '\'"><div class="card-topo"><span class="card-tipo' + (p.tipo==='projecto'?' projecto':'') + '">' + tipo + '</span></div><div class="card-body"><div class="card-titulo">' + p.titulo + '</div><div class="card-entidade">' + (p.nomeEntidade||p.proponenteId?.nome||'—') + '</div>' + (p.areas?.[0]?'<span class="card-area">'+p.areas[0]+'</span>':'') + '<div class="card-descricao">' + (p.descricao||'') + '</div></div><div class="card-footer"><span class="estado ' + p.estado + '">' + (estadoLabels[p.estado]||p.estado) + '</span><span class="card-data">' + formatarData(p.criadaEm) + '</span></div></div>';
+    }).join('');
+  }
+
+  let debounceTimer;
+  function filtrar() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      const pesq    = document.getElementById('inputPesquisa').value.toLowerCase().trim();
+      const tipo    = document.getElementById('filtroTipo').value;
+      const area    = document.getElementById('filtroArea').value;
+      const empresa = document.getElementById('filtroEmpresa').value.toLowerCase().trim();
+      renderPropostas(todasPropostas.filter(p => {
+        if (tipo    && p.tipo !== tipo)                                          return false;
+        if (area    && !p.areas?.includes(area))                                 return false;
+        if (empresa && !(p.nomeEntidade||'').toLowerCase().includes(empresa))    return false;
+        if (pesq    && !p.titulo.toLowerCase().includes(pesq) && !p.descricao?.toLowerCase().includes(pesq)) return false;
+        return true;
+      }));
+    }, 250);
+  }
+  document.getElementById('inputPesquisa').addEventListener('input', filtrar);
+  document.getElementById('filtroTipo').addEventListener('change', filtrar);
+  document.getElementById('filtroArea').addEventListener('change', filtrar);
+  document.getElementById('filtroEmpresa').addEventListener('input', filtrar);
+
+  // ══ MODAL MULTI-PASSO ══
+  const PASSOS = [
+    'Sobre a Entidade',
+    'Tutor na Entidade',
+    'Dados da Proposta',
+    'Objectivos',
+    'Resultados Esperados',
+    'Plano e Perfil',
+    'Plug-IN e Resumo'
+  ];
+
+  let passoActual = 0;
+  let dadosProposta = {};
+  let cursoProposta = 'TeSP DTAM';
+
+  function esc(s) {
+    return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function abrirModal() {
+    passoActual = 0;
+    dadosProposta = { nomeEntidade:'', emailContacto:'', moradaEntidade:'', moradaLocal:'', tutorNome:'', tutorEmail:'', tutorCargo:'', curso: cursoProposta, tipo:'estagio', areas:[], titulo:'', objetivos:'', resultados:'', plano:'', perfilCand:'', plugIN: false };
+    req('/utilizadores/perfil').then(r => {
+      if (r.sucesso && r.dadosExtra?.curso) { cursoProposta = r.dadosExtra.curso; dadosProposta.curso = cursoProposta; }
+      renderPasso();
+    }).catch(() => renderPasso());
+    document.getElementById('modalOverlay').classList.add('aberto');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function fecharModal() {
+    document.getElementById('modalOverlay').classList.remove('aberto');
+    document.body.style.overflow = '';
+  }
+  document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === document.getElementById('modalOverlay')) fecharModal(); });
+
+  function actualizarProgress() {
+    const n = passoActual + 1, t = PASSOS.length;
+    document.getElementById('progressLabel').textContent   = PASSOS[passoActual];
+    document.getElementById('progressCounter').textContent = n + ' / ' + t;
+    document.getElementById('progressFill').style.width    = Math.round(n/t*100) + '%';
+    document.getElementById('modalPassoLabel').textContent = 'Passo ' + n + ' de ' + t;
+    const btnA = document.getElementById('btnAnterior');
+    btnA.className = passoActual === 0 ? 'btn-anterior invisivel' : 'btn-anterior';
+    const btnS = document.getElementById('btnSeguinte');
+    btnS.textContent = passoActual === PASSOS.length - 1 ? 'Submeter Proposta' : 'Seguinte →';
+    btnS.disabled = false;
+  }
+
+  function getPassoHTML(p) {
+    const areas = ['UI/UX','Front-end','Back-end','Full-stack','Mobile','Games/Graphics','Marketing Digital','Outro'];
+    switch(p) {
+      case 0: return '<div class="form-grid">' +
+        '<div class="form-campo"><label>Nome da entidade <span class="obg">*</span></label><input class="campo-input" type="text" id="f0" value="' + esc(dadosProposta.nomeEntidade) + '" placeholder="Ex: TechLisboa, Lda."></div>' +
+        '<div class="form-campo"><label>Email de contacto <span class="obg">*</span></label><input class="campo-input" type="email" id="f1" value="' + esc(dadosProposta.emailContacto) + '" placeholder="email@empresa.pt"></div>' +
+        '<div class="form-campo"><label>Morada da entidade <span class="obg">*</span></label><input class="campo-input" type="text" id="f2" value="' + esc(dadosProposta.moradaEntidade) + '" placeholder="Rua, n.º, Cidade"></div>' +
+        '<div class="form-campo"><label>Morada do local de estágio</label><input class="campo-input" type="text" id="f3" value="' + esc(dadosProposta.moradaLocal) + '" placeholder="Se diferente da entidade"></div>' +
+        '</div>';
+
+      case 1: return '<div class="form-grid">' +
+        '<div class="form-campo"><label>Nome do tutor <span class="obg">*</span></label><input class="campo-input" type="text" id="f0" value="' + esc(dadosProposta.tutorNome) + '" placeholder="Nome completo"></div>' +
+        '<div class="form-campo"><label>Email do tutor <span class="obg">*</span></label><input class="campo-input" type="email" id="f1" value="' + esc(dadosProposta.tutorEmail) + '" placeholder="tutor@empresa.pt"></div>' +
+        '</div>' +
+        '<div class="form-campo" style="margin-top:14px"><label>Cargo do tutor</label><input class="campo-input" type="text" id="f2" value="' + esc(dadosProposta.tutorCargo) + '" placeholder="Ex: Director de Tecnologia"></div>';
+
+      case 2: return '<div class="form-grid" style="margin-bottom:16px">' +
+        '<div class="form-campo"><label>Curso destinatário <span class="obg">*</span></label>' +
+        '<input class="campo-input readonly" type="text" readonly value="' + esc(dadosProposta.curso) + '">' +
+        '<p class="campo-nota">A proposta será submetida para o teu curso.</p></div>' +
+        '<div class="form-campo"><label>Tipo de proposta <span class="obg">*</span></label>' +
+        '<select class="campo-select" id="f0"><option value="estagio"' + (dadosProposta.tipo==='estagio'?' selected':'') + '>Estágio</option><option value="projecto"' + (dadosProposta.tipo==='projecto'?' selected':'') + '>Projecto</option></select></div>' +
+        '</div>' +
+        '<div class="form-campo" style="margin-bottom:16px"><label>Área(s) de actuação <span class="obg">*</span></label>' +
+        '<div class="areas-grid">' + areas.map(a => '<label class="area-check' + (dadosProposta.areas.includes(a)?' marcada':'') + '"><input type="checkbox" value="' + a + '" class="area-cb"' + (dadosProposta.areas.includes(a)?' checked':'') + '> ' + a + '</label>').join('') + '</div></div>' +
+        '<div class="form-campo"><label>Título da proposta <span class="obg">*</span> <span style="font-size:0.7rem;color:var(--cinza-texto);text-transform:none;font-weight:400">(máx. 50 car.)</span></label>' +
+        '<input class="campo-input" type="text" id="f1" value="' + esc(dadosProposta.titulo) + '" placeholder="Ex: Sistema de Gestão de Encomendas" maxlength="50"></div>';
+
+      case 3: return '<div class="form-campo" style="margin-bottom:10px"><label>Objectivos <span class="obg">*</span></label>' +
+        '<p class="campo-nota">O que se pretende alcançar com este estágio.</p></div>' +
+        '<textarea class="campo-textarea" id="f0" placeholder="Descreve os objectivos esperados no final do estágio…" style="min-height:240px">' + esc(dadosProposta.objetivos) + '</textarea>';
+
+      case 4: return '<div class="form-campo" style="margin-bottom:10px"><label>Resultados Esperados <span class="obg">*</span></label>' +
+        '<p class="campo-nota">O que o estudante deverá entregar ou produzir.</p></div>' +
+        '<textarea class="campo-textarea" id="f0" placeholder="Descreve os resultados e entregas esperadas…" style="min-height:240px">' + esc(dadosProposta.resultados) + '</textarea>';
+
+      case 5: return '<div class="form-campo" style="margin-bottom:8px"><label>Plano Provisório de Trabalho</label>' +
+        '<p class="campo-nota">Opcional — resumo das tarefas ao longo do estágio.</p></div>' +
+        '<textarea class="campo-textarea" id="f0" placeholder="Descreve o plano de trabalho…" style="min-height:120px">' + esc(dadosProposta.plano) + '</textarea>' +
+        '<hr class="separador">' +
+        '<div class="form-campo" style="margin-bottom:8px"><label>Perfil do Candidato Desejado</label>' +
+        '<p class="campo-nota">Opcional — competências e requisitos pretendidos.</p></div>' +
+        '<textarea class="campo-textarea" id="f1" placeholder="Descreve o perfil ideal do candidato…" style="min-height:120px">' + esc(dadosProposta.perfilCand) + '</textarea>';
+
+      case 6: return '<div class="form-campo" style="margin-bottom:22px"><label>Pretende participar no Plug-IN?</label>' +
+        '<div class="radio-grupo" style="margin-top:10px">' +
+        '<label class="radio-item' + (dadosProposta.plugIN?'':' marcada') + '"><input type="radio" name="plugin" value="false"' + (dadosProposta.plugIN?'':' checked') + '> Não</label>' +
+        '<label class="radio-item' + (dadosProposta.plugIN?' marcada':'') + '"><input type="radio" name="plugin" value="true"' + (dadosProposta.plugIN?' checked':'') + '> Sim</label>' +
+        '</div></div>' +
+        '<div style="background:#F5F5F5;border-radius:10px;padding:16px 18px">' +
+        '<div style="font-size:0.8rem;font-weight:700;color:var(--preto);margin-bottom:10px">Resumo da proposta</div>' +
+        '<div style="font-size:0.82rem;color:#555;display:grid;gap:6px">' +
+        '<div><b>Entidade:</b> ' + esc(dadosProposta.nomeEntidade) + '</div>' +
+        '<div><b>Tutor:</b> ' + esc(dadosProposta.tutorNome) + '</div>' +
+        '<div><b>Curso:</b> ' + esc(dadosProposta.curso) + '</div>' +
+        '<div><b>Tipo:</b> ' + (dadosProposta.tipo==='estagio'?'Estágio':'Projecto') + '</div>' +
+        '<div><b>Áreas:</b> ' + (dadosProposta.areas.join(', ')||'—') + '</div>' +
+        '<div><b>Título:</b> ' + esc(dadosProposta.titulo) + '</div>' +
+        '</div></div>';
+    }
+    return '';
+  }
+
+  function renderPasso() {
+    actualizarProgress();
+    const body = document.getElementById('modalBody');
+    body.innerHTML = '<div id="alertaModal" class="alerta-modal"></div>' + getPassoHTML(passoActual);
+
+    // Bind checkboxes de área (passo 2)
+    if (passoActual === 2) {
+      document.querySelectorAll('.area-cb').forEach(cb => {
+        cb.addEventListener('change', () => {
+          cb.closest('.area-check').classList.toggle('marcada', cb.checked);
+          dadosProposta.areas = [...document.querySelectorAll('.area-cb:checked')].map(c => c.value);
+        });
+      });
+    }
+
+    // Bind radios Plug-IN (passo 6)
+    if (passoActual === 6) {
+      document.querySelectorAll('input[name="plugin"]').forEach(r => {
+        r.addEventListener('change', () => {
+          document.querySelectorAll('.radio-item').forEach(el => el.classList.remove('marcada'));
+          r.closest('.radio-item').classList.add('marcada');
+          dadosProposta.plugIN = r.value === 'true';
+        });
+      });
+    }
+
+    body.scrollTop = 0;
+  }
+
+  function guardarPasso() {
+    const g = (id) => document.getElementById(id)?.value.trim() || '';
+    switch(passoActual) {
+      case 0: dadosProposta.nomeEntidade=g('f0'); dadosProposta.emailContacto=g('f1'); dadosProposta.moradaEntidade=g('f2'); dadosProposta.moradaLocal=g('f3'); break;
+      case 1: dadosProposta.tutorNome=g('f0'); dadosProposta.tutorEmail=g('f1'); dadosProposta.tutorCargo=g('f2'); break;
+      case 2: dadosProposta.tipo=document.getElementById('f0')?.value||'estagio'; dadosProposta.titulo=g('f1'); dadosProposta.areas=[...document.querySelectorAll('.area-cb:checked')].map(c=>c.value); break;
+      case 3: dadosProposta.objetivos=g('f0'); break;
+      case 4: dadosProposta.resultados=g('f0'); break;
+      case 5: dadosProposta.plano=g('f0'); dadosProposta.perfilCand=g('f1'); break;
+    }
+  }
+
+  function validarPasso() {
+    const al = document.getElementById('alertaModal');
+    al.className = 'alerta-modal';
+    const err = (msg) => { al.textContent = msg; al.className = 'alerta-modal erro'; al.scrollIntoView({behavior:'smooth',block:'nearest'}); return false; };
+    switch(passoActual) {
+      case 0: if (!dadosProposta.nomeEntidade) return err('O nome da entidade é obrigatório.'); if (!dadosProposta.emailContacto) return err('O email de contacto é obrigatório.'); if (!dadosProposta.moradaEntidade) return err('A morada da entidade é obrigatória.'); break;
+      case 1: if (!dadosProposta.tutorNome) return err('O nome do tutor é obrigatório.'); if (!dadosProposta.tutorEmail) return err('O email do tutor é obrigatório.'); break;
+      case 2: if (!dadosProposta.areas.length) return err('Selecciona pelo menos uma área.'); if (!dadosProposta.titulo) return err('O título da proposta é obrigatório.'); break;
+      case 3: if (!dadosProposta.objetivos) return err('Os objectivos são obrigatórios.'); break;
+      case 4: if (!dadosProposta.resultados) return err('Os resultados esperados são obrigatórios.'); break;
+    }
+    return true;
+  }
+
+  async function passo(dir) {
+    guardarPasso();
+    if (dir === 1 && !validarPasso()) return;
+    if (dir === 1 && passoActual === PASSOS.length - 1) { await submeter(); return; }
+    passoActual = Math.max(0, Math.min(PASSOS.length-1, passoActual+dir));
+    renderPasso();
+  }
+
+  async function submeter() {
+    const btn = document.getElementById('btnSeguinte');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin"></span>A submeter…';
+    try {
+      const resp = await req('/propostas', { method:'POST', body: JSON.stringify({
+        titulo: dadosProposta.titulo, tipo: dadosProposta.tipo, curso: dadosProposta.curso,
+        areas: dadosProposta.areas, plugIN: dadosProposta.plugIN,
+        descricao: dadosProposta.objetivos, objetivos: dadosProposta.objetivos,
+        resultadosEsperados: dadosProposta.resultados, planoTrabalho: dadosProposta.plano,
+        perfilCandidato: dadosProposta.perfilCand, nomeEntidade: dadosProposta.nomeEntidade,
+        emailContacto: dadosProposta.emailContacto, moradaEntidade: dadosProposta.moradaEntidade,
+        moradaLocalEstagio: dadosProposta.moradaLocal, tutorNome: dadosProposta.tutorNome,
+        tutorEmail: dadosProposta.tutorEmail, tutorCargo: dadosProposta.tutorCargo
+      })});
+      if (!resp.sucesso) throw new Error(resp.mensagem);
+      const al = document.getElementById('alertaModal');
+      al.textContent = '✔ Proposta submetida com sucesso! Aguarda aprovação da CCA.';
+      al.className = 'alerta-modal sucesso';
+      btn.innerHTML = '✔ Submetida';
+      setTimeout(() => { fecharModal(); carregarPropostas(); btn.disabled=false; btn.textContent='Submeter Proposta'; }, 1600);
+    } catch(err) {
+      const al = document.getElementById('alertaModal');
+      al.textContent = err.message;
+      al.className = 'alerta-modal erro';
+      btn.disabled = false;
+      btn.textContent = 'Submeter Proposta';
+    }
+  }
+
+  carregarPropostas();
+</script>
+</body>
+</html>

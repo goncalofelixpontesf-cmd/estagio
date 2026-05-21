@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESMAD</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.ico">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --laranja:       #F15A24;
+      --laranja-hover: #d94d1c;
+      --laranja-light: #FEE8DF;
+      --preto:         #1A1A1A;
+      --cinza-bg:      #F4F4F4;
+      --cinza-texto:   #888888;
+      --cinza-linha:   #EEEEEE;
+      --branco:        #FFFFFF;
+      --azul:          #2E75B6;
+      --azul-light:    #EBF3FB;
+      --verde:         #70AD47;
+      --verde-light:   #E2EFDA;
+      --amarelo:       #BF8F00;
+      --amarelo-light: #FFF2CC;
+      --vermelho:      #C00000;
+      --vermelho-light:#FFDEDE;
+      --sidebar-w:     220px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--cinza-bg);
+      color: var(--preto);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ══ SIDEBAR ══ */
+    .sidebar {
+      width: var(--sidebar-w); background: var(--laranja);
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; height: 100vh; z-index: 100;
+    }
+    .sidebar-logo { padding: 22px 0 18px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.18); }
+    .sidebar-logo span { color: var(--branco); font-size: 1.35rem; font-weight: 800; letter-spacing: 2px; }
+    .sidebar-nav { flex: 1; padding: 12px 0; }
+    .nav-item {
+      display: block; padding: 13px 28px;
+      color: rgba(255,255,255,0.82); font-size: 0.88rem; font-weight: 500;
+      text-decoration: none; cursor: pointer; border: none; background: none;
+      width: 100%; text-align: left; transition: background 0.15s, color 0.15s;
+    }
+    .nav-item:hover  { background: rgba(0,0,0,0.12); color: var(--branco); }
+    .nav-item.activo { background: rgba(0,0,0,0.18); color: var(--branco); font-weight: 700; }
+    .sidebar-footer { padding: 18px 28px; border-top: 1px solid rgba(255,255,255,0.18); }
+    .sidebar-footer .nome   { color: var(--branco); font-size: 0.82rem; font-weight: 600; }
+    .sidebar-footer .perfil { color: rgba(255,255,255,0.65); font-size: 0.75rem; margin-top: 2px; }
+
+    /* ══ MAIN ══ */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    .topbar {
+      background: var(--branco); padding: 18px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--cinza-linha);
+      position: sticky; top: 0; z-index: 50;
+    }
+    .topbar-info .titulo    { font-size: 1rem; font-weight: 700; }
+    .topbar-info .subtitulo { font-size: 0.78rem; color: var(--cinza-texto); margin-top: 1px; }
+    .avatar {
+      width: 38px; height: 38px; background: var(--laranja); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--branco); font-weight: 700; font-size: 0.95rem;
+      cursor: pointer; flex-shrink: 0;
+    }
+
+    .content { padding: 24px 32px; flex: 1; }
+
+    /* ══ STATS ══ */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(2, 220px);
+      gap: 16px; margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--branco); border-radius: 12px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+      padding: 20px 22px; text-align: center;
+    }
+    .stat-card .num   { font-size: 2rem; font-weight: 800; line-height: 1; margin-bottom: 6px; }
+    .stat-card .label { font-size: 0.75rem; color: var(--cinza-texto); font-weight: 500; }
+    .stat-card.laranja { background: var(--laranja-light); }
+    .stat-card.laranja .num { color: var(--laranja); }
+    .stat-card.azul    { background: var(--azul-light); }
+    .stat-card.azul    .num { color: var(--azul); }
+
+    /* Skeleton */
+    .skeleton {
+      background: linear-gradient(90deg,#ececec 25%,#f5f5f5 50%,#ececec 75%);
+      background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 6px;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    /* ══ SECÇÕES ══ */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
+    }
+    .section-title { font-size: 1rem; font-weight: 700; }
+
+    /* Tabela */
+    .tabela-card {
+      background: var(--branco); border-radius: 12px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06); overflow: hidden; margin-bottom: 24px;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #F8F8F8; }
+    th {
+      padding: 12px 16px; text-align: left;
+      font-size: 0.72rem; font-weight: 700; color: var(--cinza-texto);
+      text-transform: uppercase; letter-spacing: 0.4px;
+      border-bottom: 1px solid var(--cinza-linha); white-space: nowrap;
+    }
+    td {
+      padding: 13px 16px; font-size: 0.83rem;
+      border-bottom: 1px solid var(--cinza-linha); vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #FAFAFA; }
+
+    .titulo-link {
+      font-weight: 600; cursor: pointer; color: var(--preto); transition: color 0.15s;
+    }
+    .titulo-link:hover { color: var(--laranja); }
+
+    /* Tags e estados */
+    .tag {
+      display: inline-block; padding: 3px 10px; border-radius: 4px;
+      font-size: 0.72rem; font-weight: 600;
+    }
+    .tag.estagio  { background: var(--laranja-light); color: var(--laranja); }
+    .tag.projecto { background: var(--azul-light); color: var(--azul); }
+    .tag.area     { background: var(--azul-light); color: var(--azul); }
+
+    .estado {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 0.78rem; font-weight: 600;
+    }
+    .estado::before { content: ''; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .estado.aprovada::before  { background: var(--verde); }
+    .estado.pendente::before  { background: var(--amarelo); }
+    .estado.rejeitada::before { background: var(--vermelho); }
+    .estado.atribuida::before { background: var(--azul); }
+
+    .badge-cand {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--azul-light); color: var(--azul);
+      border-radius: 4px; padding: 3px 9px; font-size: 0.72rem; font-weight: 700;
+    }
+
+    /* Botões tabela */
+    .btn-ver {
+      background: var(--laranja-light); color: var(--laranja);
+      border: none; border-radius: 6px; padding: 6px 14px;
+      font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 700;
+      cursor: pointer; transition: opacity 0.15s; white-space: nowrap;
+    }
+    .btn-ver:hover { opacity: 0.8; }
+
+    .vazio { padding: 36px 16px; text-align: center; color: var(--cinza-texto); font-size: 0.86rem; }
+    .vazio .emoji { font-size: 1.8rem; margin-bottom: 8px; }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      font-size: 0.82rem; color: var(--cinza-texto);
+      margin-bottom: 18px; display: flex; align-items: center; gap: 6px;
+    }
+    .breadcrumb .link { color: var(--laranja); font-weight: 600; cursor: pointer; }
+    .breadcrumb .link:hover { text-decoration: underline; }
+
+    /* ══ TABELA ESTUDANTES INTERESSADOS ══ */
+    .acoes-linha { display: flex; gap: 6px; align-items: center; }
+
+    .btn-agendar {
+      border: none; border-radius: 6px; padding: 6px 12px;
+      font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 700;
+      cursor: pointer; transition: opacity 0.15s; white-space: nowrap;
+    }
+    .btn-agendar.ativo    { background: var(--laranja); color: var(--branco); }
+    .btn-agendar.inativo  { background: #F0F0F0; color: var(--cinza-texto); }
+    .btn-agendar:hover    { opacity: 0.85; }
+
+    .btn-escolher {
+      border: none; border-radius: 6px; padding: 6px 12px;
+      font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 700;
+      cursor: pointer; background: var(--verde-light); color: var(--verde);
+      transition: opacity 0.15s; white-space: nowrap;
+    }
+    .btn-escolher:hover { opacity: 0.8; }
+    .btn-escolher.escolhido { background: var(--verde); color: var(--branco); cursor: default; }
+
+    .badge-estado {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 4px; font-size: 0.72rem; font-weight: 600;
+    }
+    .badge-estado.pendente           { background: var(--amarelo-light); color: var(--amarelo); }
+    .badge-estado.entrevista_agendada{ background: var(--azul-light);    color: var(--azul); }
+    .badge-estado.aceite             { background: var(--verde-light);   color: var(--verde); }
+    .badge-estado.rejeitada          { background: var(--vermelho-light); color: var(--vermelho); }
+
+    .btn-enviar-cca {
+      background: var(--laranja); color: var(--branco);
+      border: none; border-radius: 8px; padding: 10px 22px;
+      font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 700;
+      cursor: pointer; transition: background 0.15s; float: right; margin-bottom: 8px;
+    }
+    .btn-enviar-cca:hover { background: var(--laranja-hover); }
+
+    .link-portfolio { color: var(--azul); text-decoration: none; font-size: 0.82rem; font-weight: 500; }
+    .link-portfolio:hover { text-decoration: underline; }
+
+    /* ══ MODAIS ══ */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.42); z-index: 400;
+      align-items: center; justify-content: center; padding: 16px;
+    }
+    .modal-overlay.aberto { display: flex; }
+    .modal {
+      background: var(--branco); border-radius: 14px;
+      width: 100%; max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    }
+    .modal-topo { height: 6px; background: var(--laranja); border-radius: 14px 14px 0 0; }
+    .modal-header {
+      padding: 22px 26px 0;
+      display: flex; align-items: flex-start; justify-content: space-between;
+    }
+    .modal-header h2 { font-size: 1rem; font-weight: 700; }
+    .modal-header .sub { font-size: 0.78rem; color: var(--cinza-texto); margin-top: 3px; }
+    .btn-fechar {
+      background: none; border: none; cursor: pointer; color: var(--cinza-texto);
+      font-size: 1.2rem; padding: 2px 6px; transition: color 0.15s; flex-shrink: 0;
+    }
+    .btn-fechar:hover { color: var(--preto); }
+    .modal-body { padding: 18px 26px; }
+    .modal-footer {
+      padding: 0 26px 22px;
+      display: flex; justify-content: flex-end; gap: 10px;
+    }
+    .linha-modal { border: none; border-top: 1px solid var(--cinza-linha); margin: 12px 0; }
+
+    .alerta-modal {
+      display: none; border-radius: 8px; padding: 10px 13px;
+      font-size: 0.8rem; font-weight: 500; margin-bottom: 12px;
+    }
+    .alerta-modal.erro    { background: var(--vermelho-light); color: var(--vermelho); display: block; }
+    .alerta-modal.sucesso { background: var(--verde-light);    color: var(--verde);    display: block; }
+
+    /* Campos modal */
+    .campo-label {
+      font-size: 0.72rem; font-weight: 700; color: var(--preto);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 7px; display: block;
+    }
+    .campo-input {
+      width: 100%; background: #F5F5F5; border: 1.5px solid transparent;
+      border-radius: 8px; padding: 12px 14px;
+      font-family: 'Inter', sans-serif; font-size: 0.86rem; color: var(--preto);
+      outline: none; transition: border-color 0.18s, box-shadow 0.18s; margin-bottom: 14px;
+    }
+    .campo-input::placeholder { color: #BBBBBB; }
+    .campo-input:focus { background: var(--branco); border-color: var(--laranja); box-shadow: 0 0 0 3px rgba(241,90,36,0.10); }
+
+    .btn-m-cancelar {
+      background: #F0F0F0; color: #666; border: none; border-radius: 8px;
+      padding: 10px 20px; font-family: 'Inter', sans-serif; font-size: 0.84rem;
+      font-weight: 500; cursor: pointer; transition: background 0.15s;
+    }
+    .btn-m-cancelar:hover { background: #E4E4E4; }
+    .btn-m-primario {
+      background: var(--laranja); color: var(--branco); border: none; border-radius: 8px;
+      padding: 10px 22px; font-family: 'Inter', sans-serif; font-size: 0.84rem;
+      font-weight: 700; cursor: pointer; transition: background 0.15s;
+    }
+    .btn-m-primario:hover    { background: var(--laranja-hover); }
+    .btn-m-primario:disabled { opacity: 0.65; cursor: not-allowed; }
+
+    /* Spin */
+    .spin {
+      display: inline-block; width: 13px; height: 13px;
+      border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff;
+      border-radius: 50%; animation: girar 0.6s linear infinite;
+      vertical-align: middle; margin-right: 6px;
+    }
+    @keyframes girar { to { transform: rotate(360deg); } }
+
+
+    /* ══ MODAL NOVA PROPOSTA ══ */
+    .btn-nova {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--laranja); color: var(--branco);
+      border: none; border-radius: 8px; padding: 9px 18px;
+      font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 700;
+      cursor: pointer; transition: background 0.15s; white-space: nowrap;
+    }
+    .btn-nova:hover { background: var(--laranja-hover); }
+
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.42); z-index: 400;
+      align-items: center; justify-content: center; padding: 16px;
+    }
+    .modal-overlay.aberto { display: flex; }
+    .modal-np {
+      background: var(--branco); border-radius: 14px;
+      width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    }
+    .modal-topo-np { height: 6px; background: var(--laranja); border-radius: 14px 14px 0 0; }
+    .modal-header-np {
+      padding: 22px 28px 0;
+      display: flex; align-items: flex-start; justify-content: space-between;
+    }
+    .modal-header-np h2 { font-size: 1rem; font-weight: 700; }
+    .modal-header-np .sub { font-size: 0.78rem; color: var(--cinza-texto); margin-top: 2px; }
+    .btn-fechar-np {
+      background: none; border: none; cursor: pointer;
+      color: var(--cinza-texto); font-size: 1.2rem; padding: 2px 6px;
+      transition: color 0.15s; flex-shrink: 0;
+    }
+    .btn-fechar-np:hover { color: var(--preto); }
+    .modal-body-np { padding: 18px 28px; }
+    .modal-footer-np {
+      display: flex; align-items: center; justify-content: flex-end;
+      gap: 10px; padding: 0 28px 24px;
+    }
+
+    /* Formulário */
+    .form-secao-titulo {
+      font-size: 0.8rem; font-weight: 700; color: var(--preto);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 14px; padding-bottom: 8px;
+      border-bottom: 1px solid var(--cinza-linha);
+    }
+    .form-grid-np { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .form-campo-np label {
+      display: block; font-size: 0.72rem; font-weight: 700; color: var(--preto);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 7px;
+    }
+    .form-campo-np label .obg { color: var(--laranja); }
+    .form-campo-np input:not([type="checkbox"]):not([type="radio"]),
+    .form-campo-np select,
+    .form-campo-np textarea {
+      width: 100%; background: #F5F5F5; border: 1.5px solid transparent;
+      border-radius: 8px; padding: 11px 14px;
+      font-family: 'Inter', sans-serif; font-size: 0.84rem; color: var(--preto);
+      outline: none; transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
+      appearance: none;
+    }
+    .form-campo-np textarea { resize: vertical; min-height: 82px; }
+    .form-campo-np input::placeholder, .form-campo-np textarea::placeholder { color: #BBBBBB; }
+    .form-campo-np input:not([type="checkbox"]):not([type="radio"]):focus,
+    .form-campo-np select:focus, .form-campo-np textarea:focus {
+      background: var(--branco); border-color: var(--laranja);
+      box-shadow: 0 0 0 3px rgba(241,90,36,0.10);
+    }
+    .form-campo-np select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+      background-color: #F5F5F5; padding-right: 32px;
+    }
+    .form-campo-np select:focus { background-color: var(--branco); }
+
+    .areas-grid-np {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 8px; margin-bottom: 14px;
+    }
+    .area-check-np {
+      display: flex; align-items: center; gap: 8px; cursor: pointer;
+      font-size: 0.8rem; color: var(--preto); padding: 7px 10px;
+      border-radius: 6px; border: 1.5px solid var(--cinza-linha);
+      background: #F9F9F9; transition: border-color 0.15s, background 0.15s;
+      user-select: none;
+    }
+    .area-check-np:hover { border-color: var(--laranja); background: var(--laranja-light); }
+    .area-check-np.marcada { border-color: var(--laranja); background: var(--laranja-light); }
+    .area-check-np input[type="checkbox"] {
+      width: 15px; height: 15px; flex-shrink: 0; cursor: pointer;
+      accent-color: var(--laranja); margin: 0; padding: 0;
+    }
+
+    .radio-grupo-np { display: flex; gap: 10px; margin-bottom: 14px; }
+    .radio-item-np {
+      display: flex; align-items: center; gap: 8px; font-size: 0.84rem;
+      cursor: pointer; padding: 8px 18px; border-radius: 6px;
+      border: 1.5px solid var(--cinza-linha); background: #F9F9F9;
+      transition: border-color 0.15s, background 0.15s; user-select: none;
+    }
+    .radio-item-np:hover { border-color: var(--laranja); background: var(--laranja-light); }
+    .radio-item-np.marcada { border-color: var(--laranja); background: var(--laranja-light); }
+    .radio-item-np input[type="radio"] {
+      width: 15px; height: 15px; accent-color: var(--laranja);
+      cursor: pointer; margin: 0; padding: 0;
+    }
+
+    .separador-np { border: none; border-top: 1px solid var(--cinza-linha); margin: 18px 0; }
+
+    .btn-cancelar-np {
+      background: #F0F0F0; color: #666; border: none; border-radius: 8px;
+      padding: 11px 22px; font-family: 'Inter', sans-serif; font-size: 0.84rem;
+      font-weight: 500; cursor: pointer; transition: background 0.15s;
+    }
+    .btn-cancelar-np:hover { background: #E4E4E4; }
+    .btn-submeter-np {
+      background: var(--laranja); color: var(--branco); border: none;
+      border-radius: 8px; padding: 11px 24px; font-family: 'Inter', sans-serif;
+      font-size: 0.84rem; font-weight: 700; cursor: pointer; transition: background 0.15s;
+    }
+    .btn-submeter-np:hover    { background: var(--laranja-hover); }
+    .btn-submeter-np:disabled { opacity: 0.65; cursor: not-allowed; }
+
+    .alerta-modal-np {
+      display: none; border-radius: 8px; padding: 11px 14px;
+      font-size: 0.82rem; font-weight: 500; margin-bottom: 14px;
+    }
+    .alerta-modal-np.erro    { background: #FFDEDE; color: var(--vermelho); display: block; }
+    .alerta-modal-np.sucesso { background: #DFF0D8; color: #375623; display: block; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      padding: 12px 20px; border-radius: 8px; font-size: 0.84rem; font-weight: 500;
+      transform: translateY(80px); opacity: 0; z-index: 500; max-width: 320px;
+      transition: transform 0.3s, opacity 0.3s; color: var(--branco);
+    }
+    .toast.visivel { transform: translateY(0); opacity: 1; }
+    .toast.sucesso { background: var(--verde); }
+    .toast.erro    { background: var(--vermelho); }
+    .toast.info    { background: var(--preto); }
+
+    /* Mobile */
+    .menu-toggle {
+      display: none; position: fixed; top: 14px; left: 14px; z-index: 200;
+      background: var(--laranja); border: none; border-radius: 8px;
+      padding: 8px 10px; cursor: pointer; color: white; font-size: 1.1rem;
+    }
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 90; }
+
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
+      .sidebar.aberta { transform: translateX(0); }
+      .sidebar-overlay.visivel { display: block; }
+      .main { margin-left: 0; }
+      .menu-toggle { display: block; }
+      .topbar { padding-left: 56px; }
+      .content { padding: 20px 16px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      th:nth-child(4), td:nth-child(4) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="menu-toggle" id="menuToggle">☰</button>
+<div class="sidebar-overlay" id="overlay"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><span>ESMAD</span></div>
+  <nav class="sidebar-nav">
+    <a class="nav-item" id="navPropostas"  onclick="mostrarSecao('propostas')">As Minhas Propostas</a>
+    <a class="nav-item" id="navInteressados" href="estudantes-interessados.html">Estudantes Interessados</a>
+    <a class="nav-item" id="navEntrevistas" href="entrevistas.html">Entrevistas</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="nome" id="sidebarNome">—</div>
+    <div class="perfil" id="sidebarPerfil">Entidade</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-info">
+      <div class="titulo" id="topbarTitulo">Olá 👋</div>
+      <div class="subtitulo">Acompanhe as suas propostas</div>
+    </div>
+    <div class="avatar" id="avatar">?</div>
+  </div>
+
+  <div class="content" id="conteudo">
+    <!-- renderizado por JS -->
+  </div>
+</main>
+
+<!-- ══ MODAL 14 — AGENDAR ENTREVISTA ══ -->
+<div class="modal-overlay" id="modalAgendar">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-topo"></div>
+    <div class="modal-header">
+      <div>
+        <h2>Agendar Entrevista</h2>
+        <div class="sub" id="agendarSub">—</div>
+      </div>
+      <button class="btn-fechar" onclick="fecharModal('modalAgendar')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="alertaAgendar" class="alerta-modal"></div>
+      <div class="linha-modal" style="margin-top:4px"></div>
+
+      <label class="campo-label">Data e Hora <span style="color:var(--laranja)">*</span></label>
+      <input type="datetime-local" class="campo-input" id="agendarData">
+
+      <label class="campo-label">Local / Link da Entrevista <span style="color:var(--laranja)">*</span></label>
+      <input type="text" class="campo-input" id="agendarLocal"
+        placeholder="Ex: Google Meet, Zoom ou morada física">
+    </div>
+    <div class="modal-footer">
+      <button class="btn-m-cancelar" onclick="fecharModal('modalAgendar')">Cancelar</button>
+      <button class="btn-m-primario" id="btnConfirmarAgendar" onclick="confirmarAgendar()">
+        Confirmar Entrevista
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL — ESCOLHER ESTUDANTE ══ -->
+<div class="modal-overlay" id="modalEscolher">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-topo"></div>
+    <div class="modal-header">
+      <div>
+        <h2>Indicar Estudante Escolhido</h2>
+        <div class="sub" id="escolherSub">—</div>
+      </div>
+      <button class="btn-fechar" onclick="fecharModal('modalEscolher')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="alertaEscolher" class="alerta-modal"></div>
+      <div class="linha-modal" style="margin-top:4px"></div>
+      <p style="font-size:0.86rem;color:#444;line-height:1.6;margin-bottom:12px">
+        Ao confirmar, o estudante será notificado da aceitação e as restantes candidaturas
+        serão automaticamente rejeitadas.
+      </p>
+      <p style="font-size:0.88rem;font-weight:600;color:var(--preto)">
+        Estudante: <span id="escolherNomeEstudante" style="color:var(--laranja)">—</span>
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-m-cancelar" onclick="fecharModal('modalEscolher')">Cancelar</button>
+      <button class="btn-m-primario" id="btnConfirmarEscolher" onclick="confirmarEscolher()"
+        style="background:var(--verde)">Confirmar Escolha</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ MODAL NOVA PROPOSTA ══ -->
+<div class="modal-overlay" id="modalNovaProposta">
+  <div class="modal-np">
+    <div class="modal-topo-np"></div>
+    <div class="modal-header-np">
+      <div>
+        <h2>Submeter Nova Proposta</h2>
+        <div class="sub">Preencha os campos com os dados da proposta</div>
+      </div>
+      <button class="btn-fechar-np" onclick="fecharModalProposta()">✕</button>
+    </div>
+    <div class="modal-body-np">
+
+      <div id="alertaModalNP" class="alerta-modal-np"></div>
+
+      <form id="formNovaProposta" novalidate>
+
+        <div class="form-secao-titulo">Sobre a Entidade</div>
+        <div class="form-grid-np">
+          <div class="form-campo-np">
+            <label>Nome da entidade <span class="obg">*</span></label>
+            <input type="text" id="np_nomeEntidade" placeholder="Ex: TechLisboa, Lda.">
+          </div>
+          <div class="form-campo-np">
+            <label>Email de contacto <span class="obg">*</span></label>
+            <input type="email" id="np_emailContacto" placeholder="email@empresa.pt">
+          </div>
+          <div class="form-campo-np">
+            <label>Morada da entidade <span class="obg">*</span></label>
+            <input type="text" id="np_moradaEntidade" placeholder="Rua, n.º, Cidade">
+          </div>
+          <div class="form-campo-np">
+            <label>Morada do local de estágio</label>
+            <input type="text" id="np_moradaLocal" placeholder="Se diferente da morada da entidade">
+          </div>
+        </div>
+
+        <hr class="separador-np">
+
+        <div class="form-secao-titulo">Tutor na Entidade</div>
+        <div class="form-grid-np">
+          <div class="form-campo-np">
+            <label>Nome do tutor <span class="obg">*</span></label>
+            <input type="text" id="np_tutorNome" placeholder="Nome completo">
+          </div>
+          <div class="form-campo-np">
+            <label>Email do tutor <span class="obg">*</span></label>
+            <input type="email" id="np_tutorEmail" placeholder="tutor@empresa.pt">
+          </div>
+          <div class="form-campo-np">
+            <label>Cargo do tutor</label>
+            <input type="text" id="np_tutorCargo" placeholder="Ex: Director de Tecnologia">
+          </div>
+        </div>
+
+        <hr class="separador-np">
+
+        <div class="form-secao-titulo">Proposta de Estágio</div>
+        <div class="form-grid-np">
+          <div class="form-campo-np">
+            <label>Curso destinatário <span class="obg">*</span></label>
+            <select id="np_curso">
+              <option value="TeSP DTAM">TeSP DTAM</option>
+              <option value="Lic. TSI Web">Lic. TSI Web</option>
+            </select>
+          </div>
+          <div class="form-campo-np">
+            <label>Tipo de proposta <span class="obg">*</span></label>
+            <select id="np_tipo">
+              <option value="estagio">Estágio</option>
+              <option value="projecto">Projecto</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-campo-np" style="margin-bottom:14px">
+          <label>Área(s) de atuação <span class="obg">*</span></label>
+          <div class="areas-grid-np">
+            <label class="area-check-np"><input type="checkbox" value="UI/UX"             class="np-area-cb"> UI/UX</label>
+            <label class="area-check-np"><input type="checkbox" value="Front-end"          class="np-area-cb"> Front-end</label>
+            <label class="area-check-np"><input type="checkbox" value="Back-end"           class="np-area-cb"> Back-end</label>
+            <label class="area-check-np"><input type="checkbox" value="Full-stack"         class="np-area-cb"> Full-stack</label>
+            <label class="area-check-np"><input type="checkbox" value="Mobile"             class="np-area-cb"> Mobile</label>
+            <label class="area-check-np"><input type="checkbox" value="Games/Graphics"     class="np-area-cb"> Games/Graphics</label>
+            <label class="area-check-np"><input type="checkbox" value="Marketing Digital"  class="np-area-cb"> Marketing Digital</label>
+            <label class="area-check-np"><input type="checkbox" value="Outro"              class="np-area-cb"> Outro</label>
+          </div>
+        </div>
+
+        <div class="form-campo-np" style="margin-bottom:14px">
+          <label>Título da proposta <span class="obg">*</span>
+            <span style="font-size:0.7rem;color:var(--cinza-texto);text-transform:none;font-weight:400">(máx. 50 caracteres)</span>
+          </label>
+          <input type="text" id="np_titulo" placeholder="Ex: Sistema de Gestão de Encomendas" maxlength="50">
+        </div>
+
+        <div class="form-grid-np">
+          <div class="form-campo-np">
+            <label>Objetivos <span class="obg">*</span></label>
+            <textarea id="np_objetivos" placeholder="Objetivos esperados no final do estágio…"></textarea>
+          </div>
+          <div class="form-campo-np">
+            <label>Resultados esperados <span class="obg">*</span></label>
+            <textarea id="np_resultados" placeholder="O que se espera que o estudante entregue…"></textarea>
+          </div>
+        </div>
+
+        <div class="form-grid-np">
+          <div class="form-campo-np">
+            <label>Plano provisório de trabalho</label>
+            <textarea id="np_plano" placeholder="Plano resumido do trabalho ao longo do estágio…"></textarea>
+          </div>
+          <div class="form-campo-np">
+            <label>Perfil do candidato desejado</label>
+            <textarea id="np_perfil" placeholder="Competências e requisitos pretendidos…"></textarea>
+          </div>
+        </div>
+
+        <div class="form-campo-np">
+          <label>Pretende participar no Plug-IN?</label>
+          <div class="radio-grupo-np">
+            <label class="radio-item-np"><input type="radio" name="np_plugin" value="true"> Sim</label>
+            <label class="radio-item-np marcada"><input type="radio" name="np_plugin" value="false" checked> Não</label>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <div class="modal-footer-np">
+      <button class="btn-cancelar-np" onclick="fecharModalProposta()">Cancelar</button>
+      <button class="btn-submeter-np" id="btnSubmeterNP" onclick="submeterNovaProposta()">Submeter Proposta</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const API = 'http://localhost:5000/api';
+  const token = localStorage.getItem('esmad_token');
+  const user  = localStorage.getItem('esmad_user');
+  if (!token || !user) { window.location.href = 'login.html'; }
+
+  const utilizador = JSON.parse(user);
+  if (!['docente','entidade'].includes(utilizador.perfil)) { window.location.href = 'login.html'; }
+
+  const primeiroNome = utilizador.nome.split(' ')[0];
+  document.getElementById('topbarTitulo').textContent = `Olá, ${primeiroNome} 👋`;
+  document.getElementById('sidebarNome').textContent  = utilizador.nome;
+  document.getElementById('sidebarPerfil').textContent = utilizador.perfil === 'docente' ? 'Docente' : 'Entidade';
+  document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
+
+  document.getElementById('avatar').addEventListener('click', () => {
+    if (confirm('Tens a certeza que queres fazer logout?')) {
+      localStorage.clear(); window.location.href = 'login.html';
+    }
+  });
+
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  document.getElementById('menuToggle').addEventListener('click', () => {
+    sidebar.classList.toggle('aberta'); overlay.classList.toggle('visivel');
+  });
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('aberta'); overlay.classList.remove('visivel');
+  });
+
+  // ── API helper ──
+  function req(endpoint, opts = {}) {
+    return fetch(`${API}${endpoint}`, {
+      ...opts,
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...(opts.headers||{}) }
+    }).then(r => r.json());
+  }
+
+  function formatarData(str) {
+    if (!str) return '—';
+    return new Date(str).toLocaleDateString('pt-PT', { day:'2-digit', month:'2-digit', year:'2-digit' });
+  }
+
+  function formatarDataHora(str) {
+    if (!str) return '—';
+    return new Date(str).toLocaleString('pt-PT', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' });
+  }
+
+  function mostrarToast(msg, tipo = 'info') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = `toast ${tipo} visivel`;
+    setTimeout(() => { t.className = `toast ${tipo}`; }, 3000);
+  }
+
+  function fecharModal(id) {
+    document.getElementById(id).classList.remove('aberto');
+    document.body.style.overflow = '';
+    const al = document.getElementById(id).querySelector('.alerta-modal');
+    if (al) al.className = 'alerta-modal';
+  }
+
+  function abrirModal(id) {
+    document.getElementById(id).classList.add('aberto');
+    document.body.style.overflow = 'hidden';
+  }
+
+  document.querySelectorAll('.modal-overlay').forEach(el => {
+    el.addEventListener('click', e => { if (e.target === el) fecharModal(el.id); });
+  });
+
+  // ── Estado global ──
+  let todasMinhasPropostas = [];
+  let candidaturaActiva    = null;
+  let propostaActivaId     = null;
+
+  // ══ SECÇÃO DASHBOARD ══
+  async function carregarDashboard() {
+    const c = document.getElementById('conteudo');
+    c.innerHTML = `
+      <div class="stats-grid">
+        <div class="stat-card laranja">
+          <div class="skeleton" style="height:32px;width:60px;margin:0 auto 8px"></div>
+          <div class="skeleton" style="height:12px;width:110px;margin:0 auto"></div>
+        </div>
+        <div class="stat-card azul">
+          <div class="skeleton" style="height:32px;width:60px;margin:0 auto 8px"></div>
+          <div class="skeleton" style="height:12px;width:120px;margin:0 auto"></div>
+        </div>
+      </div>
+      <div class="section-header">
+        <h2 class="section-title">As Minhas Propostas</h2>
+        <button class="btn-nova" onclick="abrirModalProposta()">Nova Proposta <span>+</span></button>
+      </div>
+      <div class="tabela-card">
+        <table><thead><tr><th>Título</th><th>Área</th><th>Estado</th><th>Interessados</th><th>Ações</th></tr></thead>
+        <tbody id="tbPropostas"><tr><td colspan="5"><div class="vazio"><div class="emoji">⏳</div>A carregar…</div></td></tr></tbody>
+        </table>
+      </div>`;
+
+    try {
+      const dados = await req('/propostas');
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+
+      // Filtrar apenas as propostas do utilizador autenticado
+      const minhas = dados.propostas.filter(p =>
+        p.proponenteId?._id === utilizador.id || p.proponenteId === utilizador.id
+      );
+      todasMinhasPropostas = minhas;
+
+      // Contar candidaturas (precisamos de ir buscar por proposta aprovada)
+      let totalInteressados = 0;
+      const comCandidaturas = await Promise.all(
+        minhas.filter(p => p.estado === 'aprovada').map(async p => {
+          try {
+            const c = await req(`/candidaturas/proposta/${p._id}`);
+            const n = c.sucesso ? c.total : 0;
+            totalInteressados += n;
+            return { ...p, numCandidatos: n };
+          } catch { return { ...p, numCandidatos: 0 }; }
+        })
+      );
+
+      // Merge candidaturas com propostas
+      const propostasComInfo = minhas.map(p => {
+        const found = comCandidaturas.find(c => c._id === p._id);
+        return found || { ...p, numCandidatos: 0 };
+      });
+      todasMinhasPropostas = propostasComInfo;
+
+      // Render stats
+      document.querySelector('.stats-grid').innerHTML = `
+        <div class="stat-card laranja">
+          <div class="num">${minhas.length}</div>
+          <div class="label">Propostas Ativas</div>
+        </div>
+        <div class="stat-card azul">
+          <div class="num">${totalInteressados}</div>
+          <div class="label">Estudantes Interessados</div>
+        </div>`;
+
+      // Render tabela
+      const tbody = document.getElementById('tbPropostas');
+      if (!minhas.length) {
+        tbody.innerHTML = `<tr><td colspan="5"><div class="vazio"><div class="emoji">📭</div>Ainda não submeteu nenhuma proposta.</div></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = propostasComInfo.map(p => `
+        <tr>
+          <td><span class="titulo-link" onclick="window.location.href='estudantes-interessados.html?proposta=${p._id}'">${p.titulo}</span></td>
+          <td>${(p.areas||[]).slice(0,2).map(a=>`<span class="tag area">${a}</span>`).join(' ')}</td>
+          <td><span class="estado ${p.estado}">${{aprovada:'Aprovada',pendente:'Pendente',rejeitada:'Rejeitada',atribuida:'Atribuída'}[p.estado]||p.estado}</span></td>
+          <td>
+            ${p.estado === 'aprovada' && p.numCandidatos > 0
+              ? `<span class="badge-cand">👥 ${p.numCandidatos}</span>`
+              : '<span style="color:var(--cinza-texto)">—</span>'}
+          </td>
+          <td>
+            ${p.estado === 'aprovada' && p.numCandidatos > 0
+              ? `<button class="btn-ver" onclick="window.location.href='estudantes-interessados.html?proposta=${p._id}'">Ver candidatos</button>`
+              : ''}
+          </td>
+        </tr>
+      `).join('');
+
+    } catch (err) {
+      document.getElementById('tbPropostas').innerHTML =
+        `<tr><td colspan="5"><div class="vazio"><div class="emoji">⚠️</div>${err.message}</div></td></tr>`;
+    }
+  }
+
+  // ══ SECÇÃO INTERESSADOS ══
+  async function verInteressados(propostaId, titulo) {
+    propostaActivaId = propostaId;
+    mostrarSecao('interessados');
+
+    const c = document.getElementById('conteudo');
+    c.innerHTML = `
+      <div class="breadcrumb">
+        <span class="link" onclick="mostrarSecao('dashboard')">As Minhas Propostas</span>
+        <span>/</span>
+        <span id="bcTitulo">${titulo}</span>
+      </div>
+      <div class="section-header">
+        <h2 class="section-title">Estudantes Interessados</h2>
+        <button class="btn-enviar-cca" onclick="enviarListaCCA()">Enviar lista à CCA</button>
+      </div>
+      <div class="tabela-card">
+        <table>
+          <thead><tr><th>Nome</th><th>Curso</th><th>Média</th><th>Portefólio</th><th>Estado</th><th>Acções</th></tr></thead>
+          <tbody id="tbInteressados">
+            <tr><td colspan="6"><div class="vazio"><div class="emoji">⏳</div>A carregar…</div></td></tr>
+          </tbody>
+        </table>
+      </div>`;
+
+    try {
+      const dados = await req(`/candidaturas/proposta/${propostaId}`);
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+
+      const tbody = document.getElementById('tbInteressados');
+      if (!dados.total) {
+        tbody.innerHTML = `<tr><td colspan="6"><div class="vazio"><div class="emoji">📭</div>Ainda não há estudantes interessados nesta proposta.</div></td></tr>`;
+        return;
+      }
+
+      const estadoLabels = {
+        pendente: 'Pendente', entrevista_agendada: 'Entrevista Agendada',
+        aceite: 'Aceite', rejeitada: 'Rejeitada'
+      };
+
+      tbody.innerHTML = dados.candidaturas.map(cand => {
+        const est = cand.estudanteId;
+        const u   = est?.utilizadorId;
+        const nome = u?.nome || '—';
+        const media = est?.mediaFinal ? est.mediaFinal.toFixed(1) : '—';
+        const portfolio = est?.portfolio
+          ? `<a class="link-portfolio" href="${est.portfolio.startsWith('http') ? est.portfolio : 'https://'+est.portfolio}" target="_blank">🔗 ver</a>`
+          : '—';
+        const estado = cand.estado;
+        const jaEscolhido = estado === 'aceite';
+
+        const btnAgendar = estado === 'entrevista_agendada'
+          ? `<button class="btn-agendar inativo" disabled>✔ Agendado</button>`
+          : `<button class="btn-agendar ativo" onclick="abrirAgendar('${cand._id}','${nome.replace(/'/g,"\\'")}','${propostaId}')">Agendar</button>`;
+
+        const btnEscolher = jaEscolhido
+          ? `<button class="btn-escolher escolhido" disabled>✔ Escolhido</button>`
+          : `<button class="btn-escolher" onclick="abrirEscolher('${cand._id}','${nome.replace(/'/g,"\\'")}','${propostaId}')">Escolher</button>`;
+
+        return `<tr>
+          <td style="font-weight:500">${nome}</td>
+          <td>${est?.curso || '—'}</td>
+          <td style="font-weight:700">${media}</td>
+          <td>${portfolio}</td>
+          <td><span class="badge-estado ${estado}">${estadoLabels[estado] || estado}</span></td>
+          <td><div class="acoes-linha">${btnAgendar}${btnEscolher}</div></td>
+        </tr>`;
+      }).join('');
+
+    } catch (err) {
+      document.getElementById('tbInteressados').innerHTML =
+        `<tr><td colspan="6"><div class="vazio"><div class="emoji">⚠️</div>${err.message}</div></td></tr>`;
+    }
+  }
+
+  // ══ SECÇÃO ENTREVISTAS ══
+  async function carregarEntrevistas() {
+    const c = document.getElementById('conteudo');
+    c.innerHTML = `
+      <div class="section-header"><h2 class="section-title">Entrevistas Agendadas</h2></div>
+      <div class="tabela-card">
+        <table>
+          <thead><tr><th>Proposta</th><th>Estudante</th><th>Data e Hora</th><th>Local / Link</th></tr></thead>
+          <tbody id="tbEntrevistas">
+            <tr><td colspan="4"><div class="vazio"><div class="emoji">⏳</div>A carregar…</div></td></tr>
+          </tbody>
+        </table>
+      </div>`;
+
+    try {
+      // Buscar todas as candidaturas das minhas propostas com entrevista agendada
+      if (!todasMinhasPropostas.length) {
+        const d = await req('/propostas');
+        if (d.sucesso) todasMinhasPropostas = d.propostas.filter(p => {
+          const pid = p.proponenteId?._id || p.proponenteId;
+          return pid === utilizador.id || pid?.toString() === utilizador.id?.toString();
+        });
+      }
+
+      const aprovadas = todasMinhasPropostas.filter(p => p.estado === 'aprovada' || p.estado === 'atribuida');
+      const entrevistas = [];
+
+      await Promise.all(aprovadas.map(async p => {
+        try {
+          const c = await req(`/candidaturas/proposta/${p._id}`);
+          if (c.sucesso) {
+            c.candidaturas
+              .filter(ca => ca.estado === 'entrevista_agendada')
+              .forEach(ca => entrevistas.push({ ...ca, propostaTitulo: p.titulo }));
+          }
+        } catch {}
+      }));
+
+      const tbody = document.getElementById('tbEntrevistas');
+      if (!entrevistas.length) {
+        tbody.innerHTML = `<tr><td colspan="4"><div class="vazio"><div class="emoji">📅</div>Não há entrevistas agendadas.</div></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = entrevistas.map(e => {
+        const nome = e.estudanteId?.utilizadorId?.nome || '—';
+        return `<tr>
+          <td style="font-weight:500">${e.propostaTitulo}</td>
+          <td>${nome}</td>
+          <td>${formatarDataHora(e.dataEntrevista)}</td>
+          <td style="color:var(--azul)">${e.localEntrevista || '—'}</td>
+        </tr>`;
+      }).join('');
+
+    } catch (err) {
+      document.getElementById('tbEntrevistas').innerHTML =
+        `<tr><td colspan="4"><div class="vazio"><div class="emoji">⚠️</div>${err.message}</div></td></tr>`;
+    }
+  }
+
+  // ══ MODAL AGENDAR (14) ══
+  let candidaturaAgendarId = null;
+  let propostaAgendarId    = null;
+
+  function abrirAgendar(candidaturaId, nomeEstudante, propostaId) {
+    candidaturaAgendarId = candidaturaId;
+    propostaAgendarId    = propostaId;
+    document.getElementById('agendarSub').textContent = nomeEstudante;
+    document.getElementById('agendarData').value  = '';
+    document.getElementById('agendarLocal').value = '';
+    document.getElementById('alertaAgendar').className = 'alerta-modal';
+    abrirModal('modalAgendar');
+    setTimeout(() => document.getElementById('agendarData').focus(), 100);
+  }
+
+  async function confirmarAgendar() {
+    const dataVal  = document.getElementById('agendarData').value;
+    const localVal = document.getElementById('agendarLocal').value.trim();
+    const al       = document.getElementById('alertaAgendar');
+
+    if (!dataVal)  { al.textContent = 'Selecciona a data e hora.'; al.className = 'alerta-modal erro'; return; }
+    if (!localVal) { al.textContent = 'Indica o local ou link.';   al.className = 'alerta-modal erro'; return; }
+
+    const btn = document.getElementById('btnConfirmarAgendar');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin"></span>A agendar…';
+
+    try {
+      const dados = await req(`/candidaturas/${candidaturaAgendarId}/entrevista`, {
+        method: 'PUT',
+        body: JSON.stringify({ dataEntrevista: dataVal, localEntrevista: localVal })
+      });
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+
+      al.textContent = 'Entrevista agendada! O estudante foi notificado.';
+      al.className = 'alerta-modal sucesso';
+      btn.innerHTML = '✔ Agendado';
+
+      setTimeout(() => {
+        fecharModal('modalAgendar');
+        btn.disabled = false; btn.textContent = 'Confirmar Entrevista';
+        verInteressados(propostaAgendarId, document.getElementById('bcTitulo')?.textContent || '');
+      }, 1300);
+
+    } catch (err) {
+      al.textContent = err.message; al.className = 'alerta-modal erro';
+      btn.disabled = false; btn.textContent = 'Confirmar Entrevista';
+    }
+  }
+
+  // ══ MODAL ESCOLHER ESTUDANTE ══
+  let candidaturaEscolherId = null;
+  let propostaEscolherId    = null;
+
+  function abrirEscolher(candidaturaId, nomeEstudante, propostaId) {
+    candidaturaEscolherId = candidaturaId;
+    propostaEscolherId    = propostaId;
+    document.getElementById('escolherSub').textContent = document.querySelector('#bcTitulo')?.textContent || '';
+    document.getElementById('escolherNomeEstudante').textContent = nomeEstudante;
+    document.getElementById('alertaEscolher').className = 'alerta-modal';
+    abrirModal('modalEscolher');
+  }
+
+  async function confirmarEscolher() {
+    const al  = document.getElementById('alertaEscolher');
+    const btn = document.getElementById('btnConfirmarEscolher');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin"></span>A confirmar…';
+
+    try {
+      const dados = await req(`/candidaturas/${candidaturaEscolherId}/aceitar`, { method: 'PUT' });
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+
+      al.textContent = 'Estudante escolhido! Foi notificado da aceitação.';
+      al.className = 'alerta-modal sucesso';
+      btn.innerHTML = '✔ Confirmado';
+
+      setTimeout(() => {
+        fecharModal('modalEscolher');
+        btn.disabled = false; btn.textContent = 'Confirmar Escolha';
+        verInteressados(propostaEscolherId, document.querySelector('#bcTitulo')?.textContent || '');
+      }, 1300);
+
+    } catch (err) {
+      al.textContent = err.message; al.className = 'alerta-modal erro';
+      btn.disabled = false; btn.textContent = 'Confirmar Escolha';
+    }
+  }
+
+  // ══ ENVIAR LISTA À CCA ══
+  async function enviarListaCCA() {
+    mostrarToast('Lista de estudantes interessados enviada à CCA.', 'sucesso');
+  }
+
+  // ══ NAVEGAÇÃO ══
+  function mostrarSecao(secao) {
+    ['navDashboard','navPropostas','navInteressados','navEntrevistas']
+      .forEach(id => document.getElementById(id).classList.remove('activo'));
+
+    sidebar.classList.remove('aberta');
+    overlay.classList.remove('visivel');
+
+    if (secao === 'dashboard') {
+      document.getElementById('navDashboard').classList.add('activo');
+      carregarDashboard();
+    } else if (secao === 'propostas') {
+      document.getElementById('navPropostas').classList.add('activo');
+      carregarDashboard();
+    } else if (secao === 'interessados') {
+      window.location.href = 'estudantes-interessados.html';
+      return;
+    } else if (secao === 'entrevistas') {
+      window.location.href = 'entrevistas.html';
+      return;
+    }
+  }
+
+  // ══ MODAL NOVA PROPOSTA ══
+  function abrirModalProposta() {
+    document.getElementById('modalNovaProposta').classList.add('aberto');
+    document.body.style.overflow = 'hidden';
+  }
+  function fecharModalProposta() {
+    document.getElementById('modalNovaProposta').classList.remove('aberto');
+    document.body.style.overflow = '';
+    document.getElementById('alertaModalNP').className = 'alerta-modal-np';
+    document.getElementById('formNovaProposta').reset();
+    document.querySelectorAll('.area-check-np').forEach(el => el.classList.remove('marcada'));
+    document.querySelectorAll('.radio-item-np').forEach(el => el.classList.remove('marcada'));
+    const r = document.querySelector('input[name="np_plugin"][value="false"]');
+    if (r) { r.checked = true; r.closest('.radio-item-np').classList.add('marcada'); }
+  }
+  document.getElementById('modalNovaProposta').addEventListener('click', e => {
+    if (e.target === document.getElementById('modalNovaProposta')) fecharModalProposta();
+  });
+
+  document.querySelectorAll('.np-area-cb').forEach(cb => {
+    cb.addEventListener('change', () => {
+      cb.closest('.area-check-np').classList.toggle('marcada', cb.checked);
+    });
+  });
+  document.querySelectorAll('input[name="np_plugin"]').forEach(r => {
+    r.addEventListener('change', () => {
+      document.querySelectorAll('.radio-item-np').forEach(el => el.classList.remove('marcada'));
+      if (r.checked) r.closest('.radio-item-np').classList.add('marcada');
+    });
+  });
+
+  function mostrarAlertaModalNP(msg, tipo = 'erro') {
+    const el = document.getElementById('alertaModalNP');
+    el.textContent = msg;
+    el.className = `alerta-modal-np ${tipo}`;
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  async function submeterNovaProposta() {
+    const btn = document.getElementById('btnSubmeterNP');
+    document.getElementById('alertaModalNP').className = 'alerta-modal-np';
+
+    const titulo        = document.getElementById('np_titulo').value.trim();
+    const tipo          = document.getElementById('np_tipo').value;
+    const curso         = document.getElementById('np_curso').value;
+    const nomeEntidade  = document.getElementById('np_nomeEntidade').value.trim();
+    const emailContacto = document.getElementById('np_emailContacto').value.trim();
+    const moradaEntidade= document.getElementById('np_moradaEntidade').value.trim();
+    const moradaLocal   = document.getElementById('np_moradaLocal').value.trim();
+    const tutorNome     = document.getElementById('np_tutorNome').value.trim();
+    const tutorEmail    = document.getElementById('np_tutorEmail').value.trim();
+    const tutorCargo    = document.getElementById('np_tutorCargo').value.trim();
+    const objetivos     = document.getElementById('np_objetivos').value.trim();
+    const resultados    = document.getElementById('np_resultados').value.trim();
+    const plano         = document.getElementById('np_plano').value.trim();
+    const perfilCand    = document.getElementById('np_perfil').value.trim();
+    const plugIN        = document.querySelector('input[name="np_plugin"]:checked')?.value === 'true';
+    const areas         = [...document.querySelectorAll('.np-area-cb:checked')].map(cb => cb.value);
+
+    if (!titulo)         { mostrarAlertaModalNP('O título da proposta é obrigatório.'); return; }
+    if (!nomeEntidade)   { mostrarAlertaModalNP('O nome da entidade é obrigatório.'); return; }
+    if (!emailContacto)  { mostrarAlertaModalNP('O email de contacto é obrigatório.'); return; }
+    if (!moradaEntidade) { mostrarAlertaModalNP('A morada da entidade é obrigatória.'); return; }
+    if (!tutorNome)      { mostrarAlertaModalNP('O nome do tutor é obrigatório.'); return; }
+    if (!tutorEmail)     { mostrarAlertaModalNP('O email do tutor é obrigatório.'); return; }
+    if (!areas.length)   { mostrarAlertaModalNP('Selecciona pelo menos uma área de actuação.'); return; }
+    if (!objetivos)      { mostrarAlertaModalNP('Os objectivos são obrigatórios.'); return; }
+    if (!resultados)     { mostrarAlertaModalNP('Os resultados esperados são obrigatórios.'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin"></span>A submeter…';
+
+    try {
+      const dados = await req('/propostas', {
+        method: 'POST',
+        body: JSON.stringify({
+          titulo, tipo, curso, areas, plugIN,
+          descricao: objetivos, objetivos,
+          resultadosEsperados: resultados,
+          planoTrabalho: plano,
+          perfilCandidato: perfilCand,
+          nomeEntidade, emailContacto, moradaEntidade,
+          moradaLocalEstagio: moradaLocal,
+          tutorNome, tutorEmail, tutorCargo
+        })
+      });
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+
+      mostrarAlertaModalNP('Proposta submetida! Aguarda aprovação da CCA.', 'sucesso');
+      btn.innerHTML = '✔ Submetida';
+      setTimeout(() => {
+        fecharModalProposta();
+        btn.disabled = false;
+        btn.textContent = 'Submeter Proposta';
+        carregarDashboard();
+      }, 1500);
+    } catch (err) {
+      mostrarAlertaModalNP(err.message);
+      btn.disabled = false;
+      btn.textContent = 'Submeter Proposta';
+    }
+  }
+
+    // ── Iniciar ──
+  carregarDashboard();
+</script>
+</body>
+</html>
