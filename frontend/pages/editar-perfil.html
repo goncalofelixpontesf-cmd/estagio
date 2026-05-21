@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESMAD</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.ico">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --laranja:       #F15A24;
+      --laranja-hover: #d94d1c;
+      --laranja-light: #FEE8DF;
+      --preto:         #1A1A1A;
+      --cinza-bg:      #F4F4F4;
+      --cinza-texto:   #888888;
+      --cinza-linha:   #EEEEEE;
+      --cinza-input:   #F5F5F5;
+      --branco:        #FFFFFF;
+      --verde:         #70AD47;
+      --verde-light:   #E2EFDA;
+      --vermelho:      #C00000;
+      --sidebar-w:     220px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--cinza-bg);
+      color: var(--preto);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ══ SIDEBAR ══ */
+    .sidebar {
+      width: var(--sidebar-w); background: var(--laranja);
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; height: 100vh; z-index: 100;
+    }
+    .sidebar-logo { padding: 22px 0 18px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.18); }
+    .sidebar-logo span { color: var(--branco); font-size: 1.35rem; font-weight: 800; letter-spacing: 2px; }
+    .sidebar-nav { flex: 1; padding: 12px 0; }
+    .nav-item {
+      display: block; padding: 13px 28px;
+      color: rgba(255,255,255,0.82); font-size: 0.88rem; font-weight: 500;
+      text-decoration: none; cursor: pointer; border: none; background: none;
+      width: 100%; text-align: left; transition: background 0.15s, color 0.15s;
+    }
+    .nav-item:hover  { background: rgba(0,0,0,0.12); color: var(--branco); }
+    .nav-item.activo { background: rgba(0,0,0,0.18); color: var(--branco); font-weight: 700; }
+    .sidebar-footer { padding: 18px 28px; border-top: 1px solid rgba(255,255,255,0.18); }
+    .sidebar-footer .nome   { color: var(--branco); font-size: 0.82rem; font-weight: 600; }
+    .sidebar-footer .perfil { color: rgba(255,255,255,0.65); font-size: 0.75rem; margin-top: 2px; }
+
+    /* ══ MAIN ══ */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    .topbar {
+      background: var(--branco); padding: 18px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--cinza-linha);
+      position: sticky; top: 0; z-index: 50;
+    }
+    .topbar-centro { text-align: center; flex: 1; }
+    .topbar-centro .titulo    { font-size: 1rem; font-weight: 700; }
+    .topbar-centro .subtitulo { font-size: 0.78rem; color: var(--cinza-texto); margin-top: 1px; }
+    .avatar {
+      width: 38px; height: 38px; background: var(--laranja); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--branco); font-weight: 700; font-size: 0.95rem;
+      cursor: pointer; flex-shrink: 0;
+    }
+    .topbar-left { width: 38px; }
+
+    .content { padding: 28px 32px; flex: 1; max-width: 820px; }
+
+    /* Alerta */
+    .alerta {
+      display: none; border-radius: 8px; padding: 12px 16px;
+      font-size: 0.84rem; font-weight: 500; margin-bottom: 20px;
+    }
+    .alerta.erro    { background: #FFDEDE; color: var(--vermelho); display: block; }
+    .alerta.sucesso { background: var(--verde-light); color: var(--verde); display: block; }
+
+    /* Painel branco */
+    .painel {
+      background: var(--branco);
+      border-radius: 12px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+      overflow: hidden;
+    }
+    .painel-secao { padding: 22px 28px; }
+    .painel-secao + .painel-secao { border-top: 1px solid var(--cinza-linha); }
+
+    .secao-titulo {
+      font-size: 0.88rem; font-weight: 700; color: var(--preto);
+      margin-bottom: 18px;
+    }
+
+    /* Grid de campos */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-grid.tres { grid-template-columns: 1fr 1fr 1fr; }
+    .form-grid.um   { grid-template-columns: 1fr; }
+
+    .campo { display: flex; flex-direction: column; gap: 7px; }
+    .campo label {
+      font-size: 0.72rem; font-weight: 700; color: var(--preto);
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .campo input,
+    .campo select {
+      background: var(--cinza-input);
+      border: 1.5px solid transparent;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.88rem;
+      color: var(--preto);
+      outline: none;
+      transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
+      appearance: none;
+    }
+    .campo input::placeholder { color: #BBBBBB; }
+    .campo input:focus {
+      background: var(--branco);
+      border-color: var(--laranja);
+      box-shadow: 0 0 0 3px rgba(241,90,36,0.10);
+    }
+    /* Campo não editável */
+    .campo input[readonly],
+    .campo select.readonly {
+      background: #EEEEEE;
+      color: var(--cinza-texto);
+      cursor: not-allowed;
+    }
+    .campo input[readonly]:focus {
+      border-color: transparent;
+      box-shadow: none;
+      background: #EEEEEE;
+    }
+    .campo select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-color: #EEEEEE;
+      padding-right: 32px;
+      color: var(--cinza-texto);
+      cursor: not-allowed;
+    }
+
+    /* Zona upload CV */
+    .upload-zona {
+      border: 1.5px dashed var(--cinza-linha);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      background: #FAFAFA;
+      margin-top: 2px;
+    }
+    .upload-zona:hover { border-color: var(--laranja); background: var(--laranja-light); }
+    .upload-zona.tem { border-color: var(--verde); background: var(--verde-light); }
+    .upload-zona .icone { font-size: 1.4rem; margin-bottom: 6px; }
+    .upload-zona .texto { font-size: 0.8rem; color: var(--cinza-texto); }
+    .upload-zona .texto strong { display: block; color: var(--preto); margin-bottom: 2px; font-size: 0.84rem; }
+    .upload-zona.tem .texto { color: var(--verde); }
+    #inputCV { display: none; }
+
+    /* Footer com botões */
+    .painel-footer {
+      padding: 18px 28px;
+      border-top: 1px solid var(--cinza-linha);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .btn-cancelar {
+      background: #F0F0F0; color: #666;
+      border: none; border-radius: 8px; padding: 11px 22px;
+      font-family: 'Inter', sans-serif; font-size: 0.86rem; font-weight: 500;
+      cursor: pointer; text-decoration: none;
+      transition: background 0.15s;
+    }
+    .btn-cancelar:hover { background: #E4E4E4; }
+    .btn-guardar {
+      background: var(--laranja); color: var(--branco);
+      border: none; border-radius: 8px; padding: 11px 28px;
+      font-family: 'Inter', sans-serif; font-size: 0.86rem; font-weight: 700;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .btn-guardar:hover   { background: var(--laranja-hover); }
+    .btn-guardar:disabled { opacity: 0.65; cursor: not-allowed; }
+
+    /* Spin */
+    .spin {
+      display: inline-block; width: 13px; height: 13px;
+      border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff;
+      border-radius: 50%; animation: girar 0.6s linear infinite;
+      vertical-align: middle; margin-right: 6px;
+    }
+    @keyframes girar { to { transform: rotate(360deg); } }
+
+    /* Skeleton */
+    .skeleton {
+      background: linear-gradient(90deg,#ececec 25%,#f5f5f5 50%,#ececec 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite; border-radius: 6px;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    /* Mobile */
+    .menu-toggle {
+      display: none; position: fixed; top: 14px; left: 14px; z-index: 200;
+      background: var(--laranja); border: none; border-radius: 8px;
+      padding: 8px 10px; cursor: pointer; color: white; font-size: 1.1rem;
+    }
+    .sidebar-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4); z-index: 90;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
+      .sidebar.aberta { transform: translateX(0); }
+      .sidebar-overlay.visivel { display: block; }
+      .main { margin-left: 0; }
+      .menu-toggle { display: block; }
+      .topbar { padding-left: 56px; }
+      .content { padding: 20px 16px; }
+      .form-grid, .form-grid.tres { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="menu-toggle" id="menuToggle">☰</button>
+<div class="sidebar-overlay" id="overlay"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><span>ESMAD</span></div>
+  <nav class="sidebar-nav">
+    <a class="nav-item" href="lista-propostas.html">Propostas</a>
+    <a class="nav-item activo" href="perfil-estudante.html">O Meu Perfil</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="nome" id="sidebarNome">—</div>
+    <div class="perfil">Estudante</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <div class="topbar">
+    <div class="topbar-left"></div>
+    <div class="topbar-centro">
+      <div class="titulo">Editar Perfil</div>
+      <div class="subtitulo">Atualiza os teus dados pessoais e académicos</div>
+    </div>
+    <div class="avatar" id="avatar">?</div>
+  </div>
+
+  <div class="content">
+
+    <div id="alerta" class="alerta"></div>
+
+    <div class="painel" id="painel">
+
+      <!-- Skeleton enquanto carrega -->
+      <div class="painel-secao">
+        <div class="skeleton" style="height:14px;width:130px;margin-bottom:20px"></div>
+        <div class="form-grid">
+          <div><div class="skeleton" style="height:12px;width:80px;margin-bottom:8px"></div><div class="skeleton" style="height:42px;border-radius:8px"></div></div>
+          <div><div class="skeleton" style="height:12px;width:80px;margin-bottom:8px"></div><div class="skeleton" style="height:42px;border-radius:8px"></div></div>
+          <div><div class="skeleton" style="height:12px;width:80px;margin-bottom:8px"></div><div class="skeleton" style="height:42px;border-radius:8px"></div></div>
+          <div><div class="skeleton" style="height:12px;width:80px;margin-bottom:8px"></div><div class="skeleton" style="height:42px;border-radius:8px"></div></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<input type="file" id="inputCV" accept=".pdf">
+
+<script>
+  const API = 'http://localhost:5000/api';
+  const token = localStorage.getItem('esmad_token');
+  const user  = localStorage.getItem('esmad_user');
+  if (!token || !user) { window.location.href = 'login.html'; }
+
+  const utilizador = JSON.parse(user);
+  if (utilizador.perfil !== 'estudante') { window.location.href = 'login.html'; }
+
+  document.getElementById('sidebarNome').textContent = utilizador.nome;
+  document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
+
+  document.getElementById('avatar').addEventListener('click', () => {
+    if (confirm('Tens a certeza que queres fazer logout?')) {
+      localStorage.clear();
+      window.location.href = 'login.html';
+    }
+  });
+
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  document.getElementById('menuToggle').addEventListener('click', () => {
+    sidebar.classList.toggle('aberta');
+    overlay.classList.toggle('visivel');
+  });
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('aberta');
+    overlay.classList.remove('visivel');
+  });
+
+  function req(endpoint, opts = {}) {
+    return fetch(`${API}${endpoint}`, {
+      ...opts,
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...(opts.headers || {}) }
+    }).then(r => r.json());
+  }
+
+  function mostrarAlerta(msg, tipo = 'erro') {
+    const el = document.getElementById('alerta');
+    el.textContent = msg;
+    el.className = `alerta ${tipo}`;
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  let cvNome = null;
+  let cvFile = null; // ficheiro selecionado, por enviar
+
+  // ── Carregar dados e render ──
+  async function carregar() {
+    try {
+      const dados = await req('/utilizadores/perfil');
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+
+      const { utilizador: u, dadosExtra: est } = dados;
+      // Mostrar CV existente guardado na BD
+      if (est?.cv) {
+        cvNome = est.cv;
+      }
+      renderFormulario(u, est);
+
+    } catch (err) {
+      document.getElementById('painel').innerHTML = `
+        <div style="padding:40px;text-align:center;color:var(--cinza-texto)">
+          <div style="font-size:2rem;margin-bottom:10px">⚠️</div>
+          <p>${err.message}</p>
+        </div>`;
+    }
+  }
+
+  function renderFormulario(u, est) {
+    document.getElementById('painel').innerHTML = `
+
+      <!-- Dados Pessoais -->
+      <div class="painel-secao">
+        <div class="secao-titulo">Dados Pessoais</div>
+        <div class="form-grid">
+          <div class="campo">
+            <label>Nome Completo</label>
+            <input type="text" id="f_nome" value="${u.nome || ''}" placeholder="Nome completo">
+          </div>
+          <div class="campo">
+            <label>E-mail</label>
+            <input type="email" id="f_email" value="${u.email || ''}" readonly>
+          </div>
+          <div class="campo">
+            <label>Telefone</label>
+            <input type="tel" id="f_telefone" value="${est?.telefone || ''}" placeholder="+351 9XX XXX XXX">
+          </div>
+        </div>
+      </div>
+
+      <!-- Links -->
+      <div class="painel-secao">
+        <div class="secao-titulo">Presença Online</div>
+        <div class="form-grid">
+          <div class="campo">
+            <label>Portefólio</label>
+            <input type="text" id="f_portfolio" value="${est?.portfolio || ''}" placeholder="gpontes.pt">
+          </div>
+          <div class="campo">
+            <label>LinkedIn</label>
+            <input type="text" id="f_linkedin" value="${est?.linkedin || ''}" placeholder="linkedin.com/in/gpontes">
+          </div>
+        </div>
+      </div>
+
+      <!-- Dados Académicos (não editáveis) -->
+      <div class="painel-secao">
+        <div class="secao-titulo">Dados Académicos</div>
+        <div class="form-grid">
+          <div class="campo">
+            <label>Curso</label>
+            <input type="text" value="${est?.curso || 'TeSP DTAM'}" readonly>
+          </div>
+          <div class="campo">
+            <label>Ano</label>
+            <input type="text" value="${est?.ano ? est.ano + '.º Ano' : '—'}" readonly>
+          </div>
+        </div>
+        <p style="font-size:0.74rem;color:var(--cinza-texto);margin-top:10px;font-style:italic">
+          Os dados académicos são geridos pela instituição e não podem ser alterados aqui.
+        </p>
+      </div>
+
+      <!-- CV -->
+      <div class="painel-secao">
+        <div class="secao-titulo">CV</div>
+        <div class="upload-zona ${cvNome ? 'tem' : ''}" id="zonaCV" onclick="document.getElementById('inputCV').click()">
+          <div class="icone">${cvNome ? '✅' : '📄'}</div>
+          <div class="texto">
+            ${cvNome
+              ? `<strong>${cvNome}</strong>Clica para substituir`
+              : `<strong>Clica para fazer upload do teu CV</strong>PDF, máx. 5MB`}
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="painel-footer">
+        <a href="perfil-estudante.html" class="btn-cancelar">Cancelar</a>
+        <button class="btn-guardar" id="btnGuardar" onclick="guardar()">Guardar Alterações</button>
+      </div>
+    `;
+
+    // Input CV
+    document.getElementById('inputCV').addEventListener('change', handleCV);
+  }
+
+  // ── Upload CV ──
+  function handleCV(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.type !== 'application/pdf') {
+      mostrarAlerta('Só são aceites ficheiros PDF.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      mostrarAlerta('O ficheiro não pode ter mais de 5MB.');
+      return;
+    }
+    cvFile = file;
+    cvNome = file.name;
+
+    const zona = document.getElementById('zonaCV');
+    zona.className = 'upload-zona tem';
+    zona.innerHTML = `<div class="icone">✅</div><div class="texto"><strong>${file.name}</strong>Clica para substituir</div>`;
+  }
+
+  // ── Guardar alterações ──
+  async function guardar() {
+    const btn = document.getElementById('btnGuardar');
+    document.getElementById('alerta').className = 'alerta';
+
+    const nome      = document.getElementById('f_nome').value.trim();
+    const telefone  = document.getElementById('f_telefone').value.trim();
+    const portfolio = document.getElementById('f_portfolio').value.trim();
+    const linkedin  = document.getElementById('f_linkedin').value.trim();
+
+    if (!nome) { mostrarAlerta('O nome não pode estar vazio.'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin"></span>A guardar…';
+
+    try {
+      // 1 — Fazer upload do CV se foi selecionado um ficheiro novo
+      if (cvFile) {
+        btn.innerHTML = '<span class="spin"></span>A enviar CV…';
+        const formData = new FormData();
+        formData.append('cv', cvFile);
+
+        const resCV = await fetch(`${API}/utilizadores/cv`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` },
+          // Não definir Content-Type — o browser define com o boundary correto
+          body: formData
+        });
+        const dadosCV = await resCV.json();
+        if (!dadosCV.sucesso) throw new Error('Erro ao enviar CV: ' + dadosCV.mensagem);
+      }
+
+      // 2 — Guardar restantes dados do perfil
+      btn.innerHTML = '<span class="spin"></span>A guardar perfil…';
+      const dados = await req('/utilizadores/perfil', {
+        method: 'PUT',
+        body: JSON.stringify({ nome, telefone, portfolio, linkedin })
+      });
+
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+
+      // Atualizar localStorage com novo nome
+      const uLocal = JSON.parse(localStorage.getItem('esmad_user') || '{}');
+      uLocal.nome = nome;
+      localStorage.setItem('esmad_user', JSON.stringify(uLocal));
+
+      mostrarAlerta('Perfil atualizado com sucesso!', 'sucesso');
+      setTimeout(() => { window.location.href = 'perfil-estudante.html'; }, 1200);
+
+    } catch (err) {
+      mostrarAlerta(err.message);
+      btn.disabled = false;
+      btn.textContent = 'Guardar Alterações';
+    }
+  }
+
+  carregar();
+</script>
+</body>
+</html>

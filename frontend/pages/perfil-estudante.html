@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESMAD</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.ico">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --laranja:       #F15A24;
+      --laranja-hover: #d94d1c;
+      --laranja-light: #FEE8DF;
+      --preto:         #1A1A1A;
+      --cinza-bg:      #F4F4F4;
+      --cinza-texto:   #888888;
+      --cinza-linha:   #EEEEEE;
+      --branco:        #FFFFFF;
+      --azul:          #2E75B6;
+      --azul-light:    #EBF3FB;
+      --verde:         #70AD47;
+      --verde-light:   #E2EFDA;
+      --amarelo:       #BF8F00;
+      --amarelo-light: #FFF2CC;
+      --vermelho:      #C00000;
+      --sidebar-w:     220px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--cinza-bg);
+      color: var(--preto);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ══ SIDEBAR ══ */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--laranja);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0;
+      height: 100vh;
+      z-index: 100;
+    }
+    .sidebar-logo {
+      padding: 22px 0 18px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,0.18);
+    }
+    .sidebar-logo span { color: var(--branco); font-size: 1.35rem; font-weight: 800; letter-spacing: 2px; }
+    .sidebar-nav { flex: 1; padding: 12px 0; }
+    .nav-item {
+      display: block; padding: 13px 28px;
+      color: rgba(255,255,255,0.82); font-size: 0.88rem; font-weight: 500;
+      text-decoration: none; cursor: pointer; border: none; background: none;
+      width: 100%; text-align: left; transition: background 0.15s, color 0.15s;
+    }
+    .nav-item:hover  { background: rgba(0,0,0,0.12); color: var(--branco); }
+    .nav-item.activo { background: rgba(0,0,0,0.18); color: var(--branco); font-weight: 700; }
+    .sidebar-footer { padding: 18px 28px; border-top: 1px solid rgba(255,255,255,0.18); }
+    .sidebar-footer .nome   { color: var(--branco); font-size: 0.82rem; font-weight: 600; }
+    .sidebar-footer .perfil { color: rgba(255,255,255,0.65); font-size: 0.75rem; margin-top: 2px; }
+
+    /* ══ MAIN ══ */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    .topbar {
+      background: var(--branco); padding: 18px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--cinza-linha);
+      position: sticky; top: 0; z-index: 50;
+    }
+    .topbar-centro { text-align: center; flex: 1; }
+    .topbar-centro .titulo    { font-size: 1rem; font-weight: 700; }
+    .topbar-centro .subtitulo { font-size: 0.78rem; color: var(--cinza-texto); margin-top: 1px; }
+    .avatar {
+      width: 38px; height: 38px; background: var(--laranja); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--branco); font-weight: 700; font-size: 0.95rem;
+      cursor: pointer; flex-shrink: 0;
+    }
+    .topbar-left { width: 38px; }
+
+    .content { padding: 28px 32px; flex: 1; }
+
+    /* ══ LAYOUT 2 COLUNAS ══ */
+    .layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* Skeleton */
+    .skeleton {
+      background: linear-gradient(90deg,#ececec 25%,#f5f5f5 50%,#ececec 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      border-radius: 6px;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    /* ══ CARD DE PERFIL ══ */
+    .card-perfil {
+      background: var(--branco);
+      border-radius: 12px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+      padding: 28px 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .avatar-grande {
+      width: 72px; height: 72px;
+      background: var(--laranja);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--branco); font-size: 1.8rem; font-weight: 800;
+      margin-bottom: 14px;
+      flex-shrink: 0;
+    }
+    .perfil-nome   { font-size: 1rem; font-weight: 700; margin-bottom: 2px; }
+    .perfil-tipo   { font-size: 0.8rem; color: var(--laranja); font-weight: 600; margin-bottom: 2px; }
+    .perfil-curso  { font-size: 0.78rem; color: var(--cinza-texto); margin-bottom: 16px; }
+
+    .perfil-contactos { width: 100%; text-align: left; margin-bottom: 20px; }
+    .contacto-linha {
+      display: flex; align-items: flex-start; gap: 8px;
+      margin-bottom: 8px; font-size: 0.8rem;
+    }
+    .contacto-linha .label { color: var(--cinza-texto); flex-shrink: 0; width: 64px; }
+    .contacto-linha .valor { color: var(--preto); font-weight: 500; word-break: break-all; }
+    .contacto-linha .valor a {
+      color: var(--azul); text-decoration: none; font-weight: 500;
+    }
+    .contacto-linha .valor a:hover { text-decoration: underline; }
+
+    .btn-editar {
+      display: block; width: 100%;
+      background: var(--laranja); color: var(--branco);
+      border: none; border-radius: 8px; padding: 11px;
+      font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 700;
+      cursor: pointer; text-align: center;
+      transition: background 0.15s; margin-bottom: 10px;
+      text-decoration: none;
+    }
+    .btn-editar:hover { background: var(--laranja-hover); }
+
+    .btn-secundario {
+      display: block; width: 100%;
+      background: var(--branco); color: var(--preto);
+      border: 1.5px solid var(--cinza-linha); border-radius: 8px; padding: 10px;
+      font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 600;
+      cursor: pointer; text-align: center;
+      transition: border-color 0.15s, background 0.15s; margin-bottom: 10px;
+    }
+    .btn-secundario:hover { border-color: var(--laranja); background: var(--laranja-light); }
+
+    .btn-secundario-nota {
+      font-size: 0.7rem; color: var(--cinza-texto); font-style: italic;
+      text-align: center; margin-top: 4px; margin-bottom: 14px;
+    }
+
+    /* Card escolher proposta */
+    .card-escolha {
+      background: var(--laranja-light);
+      border: 1.5px solid var(--laranja);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-top: 6px;
+    }
+    .card-escolha .escolha-titulo {
+      font-size: 0.88rem; font-weight: 700; color: var(--laranja); margin-bottom: 6px;
+    }
+    .card-escolha .escolha-texto {
+      font-size: 0.78rem; color: #666; margin-bottom: 14px; line-height: 1.5;
+    }
+    .card-escolha .escolha-proposta {
+      font-size: 0.82rem; font-weight: 600; color: var(--preto);
+      background: var(--branco); border-radius: 6px; padding: 8px 12px;
+      margin-bottom: 10px; border: 1px solid var(--cinza-linha);
+    }
+    .btn-escolha {
+      display: block; width: 100%;
+      background: var(--laranja); color: var(--branco);
+      border: none; border-radius: 8px; padding: 10px;
+      font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 700;
+      cursor: pointer; text-align: center; transition: background 0.15s;
+      text-decoration: none;
+    }
+    .btn-escolha:hover { background: var(--laranja-hover); }
+
+    /* ══ COLUNA DIREITA ══ */
+    .col-dir { display: flex; flex-direction: column; gap: 20px; }
+
+    .card {
+      background: var(--branco);
+      border-radius: 12px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid var(--cinza-linha);
+    }
+    .card-header h2 { font-size: 0.92rem; font-weight: 700; }
+
+    /* Tabelas */
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #F8F8F8; }
+    th {
+      padding: 11px 18px; text-align: left;
+      font-size: 0.72rem; font-weight: 700; color: var(--cinza-texto);
+      text-transform: uppercase; letter-spacing: 0.4px;
+      border-bottom: 1px solid var(--cinza-linha);
+    }
+    td {
+      padding: 13px 18px; font-size: 0.83rem;
+      border-bottom: 1px solid var(--cinza-linha);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #FAFAFA; }
+    td .nome-disciplina { font-weight: 500; }
+    td .nota { font-weight: 700; color: var(--preto); }
+
+    /* Badges de estado */
+    .badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 4px;
+      font-size: 0.72rem; font-weight: 600;
+    }
+    .badge::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50; flex-shrink: 0;
+    }
+    .badge.concluida { background: var(--verde-light); color: var(--verde); }
+    .badge.concluida::before { background: var(--verde); border-radius: 50%; }
+    .badge.em_curso  { background: var(--amarelo-light); color: var(--amarelo); }
+    .badge.em_curso::before  { background: var(--amarelo); border-radius: 50%; }
+    .badge.reprovada { background: #FFDEDE; color: var(--vermelho); }
+    .badge.reprovada::before { background: var(--vermelho); border-radius: 50%; }
+    .badge.pendente          { background: #F0F0F0; color: var(--cinza-texto); }
+    .badge.pendente::before  { background: var(--cinza-texto); border-radius: 50%; }
+    .badge.entrevista_agendada { background: var(--azul-light); color: var(--azul); }
+    .badge.entrevista_agendada::before { background: var(--azul); border-radius: 50%; }
+    .badge.aceite    { background: var(--verde-light); color: var(--verde); }
+    .badge.aceite::before    { background: var(--verde); border-radius: 50%; }
+    .badge.rejeitada { background: #FFDEDE; color: var(--vermelho); }
+    .badge.rejeitada::before { background: var(--vermelho); border-radius: 50%; }
+
+    .vazio {
+      padding: 32px 18px; text-align: center;
+      color: var(--cinza-texto); font-size: 0.84rem;
+    }
+    .vazio .emoji { font-size: 1.8rem; margin-bottom: 8px; }
+    .vazio a { color: var(--laranja); font-weight: 600; text-decoration: none; }
+    .vazio a:hover { text-decoration: underline; }
+
+    /* Upload DOMUS */
+    .domus-zona {
+      margin: 14px 18px 18px;
+      border: 1.5px dashed var(--cinza-linha);
+      border-radius: 8px;
+      padding: 18px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      background: #FAFAFA;
+    }
+    .domus-zona:hover { border-color: var(--laranja); background: var(--laranja-light); }
+    .domus-zona.tem-ficheiro { border-color: var(--verde); background: var(--verde-light); }
+    .domus-zona .icone { font-size: 1.5rem; margin-bottom: 6px; }
+    .domus-zona .texto { font-size: 0.8rem; color: var(--cinza-texto); }
+    .domus-zona .texto strong { color: var(--preto); display: block; font-size: 0.84rem; margin-bottom: 2px; }
+    .domus-zona.tem-ficheiro .texto { color: var(--verde); }
+    #inputDomus { display: none; }
+
+    /* Alerta toast */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--preto); color: var(--branco);
+      padding: 12px 20px; border-radius: 8px;
+      font-size: 0.84rem; font-weight: 500;
+      transform: translateY(80px); opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+      z-index: 500; max-width: 320px;
+    }
+    .toast.visivel { transform: translateY(0); opacity: 1; }
+    .toast.sucesso { background: var(--verde); }
+    .toast.erro    { background: var(--vermelho); }
+
+    /* Mobile */
+    .menu-toggle {
+      display: none; position: fixed; top: 14px; left: 14px; z-index: 200;
+      background: var(--laranja); border: none; border-radius: 8px;
+      padding: 8px 10px; cursor: pointer; color: white; font-size: 1.1rem;
+    }
+    .sidebar-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4); z-index: 90;
+    }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
+      .sidebar.aberta { transform: translateX(0); }
+      .sidebar-overlay.visivel { display: block; }
+      .main { margin-left: 0; }
+      .menu-toggle { display: block; }
+      .topbar { padding-left: 56px; }
+      .content { padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="menu-toggle" id="menuToggle">☰</button>
+<div class="sidebar-overlay" id="overlay"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><span>ESMAD</span></div>
+  <nav class="sidebar-nav">
+    <a class="nav-item" href="lista-propostas.html">Propostas</a>
+    <a class="nav-item activo">O Meu Perfil</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="nome" id="sidebarNome">—</div>
+    <div class="perfil">Estudante</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <div class="topbar">
+    <div class="topbar-left"></div>
+    <div class="topbar-centro">
+      <div class="titulo">O Meu Perfil</div>
+      <div class="subtitulo">Gere o teu perfil e CV académico</div>
+    </div>
+    <div class="avatar" id="avatar">?</div>
+  </div>
+
+  <div class="content">
+    <div class="layout">
+      <!-- COLUNA ESQUERDA -->
+      <div id="colEsq">
+        <div class="card-perfil" id="cardPerfil">
+          <div class="skeleton" style="width:72px;height:72px;border-radius:50%;margin-bottom:14px"></div>
+          <div class="skeleton" style="height:16px;width:140px;margin-bottom:8px"></div>
+          <div class="skeleton" style="height:12px;width:80px;margin-bottom:6px"></div>
+          <div class="skeleton" style="height:12px;width:110px;margin-bottom:20px"></div>
+          <div class="skeleton" style="height:12px;width:100%;margin-bottom:8px"></div>
+          <div class="skeleton" style="height:12px;width:100%;margin-bottom:20px"></div>
+          <div class="skeleton" style="height:38px;width:100%;border-radius:8px;margin-bottom:10px"></div>
+          <div class="skeleton" style="height:38px;width:100%;border-radius:8px"></div>
+        </div>
+      </div>
+
+      <!-- COLUNA DIREITA -->
+      <div class="col-dir">
+        <!-- Percurso Académico -->
+        <div class="card">
+          <div class="card-header"><h2>Percurso Académico</h2></div>
+          <table>
+            <thead>
+              <tr><th>Disciplina</th><th>Nota</th><th>Estado</th></tr>
+            </thead>
+            <tbody id="tabelaDisciplinas">
+              <tr><td colspan="3"><div class="vazio"><div class="emoji">⏳</div>A carregar…</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- As Minhas Candidaturas -->
+        <div class="card">
+          <div class="card-header"><h2>As Minhas Candidaturas</h2></div>
+          <table>
+            <thead>
+              <tr><th>Proposta</th><th>Entidade</th><th>Estado</th></tr>
+            </thead>
+            <tbody id="tabelaCandidaturas">
+              <tr><td colspan="3"><div class="vazio"><div class="emoji">⏳</div>A carregar…</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Input ficheiro DOMUS (escondido) -->
+<input type="file" id="inputDomus" accept=".pdf">
+
+<script>
+  const API = 'http://localhost:5000/api';
+  const token = localStorage.getItem('esmad_token');
+  const user  = localStorage.getItem('esmad_user');
+  if (!token || !user) { window.location.href = 'login.html'; }
+
+  const utilizador = JSON.parse(user);
+  if (utilizador.perfil !== 'estudante') { window.location.href = 'login.html'; }
+
+  document.getElementById('sidebarNome').textContent = utilizador.nome;
+  document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
+
+  // Avatar logout
+  document.getElementById('avatar').addEventListener('click', () => {
+    if (confirm('Tens a certeza que queres fazer logout?')) {
+      localStorage.clear();
+      window.location.href = 'login.html';
+    }
+  });
+
+  // Mobile sidebar
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  document.getElementById('menuToggle').addEventListener('click', () => {
+    sidebar.classList.toggle('aberta');
+    overlay.classList.toggle('visivel');
+  });
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('aberta');
+    overlay.classList.remove('visivel');
+  });
+
+  // Toast
+  function mostrarToast(msg, tipo = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${tipo} visivel`;
+    setTimeout(() => { t.className = `toast ${tipo}`; }, 3000);
+  }
+
+  // Helpers
+  function req(endpoint, opts = {}) {
+    return fetch(`${API}${endpoint}`, {
+      ...opts,
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...(opts.headers || {}) }
+    }).then(r => r.json());
+  }
+
+  function formatarData(str) {
+    return new Date(str).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: '2-digit' });
+  }
+
+  const estadoBadge = {
+    concluida:           'Concluída',
+    em_curso:            'Em curso',
+    reprovada:           'Reprovada',
+    pendente:            'Pendente',
+    entrevista_agendada: 'Entrevista Agendada',
+    aceite:              'Aceite',
+    rejeitada:           'Rejeitada',
+  };
+
+  // Domus PDF — nome guardado localmente
+  let domusNome = localStorage.getItem('esmad_domus_nome') || null;
+
+  // ── Carregar dados ──
+  async function carregar() {
+    try {
+      const dados = await req('/utilizadores/perfil');
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+
+      const { utilizador: u, dadosExtra: est } = dados;
+
+      // Actualizar localStorage com nome actualizado
+      const uLocal = JSON.parse(localStorage.getItem('esmad_user') || '{}');
+      uLocal.nome = u.nome;
+      localStorage.setItem('esmad_user', JSON.stringify(uLocal));
+
+      // Render card de perfil
+      renderCardPerfil(u, est);
+
+      // Disciplinas
+      const disciplinas = est?.disciplinas || [];
+      const tbDisc = document.getElementById('tabelaDisciplinas');
+      if (!disciplinas.length) {
+        tbDisc.innerHTML = `<tr><td colspan="3"><div class="vazio"><div class="emoji">📚</div>Ainda não tens disciplinas registadas.</div></td></tr>`;
+      } else {
+        tbDisc.innerHTML = disciplinas.map(d => `
+          <tr>
+            <td><span class="nome-disciplina">${d.nome}</span></td>
+            <td><span class="nota">${d.nota ?? '—'}</span></td>
+            <td><span class="badge ${d.estado}">${estadoBadge[d.estado] || d.estado}</span></td>
+          </tr>
+        `).join('');
+      }
+
+      // Candidaturas
+      const dados2 = await req('/propostas/stats/estudante');
+      const cands = dados2.candidaturas || [];
+      const tbCand = document.getElementById('tabelaCandidaturas');
+      if (!cands.length) {
+        tbCand.innerHTML = `<tr><td colspan="3"><div class="vazio"><div class="emoji">📭</div>Ainda não te candidataste a nenhuma proposta.<br><a href="lista-propostas.html">Ver propostas →</a></div></td></tr>`;
+      } else {
+        tbCand.innerHTML = cands.map(c => {
+          const p = c.propostaId;
+          return `
+            <tr>
+              <td style="cursor:pointer;font-weight:500;color:var(--preto)"
+                onclick="window.location.href='detalhe-proposta.html?id=${p?._id}'"
+                onmouseover="this.style.color='var(--laranja)'" onmouseout="this.style.color='var(--preto)'">
+                ${p?.titulo || '—'}
+              </td>
+              <td>${p?.nomeEntidade || '—'}</td>
+              <td><span class="badge ${c.estado}">${estadoBadge[c.estado] || c.estado}</span></td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+    } catch (err) {
+      console.error(err);
+      mostrarToast('Erro ao carregar perfil. O servidor está ligado?', 'erro');
+    }
+  }
+
+  function renderCardPerfil(u, est) {
+    const inicial = u.nome.charAt(0).toUpperCase();
+    const curso   = est?.curso || 'TeSP DTAM';
+    const ano     = est?.ano ? `${est.ano}.º Ano` : '';
+    const propostaEscolhida = est?.propostaEscolhidaId;
+
+    // Card escolha de proposta
+    const cardEscolha = propostaEscolhida
+      ? `<div class="card-escolha">
+          <div class="escolha-titulo">✔ Proposta Escolhida</div>
+          <div class="escolha-proposta">${propostaEscolhida?.titulo || 'Proposta selecionada'}</div>
+          <a href="lista-propostas.html" class="btn-escolha">Ver Propostas</a>
+        </div>`
+      : `<div class="card-escolha">
+          <div class="escolha-titulo">Escolher Proposta</div>
+          <div class="escolha-texto">Ainda não escolheste nenhuma proposta.</div>
+          <a href="lista-propostas.html" class="btn-escolha">Ir para as Propostas</a>
+        </div>`;
+
+    document.getElementById('cardPerfil').innerHTML = `
+      <div class="avatar-grande">${inicial}</div>
+      <div class="perfil-nome">${u.nome}</div>
+      <div class="perfil-tipo">Estudante</div>
+      <div class="perfil-curso">${curso}${ano ? ' · ' + ano : ''}</div>
+
+      <div class="perfil-contactos">
+        <div class="contacto-linha">
+          <span class="label">Email:</span>
+          <span class="valor">${u.email}</span>
+        </div>
+        ${est?.telefone ? `
+        <div class="contacto-linha">
+          <span class="label">Telefone:</span>
+          <span class="valor">${est.telefone}</span>
+        </div>` : ''}
+        ${est?.portfolio ? `
+        <div class="contacto-linha">
+          <span class="label">Portfólio:</span>
+          <span class="valor"><a href="${est.portfolio.startsWith('http') ? est.portfolio : 'https://'+est.portfolio}" target="_blank">${est.portfolio}</a></span>
+        </div>` : ''}
+        ${est?.linkedin ? `
+        <div class="contacto-linha">
+          <span class="label">LinkedIn:</span>
+          <span class="valor"><a href="${est.linkedin.startsWith('http') ? est.linkedin : 'https://'+est.linkedin}" target="_blank">${est.linkedin}</a></span>
+        </div>` : ''}
+      </div>
+
+      <a href="editar-perfil.html" class="btn-editar">Editar Perfil</a>
+
+      <button class="btn-secundario" onclick="document.getElementById('inputDomus').click()">
+        Carregar notas (DOMUS PDF)
+      </button>
+      <div class="btn-secundario-nota" id="notaDomus">
+        ${domusNome ? `📄 ${domusNome}` : 'Ficheiro PDF exportado do DOMUS'}
+      </div>
+
+      <div class="domus-zona ${domusNome ? 'tem-ficheiro' : ''}" id="domusZona" onclick="document.getElementById('inputDomus').click()">
+        <div class="icone">${domusNome ? '✅' : '📤'}</div>
+        <div class="texto">
+          ${domusNome
+            ? `<strong>${domusNome}</strong>Clica para substituir`
+            : `<strong>Clica para fazer upload</strong>PDF exportado do DOMUS (máx. 5MB)`}
+        </div>
+      </div>
+
+      ${cardEscolha}
+    `;
+
+    // Re-bind input domus
+    document.getElementById('inputDomus').addEventListener('change', handleDomus);
+  }
+
+  // ── Upload DOMUS (armazenamento local por agora) ──
+  function handleDomus(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.type !== 'application/pdf') {
+      mostrarToast('Só são aceites ficheiros PDF.', 'erro');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      mostrarToast('O ficheiro não pode ter mais de 5MB.', 'erro');
+      return;
+    }
+    domusNome = file.name;
+    localStorage.setItem('esmad_domus_nome', domusNome);
+    mostrarToast(`Notas carregadas: ${file.name}`, 'sucesso');
+
+    // Actualizar UI
+    const zona = document.getElementById('domusZona');
+    const nota = document.getElementById('notaDomus');
+    if (zona) {
+      zona.className = 'domus-zona tem-ficheiro';
+      zona.innerHTML = `<div class="icone">✅</div><div class="texto"><strong>${file.name}</strong>Clica para substituir</div>`;
+    }
+    if (nota) nota.textContent = `📄 ${file.name}`;
+  }
+
+  // ── Iniciar ──
+  carregar();
+</script>
+</body>
+</html>

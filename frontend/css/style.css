@@ -1,0 +1,207 @@
+/* ── Variáveis ESMAD ── */
+:root {
+  --laranja:       #F15A24;
+  --laranja-hover: #d44d1a;
+  --laranja-light: #FEE8DF;
+  --preto:         #1A1A1A;
+  --cinza-claro:   #F5F5F5;
+  --cinza-border:  #E0E0E0;
+  --cinza-texto:   #888888;
+  --branco:        #FFFFFF;
+  --azul:          #2E75B6;
+  --verde:         #70AD47;
+  --vermelho:      #C00000;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background-color: var(--cinza-claro);
+  color: var(--preto);
+  min-height: 100vh;
+}
+
+/* ── Topbar ESMAD ── */
+.esmad-topbar {
+  background-color: var(--laranja);
+  padding: 16px 0;
+  text-align: center;
+}
+.esmad-topbar h1 {
+  color: var(--branco);
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+/* ── Card de formulário ── */
+.auth-card {
+  background: var(--branco);
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  padding: 36px;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ── Labels ── */
+.form-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--preto);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+/* ── Inputs ── */
+.form-control {
+  background-color: var(--cinza-claro);
+  border: 1px solid var(--cinza-border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  color: var(--preto);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-control:focus {
+  background-color: var(--branco);
+  border-color: var(--laranja);
+  box-shadow: 0 0 0 3px rgba(241,90,36,0.15);
+  outline: none;
+}
+.form-control::placeholder {
+  color: #BBBBBB;
+}
+.form-control.is-invalid {
+  border-color: var(--vermelho);
+}
+.form-control.is-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(192,0,0,0.15);
+}
+
+/* ── Select ── */
+.form-select {
+  background-color: var(--cinza-claro);
+  border: 1px solid var(--cinza-border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  color: var(--preto);
+  transition: border-color 0.2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  cursor: pointer;
+}
+.form-select:focus {
+  border-color: var(--laranja);
+  box-shadow: 0 0 0 3px rgba(241,90,36,0.15);
+  outline: none;
+}
+
+/* ── Botão principal ── */
+.btn-esmad {
+  background-color: var(--laranja);
+  color: var(--branco);
+  border: none;
+  border-radius: 8px;
+  padding: 13px 24px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  letter-spacing: 0.3px;
+}
+.btn-esmad:hover {
+  background-color: var(--laranja-hover);
+}
+.btn-esmad:active {
+  transform: scale(0.98);
+}
+.btn-esmad:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ── Link de redireção ── */
+.auth-link {
+  font-size: 0.85rem;
+  color: var(--cinza-texto);
+  text-align: center;
+  margin-top: 12px;
+}
+.auth-link a {
+  color: var(--laranja);
+  font-weight: 600;
+  text-decoration: none;
+}
+.auth-link a:hover {
+  text-decoration: underline;
+}
+
+/* ── Nota de info ── */
+.info-note {
+  font-size: 0.75rem;
+  color: var(--cinza-texto);
+  font-style: italic;
+  margin-top: 6px;
+}
+
+/* ── Alerta de erro/sucesso ── */
+.alert-esmad {
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+  display: none;
+}
+.alert-esmad.erro {
+  background-color: #FFDEDE;
+  color: var(--vermelho);
+  border: 1px solid #ffb3b3;
+}
+.alert-esmad.sucesso {
+  background-color: #E2EFDA;
+  color: #375623;
+  border: 1px solid #c6e0b4;
+}
+.alert-esmad.visivel {
+  display: block;
+}
+
+/* ── Spinner ── */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.5);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Responsivo ── */
+@media (max-width: 576px) {
+  .auth-card {
+    padding: 24px 20px;
+    border-radius: 0;
+    box-shadow: none;
+    min-height: calc(100vh - 60px);
+  }
+  .esmad-topbar h1 {
+    font-size: 1.5rem;
+  }
+}
