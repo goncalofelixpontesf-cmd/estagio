@@ -5,10 +5,16 @@ const { proteger, restringir } = require('../middleware/auth');
 
 router.use(proteger);
 
-router.get('/',              ctrl.listar);
-router.get('/stats/estudante', restringir('estudante'), ctrl.statsEstudante);
-router.get('/:id',           ctrl.obter);
-router.post('/',             restringir('entidade','docente','estudante','admin'), ctrl.criar);
-router.post('/:id/interesse',restringir('estudante'), ctrl.manifestarInteresse);
+// Listar propostas (todos os perfis autenticados)
+router.get('/', ctrl.listar);
+
+// Criar proposta (estudante ou entidade/docente)
+router.post('/', ctrl.criar);
+
+// Obter proposta individual
+router.get('/:id', ctrl.obterProposta);
+
+// Entidade edita proposta rejeitada
+router.put('/:id', restringir('docente', 'entidade'), ctrl.editarProposta);
 
 module.exports = router;

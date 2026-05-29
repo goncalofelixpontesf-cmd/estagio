@@ -296,7 +296,7 @@
       <div class="linha-modal"></div>
       <label class="campo-label">Sugestão de melhoria <span style="color:var(--cinza-texto);font-weight:400;text-transform:none;font-size:0.72rem">(opcional)</span></label>
       <textarea class="campo-textarea" id="sugestaoAprovar" placeholder="Podes deixar uma sugestão de melhoria para o proponente, mesmo aprovando…" style="border-color:transparent"></textarea>
-      <p class="campo-nota" style="margin-top:6px">A proposta será aprovada mesmo que não escrevas nada.</p>
+      <p class="campo-nota" style="margin-top:6px">A proposta será aprovada mesmo que não escreva nada.</p>
     </div>
     <div class="modal-footer">
       <button class="btn-m-cancelar" onclick="fecharModal('modalAprovar')">Cancelar</button>
@@ -354,18 +354,18 @@
   <div class="modal" style="max-width:460px">
     <div class="modal-topo"></div>
     <div class="modal-header">
-      <div><h2>Atribuir Orientador CCA</h2><div class="sub" id="atribuirSub">—</div></div>
+      <div><h2>Atribuir Tutor CCA</h2><div class="sub" id="atribuirSub">—</div></div>
       <button class="btn-fechar" onclick="fecharModal('modalAtribuir')">✕</button>
     </div>
     <div class="modal-body">
       <div id="alertaAtribuir" class="alerta-modal"></div>
       <div class="linha-modal"></div>
-      <label class="campo-label">Selecionar docente</label>
+      <label class="campo-label">Seleccionar docente</label>
       <select class="campo-select" id="selectOrientador"><option value="">Selecionar…</option></select>
     </div>
     <div class="modal-footer">
       <button class="btn-m-cancelar" onclick="fecharModal('modalAtribuir')">Cancelar</button>
-      <button class="btn-m-azul" id="btnConfirmarAtribuir" onclick="confirmarAtribuir()">Atribuir Orientador</button>
+      <button class="btn-m-azul" id="btnConfirmarAtribuir" onclick="confirmarAtribuir()">Atribuir Tutor</button>
     </div>
   </div>
 </div>
@@ -375,7 +375,7 @@
   <div class="modal" style="max-width:520px">
     <div class="modal-topo"></div>
     <div class="modal-header">
-      <div><h2>Adicionar Docente à CCA</h2><div class="sub">Define o docente e os cursos a que pertence</div></div>
+      <div><h2>Adicionar Docente à CCA</h2><div class="sub">Defina o docente e os cursos a que pertence</div></div>
       <button class="btn-fechar" onclick="fecharModal('modalDocente')">✕</button>
     </div>
     <div class="modal-body">
@@ -723,12 +723,12 @@
   async function carregarPendentes() {
     document.getElementById('conteudoTab').innerHTML = `
       <div id="alertaPBox" style="display:none" class="alerta-pendentes">
-        <div><div class="texto" id="alertaPTexto">—</div><div class="sub">Clica no título para ver os detalhes e votar.</div></div>
+        <div><div class="texto" id="alertaPTexto">—</div><div class="sub">Clique no título para ver os detalhes e votar.</div></div>
       </div>
       <div class="painel">
         <div class="painel-header"><h2>Propostas Pendentes <span class="badge-count" id="badgePTab">0</span></h2></div>
         <table>
-          <thead><tr><th>Título</th><th>Tipo</th><th>Proponente</th><th>Submetida</th><th>Orientador</th><th>Ações</th></tr></thead>
+          <thead><tr><th>Título</th><th>Tipo</th><th>Proponente</th><th>Submetida</th><th>Tutor</th><th>Ações</th></tr></thead>
           <tbody id="tbPendentes"><tr><td colspan="6"><div class="vazio"><div class="emoji">⏳</div>A carregar…</div></td></tr></tbody>
         </table>
       </div>`;
@@ -969,7 +969,7 @@
   async function confirmarAtribuir() {
     const orientadorId = document.getElementById('selectOrientador').value;
     const al = document.getElementById('alertaAtribuir');
-    if (!orientadorId) { al.textContent = 'Seleciona um docente.'; al.className = 'alerta-modal erro'; return; }
+    if (!orientadorId) { al.textContent = 'Selecciona um docente.'; al.className = 'alerta-modal erro'; return; }
     const btn = document.getElementById('btnConfirmarAtribuir');
     btn.disabled = true; btn.innerHTML = '<span class="spin"></span>A atribuir…';
     try {
@@ -1013,8 +1013,8 @@
           <td>${renderCursosBadge(m.cursosCCA)}</td>
           <td><span class="badge-ativo">Ativo</span></td>
           <td>
-            <button class="btn-editar-cursos" onclick="abrirEditarCursos('${m._id}','${m.nome.replace(/'/g,"\\'")}',${JSON.stringify(m.cursosCCA||[])})">✏️ Cursos</button>
-            <button class="btn-remover" onclick="removerMembro('${m._id}','${m.nome.replace(/'/g,"\\'")}')">Remover</button>
+            <button class="btn-editar-cursos" onclick="abrirEditarCursos('${m._id}','${m.nome.replace(/'/g,"\\'")}',${JSON.stringify(m.cursosCCA||[]).replace(/"/g,'&quot;')})">✏️ Cursos</button>
+            ${m._id !== utilizador.id ? `<button class="btn-remover" onclick="removerMembro('${m._id}','${m.nome.replace(/'/g,"\\'")}')">Remover</button>` : `<span style="font-size:0.75rem;color:var(--cinza-texto);font-style:italic;padding:6px 4px"></span>`}
           </td>
         </tr>`).join('');
     } catch (err) {
@@ -1092,7 +1092,7 @@
     try {
       const dados = await req('/cca/membros/' + membroEditarId + '/cursos', { method: 'PUT', body: JSON.stringify({ cursosCCA }) });
       if (!dados.sucesso) throw new Error(dados.mensagem);
-      al.textContent = 'Cursos actualizados.'; al.className = 'alerta-modal sucesso';
+      al.textContent = 'Cursos atualizados.'; al.className = 'alerta-modal sucesso';
       btn.innerHTML = '✔ Guardado';
       setTimeout(() => { fecharModal('modalEditarCursos'); btn.disabled = false; btn.textContent = 'Guardar'; carregarDocentes(); }, 1100);
     } catch (err) { al.textContent = err.message; al.className = 'alerta-modal erro'; btn.disabled = false; btn.textContent = 'Guardar'; }
@@ -1113,7 +1113,7 @@
   const saveCursos = l => localStorage.setItem('esmad_cursos', JSON.stringify(l));
   function renderCursos() {
     const cursos = getCursos();
-    document.getElementById('conteudoTab').innerHTML = `<div class="painel"><div class="painel-header"><h2>Cursos Disponíveis</h2><button class="btn-adicionar" onclick="abrirModal('modalCurso')">+ Adicionar</button></div><table><thead><tr><th>Nome do Curso</th><th>Sigla</th><th>Acções</th></tr></thead><tbody>${cursos.length?cursos.map(c=>`<tr><td style="font-weight:500">${c.nome}</td><td style="font-weight:700">${c.sigla}</td><td><button class="btn-remover" onclick="removerCurso('${c.id}')">Remover</button></td></tr>`).join(''):`<tr><td colspan="3"><div class="vazio"><div class="emoji">🎓</div>Sem cursos.</div></td></tr>`}</tbody></table></div>`;
+    document.getElementById('conteudoTab').innerHTML = `<div class="painel"><div class="painel-header"><h2>Cursos Disponíveis</h2><button class="btn-adicionar" onclick="abrirModal('modalCurso')">+ Adicionar</button></div><table><thead><tr><th>Nome do Curso</th><th>Sigla</th><th>Ações</th></tr></thead><tbody>${cursos.length?cursos.map(c=>`<tr><td style="font-weight:500">${c.nome}</td><td style="font-weight:700">${c.sigla}</td><td><button class="btn-remover" onclick="removerCurso('${c.id}')">Remover</button></td></tr>`).join(''):`<tr><td colspan="3"><div class="vazio"><div class="emoji">🎓</div>Sem cursos.</div></td></tr>`}</tbody></table></div>`;
   }
   function confirmarAdicionarCurso() {
     const nome=document.getElementById('nomeCurso').value.trim(),sigla=document.getElementById('siglaCurso').value.trim(),al=document.getElementById('alertaCurso');
@@ -1130,7 +1130,7 @@
   const saveAreas=l=>localStorage.setItem('esmad_areas',JSON.stringify(l));
   function renderAreas(){
     const areas=getAreas();
-    document.getElementById('conteudoTab').innerHTML=`<div class="painel"><div class="painel-header"><h2>Áreas de Atuação</h2><button class="btn-adicionar" onclick="abrirModal('modalArea')">+ Adicionar</button></div><table><thead><tr><th>Área de Atuação</th><th>Acções</th></tr></thead><tbody>${areas.length?areas.map((a,i)=>`<tr><td style="font-weight:500">${a}</td><td><button class="btn-remover" onclick="removerArea(${i},'${a.replace(/'/g,"\\'")}')">Remover</button></td></tr>`).join(''):`<tr><td colspan="2"><div class="vazio"><div class="emoji">🏷️</div>Sem áreas.</div></td></tr>`}</tbody></table></div>`;
+    document.getElementById('conteudoTab').innerHTML=`<div class="painel"><div class="painel-header"><h2>Áreas de Atuação</h2><button class="btn-adicionar" onclick="abrirModal('modalArea')">+ Adicionar</button></div><table><thead><tr><th>Área de Atuação</th><th>Ações</th></tr></thead><tbody>${areas.length?areas.map((a,i)=>`<tr><td style="font-weight:500">${a}</td><td><button class="btn-remover" onclick="removerArea(${i},'${a.replace(/'/g,"\\'")}')">Remover</button></td></tr>`).join(''):`<tr><td colspan="2"><div class="vazio"><div class="emoji">🏷️</div>Sem áreas.</div></td></tr>`}</tbody></table></div>`;
   }
   function confirmarAdicionarArea(){
     const nome=document.getElementById('nomeArea').value.trim(),al=document.getElementById('alertaArea');
