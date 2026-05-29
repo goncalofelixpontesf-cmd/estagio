@@ -51,7 +51,7 @@
     @keyframes shimmer { to { background-position: -200% 0; } }
 
     .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-    .section-title { font-size: 1rem; font-weight: 700; }
+    .section-title  { font-size: 1rem; font-weight: 700; }
 
     .tabela-card { background: var(--branco); border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); overflow: hidden; margin-bottom: 24px; }
     table { width: 100%; border-collapse: collapse; }
@@ -65,9 +65,7 @@
     .titulo-link:hover { color: var(--laranja); }
 
     .tag { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 0.72rem; font-weight: 600; }
-    .tag.estagio  { background: var(--laranja-light); color: var(--laranja); }
-    .tag.projecto { background: var(--azul-light); color: var(--azul); }
-    .tag.area     { background: var(--azul-light); color: var(--azul); }
+    .tag.area { background: var(--azul-light); color: var(--azul); }
 
     .estado { display: inline-flex; align-items: center; gap: 5px; font-size: 0.78rem; font-weight: 600; }
     .estado::before { content: ''; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
@@ -77,40 +75,24 @@
     .estado.atribuida::before { background: var(--azul); }
 
     .badge-cand { display: inline-flex; align-items: center; gap: 4px; background: var(--azul-light); color: var(--azul); border-radius: 4px; padding: 3px 9px; font-size: 0.72rem; font-weight: 700; }
-    .btn-ver { background: var(--laranja-light); color: var(--laranja); border: none; border-radius: 6px; padding: 6px 14px; font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 700; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
+
+    .acoes-tabela { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .btn-ver      { background: var(--laranja-light); color: var(--laranja); border: none; border-radius: 6px; padding: 6px 13px; font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
     .btn-ver:hover { opacity: 0.8; }
+    .btn-detalhes { background: var(--cinza-input); color: var(--preto); border: 1.5px solid var(--cinza-linha); border-radius: 6px; padding: 6px 13px; font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .btn-detalhes:hover { background: #E8E8E8; }
+    .btn-editar-proposta { background: var(--amarelo-light); color: var(--amarelo); border: none; border-radius: 6px; padding: 6px 13px; font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .btn-editar-proposta:hover { opacity: 0.8; }
+
     .vazio { padding: 36px 16px; text-align: center; color: var(--cinza-texto); font-size: 0.86rem; }
     .vazio .emoji { font-size: 1.8rem; margin-bottom: 8px; }
 
-    .breadcrumb { font-size: 0.82rem; color: var(--cinza-texto); margin-bottom: 18px; display: flex; align-items: center; gap: 6px; }
-    .breadcrumb .link { color: var(--laranja); font-weight: 600; cursor: pointer; }
-    .breadcrumb .link:hover { text-decoration: underline; }
-
-    .acoes-linha { display: flex; gap: 6px; align-items: center; }
-    .btn-agendar { border: none; border-radius: 6px; padding: 6px 12px; font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 700; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
-    .btn-agendar.ativo   { background: var(--laranja); color: var(--branco); }
-    .btn-agendar.inativo { background: #F0F0F0; color: var(--cinza-texto); }
-    .btn-agendar:hover   { opacity: 0.85; }
-    .btn-escolher { border: none; border-radius: 6px; padding: 6px 12px; font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 700; cursor: pointer; background: var(--verde-light); color: var(--verde); transition: opacity 0.15s; white-space: nowrap; }
-    .btn-escolher:hover { opacity: 0.8; }
-    .btn-escolher.escolhido { background: var(--verde); color: var(--branco); cursor: default; }
-
-    .badge-estado { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 4px; font-size: 0.72rem; font-weight: 600; }
-    .badge-estado.pendente            { background: var(--amarelo-light); color: var(--amarelo); }
-    .badge-estado.entrevista_agendada { background: var(--azul-light);    color: var(--azul); }
-    .badge-estado.aceite              { background: var(--verde-light);   color: var(--verde); }
-    .badge-estado.rejeitada           { background: var(--vermelho-light); color: var(--vermelho); }
-
-    .btn-enviar-cca { background: var(--laranja); color: var(--branco); border: none; border-radius: 8px; padding: 10px 22px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; transition: background 0.15s; float: right; margin-bottom: 8px; }
-    .btn-enviar-cca:hover { background: var(--laranja-hover); }
-    .link-portfolio { color: var(--azul); text-decoration: none; font-size: 0.82rem; font-weight: 500; }
-    .link-portfolio:hover { text-decoration: underline; }
-
-    /* ══ MODAIS GENÉRICOS ══ */
+    /* ══ MODAIS BASE ══ */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.42); z-index: 400; align-items: center; justify-content: center; padding: 16px; }
     .modal-overlay.aberto { display: flex; }
     .modal { background: var(--branco); border-radius: 14px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.18); }
     .modal-topo { height: 6px; background: var(--laranja); border-radius: 14px 14px 0 0; }
+    .modal-topo-vm { height: 6px; background: var(--vermelho); border-radius: 14px 14px 0 0; }
     .modal-header { padding: 22px 26px 0; display: flex; align-items: flex-start; justify-content: space-between; }
     .modal-header h2 { font-size: 1rem; font-weight: 700; }
     .modal-header .sub { font-size: 0.78rem; color: var(--cinza-texto); margin-top: 3px; }
@@ -119,6 +101,7 @@
     .modal-body { padding: 18px 26px; }
     .modal-footer { padding: 0 26px 22px; display: flex; justify-content: flex-end; gap: 10px; }
     .linha-modal { border: none; border-top: 1px solid var(--cinza-linha); margin: 12px 0; }
+
     .alerta-modal { display: none; border-radius: 8px; padding: 10px 13px; font-size: 0.8rem; font-weight: 500; margin-bottom: 12px; }
     .alerta-modal.erro    { background: var(--vermelho-light); color: var(--vermelho); display: block; }
     .alerta-modal.sucesso { background: var(--verde-light);    color: var(--verde);    display: block; }
@@ -127,19 +110,39 @@
     .campo-input { width: 100%; background: #F5F5F5; border: 1.5px solid transparent; border-radius: 8px; padding: 12px 14px; font-family: 'Inter', sans-serif; font-size: 0.86rem; color: var(--preto); outline: none; transition: border-color 0.18s, box-shadow 0.18s; margin-bottom: 14px; }
     .campo-input::placeholder { color: #BBBBBB; }
     .campo-input:focus { background: var(--branco); border-color: var(--laranja); box-shadow: 0 0 0 3px rgba(241,90,36,0.10); }
+
     .btn-m-cancelar { background: #F0F0F0; color: #666; border: none; border-radius: 8px; padding: 10px 20px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 500; cursor: pointer; }
     .btn-m-cancelar:hover { background: #E4E4E4; }
     .btn-m-primario { background: var(--laranja); color: var(--branco); border: none; border-radius: 8px; padding: 10px 22px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; }
     .btn-m-primario:hover    { background: var(--laranja-hover); }
     .btn-m-primario:disabled { opacity: 0.65; cursor: not-allowed; }
+    .btn-m-amarelo { background: var(--amarelo-light); color: var(--amarelo); border: none; border-radius: 8px; padding: 10px 22px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; }
+    .btn-m-amarelo:hover { opacity: 0.85; }
 
-    /* ══ MODAL MULTI-PASSO (Nova Proposta) ══ */
+    /* ══ DETALHES DA PROPOSTA ══ */
+    .detalhe-bloco { background: var(--cinza-input); border-radius: 10px; padding: 14px 18px; margin-bottom: 14px; }
+    .detalhe-bloco .db-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--cinza-texto); margin-bottom: 5px; }
+    .detalhe-bloco .db-valor { font-size: 0.86rem; font-weight: 600; color: var(--preto); }
+    .detalhe-bloco.vermelho { background: var(--vermelho-light); }
+    .detalhe-bloco.vermelho .db-label { color: var(--vermelho); }
+    .detalhe-bloco.vermelho .db-valor { color: var(--vermelho); font-weight: 500; line-height: 1.6; }
+    .detalhe-bloco.amarelo  { background: var(--amarelo-light); }
+    .detalhe-bloco.amarelo  .db-label { color: var(--amarelo); }
+    .detalhe-bloco.amarelo  .db-valor { color: #5a4000; font-weight: 500; line-height: 1.6; }
+    .detalhe-bloco.verde    { background: var(--verde-light); }
+    .detalhe-bloco.verde    .db-label { color: var(--verde); }
+    .detalhe-bloco.verde    .db-valor { color: #2d5a1b; }
+
+    .detalhe-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+
+    /* ══ MODAL MULTI-PASSO ══ */
     .btn-nova { display: flex; align-items: center; gap: 8px; background: var(--laranja); color: var(--branco); border: none; border-radius: 8px; padding: 9px 18px; font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
     .btn-nova:hover { background: var(--laranja-hover); }
 
     .modal-mp { background: var(--branco); border-radius: 14px; width: 100%; max-width: 640px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.18); }
-    .modal-mp-topo { height: 5px; background: var(--laranja); border-radius: 14px 14px 0 0; flex-shrink: 0; }
-    .modal-mp-header { padding: 18px 26px 0; display: flex; align-items: flex-start; justify-content: space-between; flex-shrink: 0; }
+    .modal-mp-topo    { height: 5px; background: var(--laranja); border-radius: 14px 14px 0 0; flex-shrink: 0; }
+    .modal-mp-topo.amarelo { background: var(--amarelo); }
+    .modal-mp-header  { padding: 18px 26px 0; display: flex; align-items: flex-start; justify-content: space-between; flex-shrink: 0; }
     .modal-mp-header h2 { font-size: 1rem; font-weight: 700; margin-bottom: 2px; }
     .modal-mp-header .sub { font-size: 0.76rem; color: var(--cinza-texto); }
     .modal-mp-header .sub span { color: var(--laranja); }
@@ -148,25 +151,25 @@
     .progress-info { display: flex; justify-content: space-between; margin-bottom: 6px; }
     .progress-label   { font-size: 0.78rem; font-weight: 700; color: var(--preto); }
     .progress-counter { font-size: 0.76rem; color: var(--cinza-texto); }
-    .progress-track { height: 5px; background: var(--cinza-linha); border-radius: 3px; overflow: hidden; }
-    .progress-fill  { height: 100%; background: var(--laranja); border-radius: 3px; transition: width 0.3s ease; }
+    .progress-track   { height: 5px; background: var(--cinza-linha); border-radius: 3px; overflow: hidden; }
+    .progress-fill    { height: 100%; background: var(--laranja); border-radius: 3px; transition: width 0.3s ease; }
+    .progress-fill.amarelo { background: var(--amarelo); }
 
-    .modal-mp-body { padding: 18px 26px; overflow-y: auto; flex: 1; }
+    .modal-mp-body   { padding: 18px 26px; overflow-y: auto; flex: 1; }
+    .modal-mp-footer { padding: 12px 26px 18px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--cinza-linha); flex-shrink: 0; }
+    .btn-mp-anterior { background: #F0F0F0; color: #555; border: none; border-radius: 8px; padding: 11px 22px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 500; cursor: pointer; }
+    .btn-mp-anterior:hover    { background: #E4E4E4; }
+    .btn-mp-anterior.invisivel { opacity: 0; pointer-events: none; }
+    .btn-mp-seguinte { background: var(--laranja); color: var(--branco); border: none; border-radius: 8px; padding: 11px 26px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; }
+    .btn-mp-seguinte:hover    { background: var(--laranja-hover); }
+    .btn-mp-seguinte:disabled { opacity: 0.65; cursor: not-allowed; }
+    .btn-mp-seguinte.amarelo  { background: var(--amarelo); }
 
     .alerta-mp { display: none; border-radius: 8px; padding: 10px 13px; font-size: 0.81rem; font-weight: 500; margin-bottom: 14px; }
     .alerta-mp.erro    { background: #FFDEDE; color: var(--vermelho); display: block; }
     .alerta-mp.sucesso { background: var(--verde-light); color: #375623; display: block; }
 
-    .modal-mp-footer { padding: 12px 26px 18px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--cinza-linha); flex-shrink: 0; }
-    .btn-mp-anterior { background: #F0F0F0; color: #555; border: none; border-radius: 8px; padding: 11px 22px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 500; cursor: pointer; }
-    .btn-mp-anterior:hover { background: #E4E4E4; }
-    .btn-mp-anterior.invisivel { opacity: 0; pointer-events: none; }
-    .btn-mp-seguinte { background: var(--laranja); color: var(--branco); border: none; border-radius: 8px; padding: 11px 26px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; }
-    .btn-mp-seguinte:hover    { background: var(--laranja-hover); }
-    .btn-mp-seguinte:disabled { opacity: 0.65; cursor: not-allowed; }
-
-    /* Campos do formulário multi-passo */
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .form-campo { display: flex; flex-direction: column; gap: 7px; }
     .form-campo label { font-size: 0.72rem; font-weight: 700; color: var(--preto); text-transform: uppercase; letter-spacing: 0.5px; }
     .form-campo label .obg { color: var(--laranja); }
@@ -192,7 +195,7 @@
     .area-check input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--laranja); cursor: pointer; margin: 0; flex-shrink: 0; }
 
     .radio-grupo { display: flex; gap: 10px; }
-    .radio-item { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 20px; border-radius: 8px; border: 1.5px solid var(--cinza-linha); background: #F9F9F9; transition: border-color 0.15s, background 0.15s; user-select: none; font-size: 0.86rem; }
+    .radio-item  { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 20px; border-radius: 8px; border: 1.5px solid var(--cinza-linha); background: #F9F9F9; transition: border-color 0.15s, background 0.15s; user-select: none; font-size: 0.86rem; }
     .radio-item:hover   { border-color: var(--laranja); background: var(--laranja-light); }
     .radio-item.marcada { border-color: var(--laranja); background: var(--laranja-light); }
     .radio-item input[type="radio"] { width: 15px; height: 15px; accent-color: var(--laranja); cursor: pointer; margin: 0; }
@@ -202,7 +205,7 @@
     .spin { display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: girar 0.6s linear infinite; vertical-align: middle; margin-right: 6px; }
     @keyframes girar { to { transform: rotate(360deg); } }
 
-    .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 8px; font-size: 0.84rem; font-weight: 500; transform: translateY(80px); opacity: 0; z-index: 500; max-width: 320px; transition: transform 0.3s, opacity 0.3s; color: var(--branco); }
+    .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 8px; font-size: 0.84rem; font-weight: 500; transform: translateY(80px); opacity: 0; z-index: 600; max-width: 320px; transition: transform 0.3s, opacity 0.3s; color: var(--branco); }
     .toast.visivel { transform: translateY(0); opacity: 1; }
     .toast.sucesso { background: var(--verde); }
     .toast.erro    { background: var(--vermelho); }
@@ -222,6 +225,7 @@
       .stats-grid { grid-template-columns: 1fr 1fr; }
       .form-grid { grid-template-columns: 1fr; }
       .areas-grid { grid-template-columns: repeat(2,1fr); }
+      .detalhe-meta-grid { grid-template-columns: 1fr; }
       th:nth-child(4), td:nth-child(4) { display: none; }
     }
   </style>
@@ -236,7 +240,7 @@
   <nav class="sidebar-nav">
     <a class="nav-item activo" id="navPropostas" onclick="mostrarSecao('propostas')">As Minhas Propostas</a>
     <a class="nav-item" href="estudantes-interessados.html">Estudantes Interessados</a>
-    <a class="nav-item" href="entrevistas.html">Entrevistas</a>
+    <a class="nav-item" href="entrevistas-entidade.html">Entrevistas</a>
   </nav>
   <div class="sidebar-footer">
     <div class="nome" id="sidebarNome">—</div>
@@ -289,12 +293,8 @@
     <div class="modal-body">
       <div id="alertaEscolher" class="alerta-modal"></div>
       <div class="linha-modal" style="margin-top:4px"></div>
-      <p style="font-size:0.86rem;color:#444;line-height:1.6;margin-bottom:12px">
-        Ao confirmar, o estudante será notificado da aceitação e as restantes candidaturas serão automaticamente rejeitadas.
-      </p>
-      <p style="font-size:0.88rem;font-weight:600;color:var(--preto)">
-        Estudante: <span id="escolherNomeEstudante" style="color:var(--laranja)">—</span>
-      </p>
+      <p style="font-size:0.86rem;color:#444;line-height:1.6;margin-bottom:12px">Ao confirmar, o estudante será notificado da aceitação e as restantes candidaturas serão automaticamente rejeitadas.</p>
+      <p style="font-size:0.88rem;font-weight:600">Estudante: <span id="escolherNomeEstudante" style="color:var(--laranja)">—</span></p>
     </div>
     <div class="modal-footer">
       <button class="btn-m-cancelar" onclick="fecharModal('modalEscolher')">Cancelar</button>
@@ -303,13 +303,30 @@
   </div>
 </div>
 
-<!-- MODAL NOVA PROPOSTA — MULTI-PASSO -->
+<!-- MODAL DETALHES DA PROPOSTA -->
+<div class="modal-overlay" id="modalDetalhesProposta">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-topo" id="detalhesTopoBarra"></div>
+    <div class="modal-header">
+      <div><h2 id="detalhesTitulo">—</h2><div class="sub" id="detalhesSub">—</div></div>
+      <button class="btn-fechar" onclick="fecharModal('modalDetalhesProposta')">✕</button>
+    </div>
+    <div class="modal-body" id="detalhesBody">
+      <div class="vazio"><div class="emoji">⏳</div>A carregar…</div>
+    </div>
+    <div class="modal-footer" id="detalhesFooter">
+      <button class="btn-m-cancelar" onclick="fecharModal('modalDetalhesProposta')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOVA PROPOSTA / EDITAR PROPOSTA — MULTI-PASSO -->
 <div class="modal-overlay" id="modalNovaProposta">
   <div class="modal-mp">
-    <div class="modal-mp-topo"></div>
+    <div class="modal-mp-topo" id="mpTopo"></div>
     <div class="modal-mp-header">
       <div>
-        <h2>Submeter Nova Proposta</h2>
+        <h2 id="mpTituloPrincipal">Submeter Nova Proposta</h2>
         <div class="sub"><span id="mpPassoLabel">Passo 1 de 7</span></div>
       </div>
       <button class="btn-fechar" onclick="fecharModalProposta()">✕</button>
@@ -342,8 +359,7 @@
   const utilizador = JSON.parse(user);
   if (!['docente','entidade'].includes(utilizador.perfil)) { window.location.href = 'login.html'; }
 
-  const primeiroNome = utilizador.nome.split(' ')[0];
-  document.getElementById('topbarTitulo').textContent  = `Olá, ${primeiroNome} 👋`;
+  document.getElementById('topbarTitulo').textContent  = `Olá, ${utilizador.nome.split(' ')[0]} 👋`;
   document.getElementById('sidebarNome').textContent   = utilizador.nome;
   document.getElementById('sidebarPerfil').textContent = utilizador.perfil === 'docente' ? 'Docente' : 'Entidade';
   document.getElementById('avatar').textContent        = utilizador.nome.charAt(0).toUpperCase();
@@ -364,44 +380,43 @@
     }).then(r => r.json());
   }
 
-  function formatarData(str) {
-    if (!str) return '—';
-    return new Date(str).toLocaleDateString('pt-PT', { day:'2-digit', month:'2-digit', year:'2-digit' });
-  }
-  function formatarDataHora(str) {
-    if (!str) return '—';
-    return new Date(str).toLocaleString('pt-PT', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' });
-  }
-
   function mostrarToast(msg, tipo = 'info') {
     const t = document.getElementById('toast');
     t.textContent = msg; t.className = `toast ${tipo} visivel`;
-    setTimeout(() => { t.className = `toast ${tipo}`; }, 3000);
+    setTimeout(() => { t.className = `toast ${tipo}`; }, 3200);
   }
 
   function fecharModal(id) {
     document.getElementById(id).classList.remove('aberto');
     document.body.style.overflow = '';
-    const al = document.getElementById(id).querySelector('.alerta-modal');
+    const al = document.getElementById(id)?.querySelector('.alerta-modal');
     if (al) al.className = 'alerta-modal';
   }
   function abrirModal(id) { document.getElementById(id).classList.add('aberto'); document.body.style.overflow = 'hidden'; }
 
   document.querySelectorAll('.modal-overlay').forEach(el => {
     el.addEventListener('click', e => {
-      if (e.target === el) {
-        if (el.id === 'modalNovaProposta') fecharModalProposta();
-        else fecharModal(el.id);
-      }
+      if (e.target !== el) return;
+      if (el.id === 'modalNovaProposta') fecharModalProposta();
+      else fecharModal(el.id);
     });
   });
 
-  // ── Estado ──
-  let todasMinhasPropostas = [];
-  let candidaturaAgendarId = null, propostaAgendarId = null;
-  let candidaturaEscolherId = null, propostaEscolherId = null;
+  function formatarData(str) {
+    if (!str) return '—';
+    return new Date(str).toLocaleDateString('pt-PT', { day:'2-digit', month:'2-digit', year:'2-digit' });
+  }
 
-  // ══ DASHBOARD ══
+  // ── Estado global ──
+  let todasMinhasPropostas  = [];
+  let candidaturaAgendarId  = null, propostaAgendarId  = null;
+  let candidaturaEscolherId = null, propostaEscolherId = null;
+  let mpModoEdicao          = false;
+  let mpPropostaEditarId    = null;
+
+  // ══════════════════════════════════════════════
+  // DASHBOARD
+  // ══════════════════════════════════════════════
   async function carregarDashboard() {
     const c = document.getElementById('conteudo');
     c.innerHTML = `
@@ -414,47 +429,188 @@
         <button class="btn-nova" onclick="abrirModalProposta()">Nova Proposta <span>+</span></button>
       </div>
       <div class="tabela-card">
-        <table><thead><tr><th>Título</th><th>Área</th><th>Estado</th><th>Interessados</th><th>Ações</th></tr></thead>
-        <tbody id="tbPropostas"><tr><td colspan="5"><div class="vazio"><div class="emoji">⏳</div>A carregar…</div></td></tr></tbody>
+        <table>
+          <thead><tr><th>Título</th><th>Áreas</th><th>Estado</th><th>Interessados</th><th>Ações</th></tr></thead>
+          <tbody id="tbPropostas"><tr><td colspan="5"><div class="vazio"><div class="emoji">⏳</div>A carregar…</div></td></tr></tbody>
         </table>
       </div>`;
 
     try {
       const dados = await req('/propostas');
       if (!dados.sucesso) throw new Error(dados.mensagem);
-      const minhas = dados.propostas.filter(p => p.proponenteId?._id === utilizador.id || p.proponenteId === utilizador.id);
+
+      const minhas = dados.propostas.filter(p =>
+        (p.proponenteId?._id || p.proponenteId) === utilizador.id ||
+        p.proponenteId?.toString() === utilizador.id
+      );
       todasMinhasPropostas = minhas;
 
       let totalInteressados = 0;
       const comCandidaturas = await Promise.all(
         minhas.filter(p => p.estado === 'aprovada').map(async p => {
-          try { const c = await req(`/candidaturas/proposta/${p._id}`); const n = c.sucesso ? c.total : 0; totalInteressados += n; return { ...p, numCandidatos: n }; }
+          try { const r = await req(`/candidaturas/proposta/${p._id}`); const n = r.sucesso ? r.total : 0; totalInteressados += n; return { ...p, numCandidatos: n }; }
           catch { return { ...p, numCandidatos: 0 }; }
         })
       );
+
       const propostasComInfo = minhas.map(p => comCandidaturas.find(c => c._id === p._id) || { ...p, numCandidatos: 0 });
       todasMinhasPropostas = propostasComInfo;
 
       document.querySelector('.stats-grid').innerHTML = `
-        <div class="stat-card laranja"><div class="num">${minhas.length}</div><div class="label">Propostas Ativas</div></div>
+        <div class="stat-card laranja"><div class="num">${minhas.length}</div><div class="label">Propostas Submetidas</div></div>
         <div class="stat-card azul"><div class="num">${totalInteressados}</div><div class="label">Estudantes Interessados</div></div>`;
 
+      const estadoLabel = { aprovada:'Aprovada', pendente:'Pendente', rejeitada:'Rejeitada', atribuida:'Atribuída' };
       const tbody = document.getElementById('tbPropostas');
-      if (!minhas.length) { tbody.innerHTML = `<tr><td colspan="5"><div class="vazio"><div class="emoji">📭</div>Ainda não submeteu nenhuma proposta.</div></td></tr>`; return; }
-      tbody.innerHTML = propostasComInfo.map(p => `
-        <tr>
-          <td><span class="titulo-link" onclick="window.location.href='estudantes-interessados.html?proposta=${p._id}'">${p.titulo}</span></td>
-          <td>${(p.areas||[]).slice(0,2).map(a=>`<span class="tag area">${a}</span>`).join(' ')}</td>
-          <td><span class="estado ${p.estado}">${{aprovada:'Aprovada',pendente:'Pendente',rejeitada:'Rejeitada',atribuida:'Atribuída'}[p.estado]||p.estado}</span></td>
-          <td>${p.estado==='aprovada'&&p.numCandidatos>0?`<span class="badge-cand">👥 ${p.numCandidatos}</span>`:'<span style="color:var(--cinza-texto)">—</span>'}</td>
-          <td>${p.estado==='aprovada'&&p.numCandidatos>0?`<button class="btn-ver" onclick="window.location.href='estudantes-interessados.html?proposta=${p._id}'">Ver candidatos</button>`:''}</td>
-        </tr>`).join('');
+
+      if (!minhas.length) {
+        tbody.innerHTML = `<tr><td colspan="5"><div class="vazio"><div class="emoji">📭</div>Ainda não submeteu nenhuma proposta.</div></td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = propostasComInfo.map(p => {
+        const acoes = `
+          <div class="acoes-tabela">
+            <button class="btn-detalhes" onclick="abrirDetalhesProposta('${p._id}')">📋 Detalhes</button>
+            ${p.estado === 'aprovada' && p.numCandidatos > 0
+              ? `<button class="btn-ver" onclick="window.location.href='estudantes-interessados.html?proposta=${p._id}'">Ver candidatos</button>`
+              : ''}
+            ${p.estado === 'rejeitada'
+              ? `<button class="btn-editar-proposta" onclick="abrirEditarProposta('${p._id}')">✏️ Editar</button>`
+              : ''}
+          </div>`;
+
+        return `<tr>
+          <td>
+            <span class="titulo-link" onclick="abrirDetalhesProposta('${p._id}')">${p.titulo}</span>
+            <div style="font-size:0.74rem;color:var(--cinza-texto);margin-top:2px">${p.tipo === 'estagio' ? 'Estágio' : 'Projeto'} · ${p.curso}</div>
+          </td>
+          <td>${(p.areas||[]).slice(0,2).map(a=>`<span class="tag area">${a}</span>`).join(' ')}${p.areas?.length > 2 ? `<span style="font-size:0.72rem;color:var(--cinza-texto);margin-left:4px">+${p.areas.length-2}</span>` : ''}</td>
+          <td><span class="estado ${p.estado}">${estadoLabel[p.estado]||p.estado}</span></td>
+          <td>${p.estado==='aprovada' && p.numCandidatos>0 ? `<span class="badge-cand">👥 ${p.numCandidatos}</span>` : '<span style="color:var(--cinza-texto)">—</span>'}</td>
+          <td>${acoes}</td>
+        </tr>`;
+      }).join('');
+
     } catch (err) {
       document.getElementById('tbPropostas').innerHTML = `<tr><td colspan="5"><div class="vazio"><div class="emoji">⚠️</div>${err.message}</div></td></tr>`;
     }
   }
 
-  // ══ AGENDAR ══
+  // ══════════════════════════════════════════════
+  // MODAL DETALHES DA PROPOSTA
+  // ══════════════════════════════════════════════
+  async function abrirDetalhesProposta(id) {
+    document.getElementById('detalhesTitulo').textContent = '—';
+    document.getElementById('detalhesSub').textContent = '—';
+    document.getElementById('detalhesBody').innerHTML = '<div class="vazio"><div class="emoji">⏳</div>A carregar…</div>';
+    document.getElementById('detalhesFooter').innerHTML = '<button class="btn-m-cancelar" onclick="fecharModal(\'modalDetalhesProposta\')">Fechar</button>';
+    abrirModal('modalDetalhesProposta');
+
+    try {
+      const dados = await req(`/propostas/${id}`);
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+      const p = dados.proposta;
+
+      const estadoLabel = { aprovada:'Aprovada', pendente:'Pendente a aprovação', rejeitada:'Rejeitada', atribuida:'Atribuída' };
+      const estadoCor   = { aprovada:'verde', pendente:'', rejeitada:'vermelho', atribuida:'azul' };
+
+      // Barra de topo
+      const topoCores = { aprovada: 'background:var(--verde)', pendente: 'background:var(--amarelo)', rejeitada: 'background:var(--vermelho)', atribuida: 'background:var(--azul)' };
+      document.getElementById('detalhesTopoBarra').style.cssText = `height:6px;border-radius:14px 14px 0 0;${topoCores[p.estado]||'background:var(--laranja)'}`;
+
+      document.getElementById('detalhesTitulo').textContent = p.titulo;
+      document.getElementById('detalhesSub').textContent    = `${p.tipo === 'estagio' ? 'Estágio' : 'Projeto'} · ${p.curso} · submetido em ${new Date(p.criadaEm).toLocaleDateString('pt-PT')}`;
+
+      let html = '<div class="linha-modal"></div>';
+
+      // Meta grid
+      html += `<div class="detalhe-meta-grid">
+        <div class="detalhe-bloco">
+          <div class="db-label">Estado</div>
+          <div class="db-valor"><span class="estado ${p.estado}">${estadoLabel[p.estado]||p.estado}</span></div>
+        </div>
+        <div class="detalhe-bloco">
+          <div class="db-label">Entidade</div>
+          <div class="db-valor">${p.nomeEntidade || '—'}</div>
+        </div>
+        ${p.tutorNome ? `
+        <div class="detalhe-bloco">
+          <div class="db-label">Tutor na Entidade</div>
+          <div class="db-valor">${p.tutorNome}${p.tutorCargo?' · '+p.tutorCargo:''}</div>
+        </div>
+        <div class="detalhe-bloco">
+          <div class="db-label">Email do Tutor</div>
+          <div class="db-valor">${p.tutorEmail||'—'}</div>
+        </div>` : ''}
+      </div>`;
+
+      // Feedback de rejeição
+      if (p.estado === 'rejeitada' && p.feedbackCCA) {
+        html += `<div class="detalhe-bloco vermelho">
+          <div class="db-label">⚠️ Motivo de rejeição pela CCA</div>
+          <div class="db-valor">${p.feedbackCCA}</div>
+        </div>`;
+      }
+
+      // Sugestão de melhoria (quando aprovada com sugestão)
+      if (p.sugestaoCCA) {
+        html += `<div class="detalhe-bloco amarelo">
+          <div class="db-label">💡 Sugestão de melhoria da CCA</div>
+          <div class="db-valor">${p.sugestaoCCA}</div>
+        </div>`;
+      }
+
+      // Estado pendente
+      if (p.estado === 'pendente') {
+        html += `<div class="detalhe-bloco" style="background:var(--amarelo-light)">
+          <div class="db-label" style="color:var(--amarelo)">⏳ A aguardar aprovação</div>
+          <div class="db-valor" style="color:#5a4000;font-weight:500">A proposta está a ser analisada pela CCA. Receberá uma notificação quando houver uma decisão.</div>
+        </div>`;
+      }
+
+      // Estado aprovada
+      if (p.estado === 'aprovada') {
+        html += `<div class="detalhe-bloco verde">
+          <div class="db-label">✅ Aprovada pela CCA</div>
+          <div class="db-valor">A proposta foi aprovada. Os estudantes já podem manifestar interesse.</div>
+        </div>`;
+      }
+
+      // Conteúdo principal
+      if (p.objetivos || p.descricao) {
+        html += `<div style="margin-top:14px">
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--cinza-texto);margin-bottom:6px">Objetivos</div>
+          <p style="font-size:0.86rem;color:#444;line-height:1.7">${(p.objetivos||p.descricao||'').replace(/\n/g,'<br>')}</p>
+        </div>`;
+      }
+      if (p.resultadosEsperados) {
+        html += `<div style="margin-top:14px">
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--cinza-texto);margin-bottom:6px">Resultados Esperados</div>
+          <p style="font-size:0.86rem;color:#444;line-height:1.7">${p.resultadosEsperados.replace(/\n/g,'<br>')}</p>
+        </div>`;
+      }
+
+      document.getElementById('detalhesBody').innerHTML = html;
+
+      // Footer
+      const footer = document.getElementById('detalhesFooter');
+      if (p.estado === 'rejeitada') {
+        footer.innerHTML = `
+          <button class="btn-m-cancelar" onclick="fecharModal('modalDetalhesProposta')">Fechar</button>
+          <button class="btn-m-amarelo" onclick="fecharModal('modalDetalhesProposta');abrirEditarProposta('${p._id}')">✏️ Editar e Resubmeter</button>`;
+      } else {
+        footer.innerHTML = `<button class="btn-m-cancelar" onclick="fecharModal('modalDetalhesProposta')">Fechar</button>`;
+      }
+
+    } catch (err) {
+      document.getElementById('detalhesBody').innerHTML = `<div class="vazio"><div class="emoji">⚠️</div>${err.message}</div>`;
+    }
+  }
+
+  // ══════════════════════════════════════════════
+  // AGENDAR / ESCOLHER
+  // ══════════════════════════════════════════════
   function abrirAgendar(candidaturaId, nomeEstudante, propostaId) {
     candidaturaAgendarId = candidaturaId; propostaAgendarId = propostaId;
     document.getElementById('agendarSub').textContent = nomeEstudante;
@@ -476,16 +632,15 @@
     try {
       const dados = await req(`/candidaturas/${candidaturaAgendarId}/entrevista`, { method:'PUT', body: JSON.stringify({ dataEntrevista: dataVal, localEntrevista: localVal }) });
       if (!dados.sucesso) throw new Error(dados.mensagem);
-      al.textContent = 'Entrevista agendada! O estudante foi notificado.'; al.className = 'alerta-modal sucesso';
+      al.textContent = 'Entrevista agendada!'; al.className = 'alerta-modal sucesso';
       btn.innerHTML = '✔ Agendado';
       setTimeout(() => { fecharModal('modalAgendar'); btn.disabled=false; btn.textContent='Confirmar Entrevista'; carregarDashboard(); }, 1300);
     } catch (err) { al.textContent = err.message; al.className = 'alerta-modal erro'; btn.disabled=false; btn.textContent='Confirmar Entrevista'; }
   }
 
-  // ══ ESCOLHER ══
   function abrirEscolher(candidaturaId, nomeEstudante, propostaId) {
     candidaturaEscolherId = candidaturaId; propostaEscolherId = propostaId;
-    document.getElementById('escolherSub').textContent = document.querySelector('#bcTitulo')?.textContent || '';
+    document.getElementById('escolherSub').textContent = '';
     document.getElementById('escolherNomeEstudante').textContent = nomeEstudante;
     document.getElementById('alertaEscolher').className = 'alerta-modal';
     abrirModal('modalEscolher');
@@ -498,22 +653,20 @@
     try {
       const dados = await req(`/candidaturas/${candidaturaEscolherId}/aceitar`, { method:'PUT' });
       if (!dados.sucesso) throw new Error(dados.mensagem);
-      al.textContent = 'Estudante escolhido! Foi notificado da aceitação.'; al.className = 'alerta-modal sucesso';
+      al.textContent = 'Estudante escolhido!'; al.className = 'alerta-modal sucesso';
       btn.innerHTML = '✔ Confirmado';
       setTimeout(() => { fecharModal('modalEscolher'); btn.disabled=false; btn.textContent='Confirmar Escolha'; carregarDashboard(); }, 1300);
     } catch (err) { al.textContent = err.message; al.className = 'alerta-modal erro'; btn.disabled=false; btn.textContent='Confirmar Escolha'; }
   }
 
-  // ══ ENVIAR LISTA ══
-  function enviarListaCCA() { mostrarToast('Lista de estudantes interessados enviada à CCA.', 'sucesso'); }
-
-  // ══ NAVEGAÇÃO ══
   function mostrarSecao(secao) {
     sidebar.classList.remove('aberta'); overlay.classList.remove('visivel');
     if (secao === 'propostas') carregarDashboard();
   }
 
-  // ══ MODAL NOVA PROPOSTA — MULTI-PASSO ══
+  // ══════════════════════════════════════════════
+  // MODAL MULTI-PASSO (nova proposta + editar)
+  // ══════════════════════════════════════════════
   const MP_PASSOS = ['Sobre a Entidade','Tutor na Entidade','Dados da Proposta','Objetivos','Resultados Esperados','Plano e Perfil','Plug-IN e Resumo'];
   let mpPassoActual = 0;
   let mpDados = {};
@@ -523,15 +676,58 @@
     return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
+  // ── Nova proposta ──
   function abrirModalProposta() {
+    mpModoEdicao = false; mpPropostaEditarId = null;
     mpPassoActual = 0;
     mpDados = { nomeEntidade:'', emailContacto:'', moradaEntidade:'', moradaLocal:'', tutorNome:'', tutorEmail:'', tutorCargo:'', curso: mpCurso, tipo:'estagio', areas:[], titulo:'', objetivos:'', resultados:'', plano:'', perfilCand:'', plugIN: false };
     req('/utilizadores/perfil').then(r => {
       if (r.sucesso && r.dadosExtra?.curso) { mpCurso = r.dadosExtra.curso; mpDados.curso = mpCurso; }
-      mpRenderPasso();
-    }).catch(() => mpRenderPasso());
-    document.getElementById('modalNovaProposta').classList.add('aberto');
-    document.body.style.overflow = 'hidden';
+      mpIniciarModal();
+    }).catch(() => mpIniciarModal());
+  }
+
+  // ── Editar proposta ──
+  async function abrirEditarProposta(id) {
+    mpModoEdicao = true; mpPropostaEditarId = id;
+    mpPassoActual = 0;
+    try {
+      const dados = await req(`/propostas/${id}`);
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+      const p = dados.proposta;
+      mpDados = {
+        nomeEntidade:  p.nomeEntidade  || '',
+        emailContacto: p.emailContacto || '',
+        moradaEntidade:p.moradaEntidade|| '',
+        moradaLocal:   p.moradaLocalEstagio || '',
+        tutorNome:     p.tutorNome     || '',
+        tutorEmail:    p.tutorEmail    || '',
+        tutorCargo:    p.tutorCargo    || '',
+        curso:         p.curso         || mpCurso,
+        tipo:          p.tipo          || 'estagio',
+        areas:         p.areas         || [],
+        titulo:        p.titulo        || '',
+        objetivos:     p.objetivos     || p.descricao || '',
+        resultados:    p.resultadosEsperados || '',
+        plano:         p.planoTrabalho || '',
+        perfilCand:    p.perfilCandidato || '',
+        plugIN:        p.plugIN        || false
+      };
+      mpIniciarModal();
+    } catch(err) { mostrarToast('Erro ao carregar proposta: ' + err.message, 'erro'); }
+  }
+
+  function mpIniciarModal() {
+    // Aparência: laranja para nova, âmbar para edição
+    const topo = document.getElementById('mpTopo');
+    const fill = document.getElementById('mpProgressFill');
+    const btnS = document.getElementById('btnMpSeguinte');
+    topo.className = mpModoEdicao ? 'modal-mp-topo amarelo' : 'modal-mp-topo';
+    fill.className = mpModoEdicao ? 'progress-fill amarelo' : 'progress-fill';
+    btnS.className = mpModoEdicao ? 'btn-mp-seguinte amarelo' : 'btn-mp-seguinte';
+    document.getElementById('mpTituloPrincipal').textContent = mpModoEdicao ? 'Editar e Resubmeter Proposta' : 'Submeter Nova Proposta';
+    mpRenderPasso();
+    abrirModal('modalNovaProposta');
   }
 
   function fecharModalProposta() {
@@ -548,7 +744,8 @@
     const btnA = document.getElementById('btnMpAnterior');
     btnA.className = mpPassoActual === 0 ? 'btn-mp-anterior invisivel' : 'btn-mp-anterior';
     const btnS = document.getElementById('btnMpSeguinte');
-    btnS.textContent = mpPassoActual === MP_PASSOS.length - 1 ? 'Submeter Proposta' : 'Seguinte →';
+    const isUltimo = mpPassoActual === MP_PASSOS.length - 1;
+    btnS.textContent = isUltimo ? (mpModoEdicao ? 'Guardar e Resubmeter' : 'Submeter Proposta') : 'Seguinte →';
     btnS.disabled = false;
   }
 
@@ -567,10 +764,10 @@
         </div>
         <div class="form-campo" style="margin-top:14px"><label>Cargo do tutor</label><input class="mp-input" type="text" id="f2" value="${esc(mpDados.tutorCargo)}" placeholder="Ex: Diretor de Tecnologia"></div>`;
       case 2: return `<div class="form-grid" style="margin-bottom:16px">
-        <div class="form-campo"><label>Curso destinatário <span class="obg">*</span></label><input class="mp-input readonly" type="text" readonly value="${esc(mpDados.curso)}"><p class="campo-nota">A proposta será submetida para o teu curso.</p></div>
+        <div class="form-campo"><label>Curso destinatário <span class="obg">*</span></label><input class="mp-input readonly" type="text" readonly value="${esc(mpDados.curso)}"><p class="campo-nota">Definido pelo curso do proponente.</p></div>
         <div class="form-campo"><label>Tipo de proposta <span class="obg">*</span></label><select class="mp-select" id="f0"><option value="estagio"${mpDados.tipo==='estagio'?' selected':''}>Estágio</option><option value="projecto"${mpDados.tipo==='projecto'?' selected':''}>Projeto</option></select></div>
         </div>
-        <div class="form-campo" style="margin-bottom:16px"><label>Área(s) de atuação <span class="obg">*</span></label>
+        <div class="form-campo" style="margin-bottom:16px"><label>Área(s) de actuação <span class="obg">*</span></label>
         <div class="areas-grid">${areas.map(a=>`<label class="area-check${mpDados.areas.includes(a)?' marcada':''}"><input type="checkbox" value="${a}" class="area-cb"${mpDados.areas.includes(a)?' checked':''}> ${a}</label>`).join('')}</div></div>
         <div class="form-campo"><label>Título da proposta <span class="obg">*</span> <span style="font-size:0.7rem;color:var(--cinza-texto);text-transform:none;font-weight:400">(máx. 50 car.)</span></label>
         <input class="mp-input" type="text" id="f1" value="${esc(mpDados.titulo)}" placeholder="Ex: Sistema de Gestão de Encomendas" maxlength="50"></div>`;
@@ -588,6 +785,9 @@
         <label class="radio-item${mpDados.plugIN?'':' marcada'}"><input type="radio" name="plugin" value="false"${mpDados.plugIN?'':' checked'}> Não</label>
         <label class="radio-item${mpDados.plugIN?' marcada':''}"><input type="radio" name="plugin" value="true"${mpDados.plugIN?' checked':''}> Sim</label>
         </div></div>
+        ${mpModoEdicao ? `<div style="background:var(--amarelo-light);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:0.83rem;color:#5a4000;font-weight:500">
+          ⚠️ Ao resubmeter, a proposta volta ao estado <b>Pendente</b> e a CCA terá de votar novamente.
+        </div>` : ''}
         <div style="background:#F5F5F5;border-radius:10px;padding:16px 18px">
         <div style="font-size:0.8rem;font-weight:700;color:var(--preto);margin-bottom:10px">Resumo da proposta</div>
         <div style="font-size:0.82rem;color:#555;display:grid;gap:6px">
@@ -656,25 +856,30 @@
   async function mpPasso(dir) {
     mpGuardarPasso();
     if (dir === 1 && !mpValidarPasso()) return;
-    if (dir === 1 && mpPassoActual === MP_PASSOS.length - 1) { await mpSubmeter(); return; }
+    if (dir === 1 && mpPassoActual === MP_PASSOS.length - 1) {
+      mpModoEdicao ? await mpSubmeterEdicao() : await mpSubmeterNova();
+      return;
+    }
     mpPassoActual = Math.max(0, Math.min(MP_PASSOS.length-1, mpPassoActual+dir));
     mpRenderPasso();
   }
 
-  async function mpSubmeter() {
+  const mpPayload = () => ({
+    titulo: mpDados.titulo, tipo: mpDados.tipo, curso: mpDados.curso,
+    areas: mpDados.areas, plugIN: mpDados.plugIN,
+    descricao: mpDados.objetivos, objetivos: mpDados.objetivos,
+    resultadosEsperados: mpDados.resultados, planoTrabalho: mpDados.plano,
+    perfilCandidato: mpDados.perfilCand, nomeEntidade: mpDados.nomeEntidade,
+    emailContacto: mpDados.emailContacto, moradaEntidade: mpDados.moradaEntidade,
+    moradaLocalEstagio: mpDados.moradaLocal, tutorNome: mpDados.tutorNome,
+    tutorEmail: mpDados.tutorEmail, tutorCargo: mpDados.tutorCargo
+  });
+
+  async function mpSubmeterNova() {
     const btn = document.getElementById('btnMpSeguinte');
     btn.disabled = true; btn.innerHTML = '<span class="spin"></span>A submeter…';
     try {
-      const resp = await req('/propostas', { method:'POST', body: JSON.stringify({
-        titulo: mpDados.titulo, tipo: mpDados.tipo, curso: mpDados.curso,
-        areas: mpDados.areas, plugIN: mpDados.plugIN,
-        descricao: mpDados.objetivos, objetivos: mpDados.objetivos,
-        resultadosEsperados: mpDados.resultados, planoTrabalho: mpDados.plano,
-        perfilCandidato: mpDados.perfilCand, nomeEntidade: mpDados.nomeEntidade,
-        emailContacto: mpDados.emailContacto, moradaEntidade: mpDados.moradaEntidade,
-        moradaLocalEstagio: mpDados.moradaLocal, tutorNome: mpDados.tutorNome,
-        tutorEmail: mpDados.tutorEmail, tutorCargo: mpDados.tutorCargo
-      })});
+      const resp = await req('/propostas', { method:'POST', body: JSON.stringify(mpPayload()) });
       if (!resp.sucesso) throw new Error(resp.mensagem);
       const al = document.getElementById('alertaMp');
       al.textContent = '✔ Proposta submetida com sucesso! Aguarda aprovação da CCA.';
@@ -685,6 +890,24 @@
       const al = document.getElementById('alertaMp');
       al.textContent = err.message; al.className = 'alerta-mp erro';
       btn.disabled=false; btn.textContent='Submeter Proposta';
+    }
+  }
+
+  async function mpSubmeterEdicao() {
+    const btn = document.getElementById('btnMpSeguinte');
+    btn.disabled = true; btn.innerHTML = '<span class="spin"></span>A resubmeter…';
+    try {
+      const resp = await req(`/propostas/${mpPropostaEditarId}`, { method:'PUT', body: JSON.stringify(mpPayload()) });
+      if (!resp.sucesso) throw new Error(resp.mensagem);
+      const al = document.getElementById('alertaMp');
+      al.textContent = '✔ Proposta atualizada e resubmetida para aprovação!';
+      al.className = 'alerta-mp sucesso';
+      btn.innerHTML = '✔ Resubmetida';
+      setTimeout(() => { fecharModalProposta(); btn.disabled=false; btn.textContent='Guardar e Resubmeter'; carregarDashboard(); }, 1600);
+    } catch(err) {
+      const al = document.getElementById('alertaMp');
+      al.textContent = err.message; al.className = 'alerta-mp erro';
+      btn.disabled=false; btn.textContent='Guardar e Resubmeter';
     }
   }
 

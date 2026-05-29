@@ -11,15 +11,15 @@
     :root {
       --laranja: #F15A24; --laranja-hover: #d94d1c; --laranja-light: #FEE8DF;
       --preto: #1A1A1A; --cinza-bg: #F4F4F4; --cinza-texto: #888888;
-      --cinza-linha: #EEEEEE; --branco: #FFFFFF;
+      --cinza-linha: #EEEEEE; --cinza-input: #F5F5F5; --branco: #FFFFFF;
       --azul: #2E75B6; --azul-light: #EBF3FB;
       --verde: #70AD47; --verde-light: #E2EFDA;
       --amarelo: #BF8F00; --amarelo-light: #FFF2CC;
-      --vermelho: #C00000; --sidebar-w: 220px;
+      --vermelho: #C00000; --vermelho-light: #FFDEDE;
+      --sidebar-w: 220px;
     }
     body { font-family: 'Inter', sans-serif; background: var(--cinza-bg); color: var(--preto); min-height: 100vh; display: flex; }
 
-    /* SIDEBAR */
     .sidebar { width: var(--sidebar-w); background: var(--laranja); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; flex-shrink: 0; }
     .sidebar-logo { padding: 22px 0 18px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.18); }
     .sidebar-logo span { color: var(--branco); font-size: 1.35rem; font-weight: 800; letter-spacing: 2px; }
@@ -31,13 +31,20 @@
     .sidebar-footer .nome   { color: var(--branco); font-size: 0.82rem; font-weight: 600; }
     .sidebar-footer .perfil { color: rgba(255,255,255,0.65); font-size: 0.75rem; margin-top: 2px; }
 
-    /* MAIN */
     .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
     .topbar { background: var(--branco); padding: 18px 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--cinza-linha); position: sticky; top: 0; z-index: 50; }
     .topbar-info .titulo    { font-size: 1rem; font-weight: 700; }
     .topbar-info .subtitulo { font-size: 0.78rem; color: var(--cinza-texto); margin-top: 1px; }
     .avatar { width: 38px; height: 38px; background: var(--laranja); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--branco); font-weight: 700; font-size: 0.95rem; cursor: pointer; flex-shrink: 0; }
     .content { padding: 24px 32px; flex: 1; }
+
+    /* TABS */
+    .tabs { display: flex; gap: 8px; margin-bottom: 22px; }
+    .tab { padding: 9px 22px; border-radius: 8px; border: none; font-family: 'Inter', sans-serif; font-size: 0.83rem; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+    .tab.inactivo { background: var(--branco); color: var(--cinza-texto); box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .tab.inactivo:hover { background: #F0F0F0; }
+    .tab.activo { background: var(--laranja); color: var(--branco); }
+    .badge-tab { background: var(--vermelho); color: var(--branco); border-radius: 10px; padding: 1px 7px; font-size: 0.7rem; font-weight: 700; margin-left: 6px; }
 
     /* PESQUISA E FILTROS */
     .barra-pesquisa { position: relative; margin-bottom: 14px; }
@@ -46,16 +53,16 @@
     .barra-pesquisa input::placeholder { color: #BBBBBB; }
     .barra-pesquisa input:focus { border-color: var(--laranja); box-shadow: 0 0 0 3px rgba(241,90,36,0.10); }
     .filtros { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
-    .filtros select { background: var(--branco); border: 1.5px solid var(--cinza-linha); border-radius: 8px; padding: 9px 36px 9px 14px; font-family: 'Inter', sans-serif; font-size: 0.82rem; color: var(--preto); cursor: pointer; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; transition: border-color 0.15s; }
+    .filtros select { background: var(--branco); border: 1.5px solid var(--cinza-linha); border-radius: 8px; padding: 9px 36px 9px 14px; font-family: 'Inter', sans-serif; font-size: 0.82rem; color: var(--preto); cursor: pointer; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
     .filtros select:focus { border-color: var(--laranja); }
-    .filtros .input-empresa { background: var(--branco); border: 1.5px solid var(--cinza-linha); border-radius: 8px; padding: 9px 14px; font-family: 'Inter', sans-serif; font-size: 0.82rem; color: var(--preto); outline: none; width: 180px; transition: border-color 0.15s; }
+    .filtros .input-empresa { background: var(--branco); border: 1.5px solid var(--cinza-linha); border-radius: 8px; padding: 9px 14px; font-family: 'Inter', sans-serif; font-size: 0.82rem; color: var(--preto); outline: none; width: 180px; }
     .filtros .input-empresa::placeholder { color: #BBBBBB; }
     .filtros .input-empresa:focus { border-color: var(--laranja); }
     .filtros .spacer { flex: 1; }
     .btn-nova { display: flex; align-items: center; gap: 8px; background: var(--laranja); color: var(--branco); border: none; border-radius: 8px; padding: 9px 18px; font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
     .btn-nova:hover { background: var(--laranja-hover); }
 
-    /* CARDS */
+    /* CARDS (tab propostas disponíveis) */
     .grelha { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
     .proposta-card { background: var(--branco); border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); overflow: hidden; display: flex; flex-direction: column; cursor: pointer; transition: transform 0.18s, box-shadow 0.18s; }
     .proposta-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
@@ -73,101 +80,139 @@
     .estado.aprovada::before  { background: var(--verde); }
     .estado.pendente::before  { background: var(--amarelo); }
     .estado.rejeitada::before { background: var(--vermelho); }
-    .estado.entrevista_agendada::before { background: var(--azul); }
+    .estado.atribuida::before { background: var(--azul); }
     .card-data { font-size: 0.75rem; color: var(--cinza-texto); }
+
+    /* TABELA (tab minhas propostas) */
+    .painel { background: var(--branco); border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); overflow: hidden; }
+    .painel-header { padding: 16px 20px; border-bottom: 1px solid var(--cinza-linha); display: flex; align-items: center; justify-content: space-between; }
+    .painel-header h2 { font-size: 0.92rem; font-weight: 700; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #F8F8F8; }
+    th { padding: 11px 16px; text-align: left; font-size: 0.71rem; font-weight: 700; color: var(--cinza-texto); text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid var(--cinza-linha); white-space: nowrap; }
+    td { padding: 13px 16px; font-size: 0.83rem; border-bottom: 1px solid var(--cinza-linha); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #FAFAFA; }
+    .titulo-link { font-weight: 600; cursor: pointer; color: var(--preto); transition: color 0.15s; }
+    .titulo-link:hover { color: var(--laranja); }
+    .tag { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 0.72rem; font-weight: 600; }
+    .tag.estagio  { background: var(--laranja-light); color: var(--laranja); }
+    .tag.projecto { background: var(--azul-light); color: var(--azul); }
+    .acoes-tabela { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .btn-detalhes { background: var(--cinza-input); color: var(--preto); border: 1.5px solid var(--cinza-linha); border-radius: 6px; padding: 6px 13px; font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 600; cursor: pointer; }
+    .btn-detalhes:hover { background: #E8E8E8; }
+    .btn-editar-proposta { background: var(--amarelo-light); color: var(--amarelo); border: none; border-radius: 6px; padding: 6px 13px; font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 700; cursor: pointer; }
+    .btn-editar-proposta:hover { opacity: 0.8; }
+
+    /* DETALHES DA PROPOSTA */
+    .detalhe-bloco { background: var(--cinza-input); border-radius: 10px; padding: 14px 18px; margin-bottom: 14px; }
+    .detalhe-bloco .db-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--cinza-texto); margin-bottom: 5px; }
+    .detalhe-bloco .db-valor { font-size: 0.86rem; font-weight: 600; color: var(--preto); }
+    .detalhe-bloco.vermelho { background: var(--vermelho-light); }
+    .detalhe-bloco.vermelho .db-label { color: var(--vermelho); }
+    .detalhe-bloco.vermelho .db-valor { color: var(--vermelho); font-weight: 500; line-height: 1.6; }
+    .detalhe-bloco.amarelo  { background: var(--amarelo-light); }
+    .detalhe-bloco.amarelo  .db-label { color: var(--amarelo); }
+    .detalhe-bloco.amarelo  .db-valor { color: #5a4000; font-weight: 500; line-height: 1.6; }
+    .detalhe-bloco.verde    { background: var(--verde-light); }
+    .detalhe-bloco.verde    .db-label { color: var(--verde); }
+    .detalhe-bloco.verde    .db-valor { color: #2d5a1b; }
+    .detalhe-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+
     .skeleton { background: linear-gradient(90deg,#ececec 25%,#f5f5f5 50%,#ececec 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 6px; }
     @keyframes shimmer { to { background-position: -200% 0; } }
     .vazio { grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--cinza-texto); }
     .vazio .emoji { font-size: 2.5rem; margin-bottom: 12px; }
     .vazio p { font-size: 0.9rem; }
+    .vazio-tabela { padding: 40px 20px; text-align: center; color: var(--cinza-texto); }
+    .vazio-tabela .emoji { font-size: 2rem; margin-bottom: 10px; }
 
-    /* ══ MODAL MULTI-PASSO ══ */
+    /* ══ MODAIS ══ */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.42); z-index: 300; align-items: center; justify-content: center; padding: 16px; }
     .modal-overlay.aberto { display: flex; }
 
-    /* Modal com layout fixo: header + progress + body scrollável + footer */
-    .modal {
-      background: var(--branco); border-radius: 14px; width: 100%; max-width: 640px;
-      max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.18);
-    }
-    .modal-topo { height: 5px; background: var(--laranja); border-radius: 14px 14px 0 0; flex-shrink: 0; }
-
-    .modal-header { padding: 18px 26px 0; display: flex; align-items: flex-start; justify-content: space-between; flex-shrink: 0; }
-    .modal-header h2 { font-size: 1rem; font-weight: 700; margin-bottom: 2px; }
-    .modal-header .sub { font-size: 0.76rem; color: var(--cinza-texto); }
-    .modal-header .sub span { color: var(--laranja); }
+    /* Modal base */
+    .modal-base { background: var(--branco); border-radius: 14px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.18); }
+    .modal-topo-base { height: 6px; background: var(--laranja); border-radius: 14px 14px 0 0; }
+    .modal-topo-vm   { height: 6px; background: var(--vermelho); border-radius: 14px 14px 0 0; }
+    .modal-header-b { padding: 22px 26px 0; display: flex; align-items: flex-start; justify-content: space-between; }
+    .modal-header-b h2 { font-size: 1rem; font-weight: 700; }
+    .modal-header-b .sub { font-size: 0.78rem; color: var(--cinza-texto); margin-top: 3px; }
     .btn-fechar { background: none; border: none; cursor: pointer; color: var(--cinza-texto); font-size: 1.2rem; padding: 2px 6px; flex-shrink: 0; }
     .btn-fechar:hover { color: var(--preto); }
+    .modal-body-b  { padding: 18px 26px; }
+    .modal-footer-b { padding: 0 26px 22px; display: flex; justify-content: flex-end; gap: 10px; }
+    .linha-modal { border: none; border-top: 1px solid var(--cinza-linha); margin: 12px 0; }
+    .alerta-base { display: none; border-radius: 8px; padding: 10px 13px; font-size: 0.8rem; font-weight: 500; margin-bottom: 12px; }
+    .alerta-base.erro    { background: var(--vermelho-light); color: var(--vermelho); display: block; }
+    .alerta-base.sucesso { background: var(--verde-light);    color: var(--verde);    display: block; }
+    .btn-m-cancelar { background: #F0F0F0; color: #666; border: none; border-radius: 8px; padding: 10px 20px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 500; cursor: pointer; }
+    .btn-m-cancelar:hover { background: #E4E4E4; }
+    .btn-m-amarelo { background: var(--amarelo-light); color: var(--amarelo); border: none; border-radius: 8px; padding: 10px 22px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; }
+    .btn-m-amarelo:hover { opacity: 0.85; }
 
-    /* Barra de progresso */
-    .modal-progress { padding: 12px 26px 0; flex-shrink: 0; }
+    /* Modal multi-passo */
+    .modal-mp { background: var(--branco); border-radius: 14px; width: 100%; max-width: 640px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.18); }
+    .modal-mp-topo { height: 5px; background: var(--laranja); border-radius: 14px 14px 0 0; flex-shrink: 0; }
+    .modal-mp-topo.amarelo { background: var(--amarelo); }
+    .modal-mp-header { padding: 18px 26px 0; display: flex; align-items: flex-start; justify-content: space-between; flex-shrink: 0; }
+    .modal-mp-header h2 { font-size: 1rem; font-weight: 700; margin-bottom: 2px; }
+    .modal-mp-header .sub { font-size: 0.76rem; color: var(--cinza-texto); }
+    .modal-mp-header .sub span { color: var(--laranja); }
+    .modal-mp-progress { padding: 12px 26px 0; flex-shrink: 0; }
     .progress-info { display: flex; justify-content: space-between; margin-bottom: 6px; }
     .progress-label   { font-size: 0.78rem; font-weight: 700; color: var(--preto); }
     .progress-counter { font-size: 0.76rem; color: var(--cinza-texto); }
     .progress-track { height: 5px; background: var(--cinza-linha); border-radius: 3px; overflow: hidden; }
     .progress-fill  { height: 100%; background: var(--laranja); border-radius: 3px; transition: width 0.3s ease; }
-
-    /* Corpo scrollável */
-    .modal-body { padding: 18px 26px; overflow-y: auto; flex: 1; }
-
-    /* Alerta dentro do modal */
-    .alerta-modal { display: none; border-radius: 8px; padding: 10px 13px; font-size: 0.81rem; font-weight: 500; margin-bottom: 14px; }
-    .alerta-modal.erro    { background: #FFDEDE; color: var(--vermelho); display: block; }
-    .alerta-modal.sucesso { background: var(--verde-light); color: #375623; display: block; }
-
-    /* Footer fixo */
-    .modal-footer { padding: 12px 26px 18px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--cinza-linha); flex-shrink: 0; }
-    .btn-anterior { background: #F0F0F0; color: #555; border: none; border-radius: 8px; padding: 11px 22px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 500; cursor: pointer; transition: background 0.15s; }
-    .btn-anterior:hover { background: #E4E4E4; }
-    .btn-anterior[style*="opacity:0"], .btn-anterior.invisivel { opacity: 0; pointer-events: none; }
-    .btn-seguinte { background: var(--laranja); color: var(--branco); border: none; border-radius: 8px; padding: 11px 26px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; transition: background 0.15s; }
-    .btn-seguinte:hover { background: var(--laranja-hover); }
-    .btn-seguinte:disabled { opacity: 0.65; cursor: not-allowed; }
+    .progress-fill.amarelo { background: var(--amarelo); }
+    .modal-mp-body   { padding: 18px 26px; overflow-y: auto; flex: 1; }
+    .alerta-mp { display: none; border-radius: 8px; padding: 10px 13px; font-size: 0.81rem; font-weight: 500; margin-bottom: 14px; }
+    .alerta-mp.erro    { background: #FFDEDE; color: var(--vermelho); display: block; }
+    .alerta-mp.sucesso { background: var(--verde-light); color: #375623; display: block; }
+    .modal-mp-footer { padding: 12px 26px 18px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--cinza-linha); flex-shrink: 0; }
+    .btn-mp-anterior { background: #F0F0F0; color: #555; border: none; border-radius: 8px; padding: 11px 22px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 500; cursor: pointer; }
+    .btn-mp-anterior:hover { background: #E4E4E4; }
+    .btn-mp-anterior.invisivel { opacity: 0; pointer-events: none; }
+    .btn-mp-seguinte { background: var(--laranja); color: var(--branco); border: none; border-radius: 8px; padding: 11px 26px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; }
+    .btn-mp-seguinte:hover { background: var(--laranja-hover); }
+    .btn-mp-seguinte:disabled { opacity: 0.65; cursor: not-allowed; }
+    .btn-mp-seguinte.amarelo { background: var(--amarelo); }
 
     /* Campos do formulário */
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .form-campo { display: flex; flex-direction: column; gap: 7px; }
     .form-campo label { font-size: 0.72rem; font-weight: 700; color: var(--preto); text-transform: uppercase; letter-spacing: 0.5px; }
     .form-campo label .obg { color: var(--laranja); }
     .campo-nota { font-size: 0.72rem; color: var(--cinza-texto); font-style: italic; }
-
-    .campo-input { width: 100%; background: #F5F5F5; border: 1.5px solid transparent; border-radius: 8px; padding: 12px 14px; font-family: 'Inter', sans-serif; font-size: 0.86rem; color: var(--preto); outline: none; transition: border-color 0.18s, background 0.18s, box-shadow 0.18s; }
-    .campo-input::placeholder { color: #BBBBBB; }
-    .campo-input:focus { background: var(--branco); border-color: var(--laranja); box-shadow: 0 0 0 3px rgba(241,90,36,0.10); }
-    .campo-input.readonly { background: #EEEEEE; color: var(--cinza-texto); cursor: not-allowed; }
-    .campo-input.readonly:focus { border-color: transparent; box-shadow: none; background: #EEEEEE; }
-
-    .campo-select { width: 100%; background: #F5F5F5; border: 1.5px solid transparent; border-radius: 8px; padding: 12px 36px 12px 14px; font-family: 'Inter', sans-serif; font-size: 0.86rem; color: var(--preto); outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; transition: border-color 0.18s; }
-    .campo-select:focus { background-color: var(--branco); border-color: var(--laranja); box-shadow: 0 0 0 3px rgba(241,90,36,0.10); }
-
-    /* Textarea grande — página própria */
-    .campo-textarea { width: 100%; background: #F5F5F5; border: 1.5px solid transparent; border-radius: 8px; padding: 14px; font-family: 'Inter', sans-serif; font-size: 0.88rem; color: var(--preto); outline: none; resize: none; transition: border-color 0.18s, box-shadow 0.18s; }
-    .campo-textarea::placeholder { color: #BBBBBB; }
-    .campo-textarea:focus { background: var(--branco); border-color: var(--laranja); box-shadow: 0 0 0 3px rgba(241,90,36,0.10); }
-
-    /* Checkboxes de área */
+    .mp-input { width: 100%; background: #F5F5F5; border: 1.5px solid transparent; border-radius: 8px; padding: 12px 14px; font-family: 'Inter', sans-serif; font-size: 0.86rem; color: var(--preto); outline: none; transition: border-color 0.18s, background 0.18s, box-shadow 0.18s; }
+    .mp-input::placeholder { color: #BBBBBB; }
+    .mp-input:focus { background: var(--branco); border-color: var(--laranja); box-shadow: 0 0 0 3px rgba(241,90,36,0.10); }
+    .mp-input.readonly { background: #EEEEEE; color: var(--cinza-texto); cursor: not-allowed; }
+    .mp-input.readonly:focus { border-color: transparent; box-shadow: none; background: #EEEEEE; }
+    .mp-select { width: 100%; background: #F5F5F5; border: 1.5px solid transparent; border-radius: 8px; padding: 12px 36px 12px 14px; font-family: 'Inter', sans-serif; font-size: 0.86rem; color: var(--preto); outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+    .mp-select:focus { background-color: var(--branco); border-color: var(--laranja); box-shadow: 0 0 0 3px rgba(241,90,36,0.10); }
+    .mp-textarea { width: 100%; background: #F5F5F5; border: 1.5px solid transparent; border-radius: 8px; padding: 14px; font-family: 'Inter', sans-serif; font-size: 0.88rem; color: var(--preto); outline: none; resize: none; transition: border-color 0.18s, box-shadow 0.18s; }
+    .mp-textarea::placeholder { color: #BBBBBB; }
+    .mp-textarea:focus { background: var(--branco); border-color: var(--laranja); box-shadow: 0 0 0 3px rgba(241,90,36,0.10); }
     .areas-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
     .area-check { display: flex; align-items: center; gap: 7px; cursor: pointer; font-size: 0.78rem; color: var(--preto); padding: 7px 9px; border-radius: 6px; border: 1.5px solid var(--cinza-linha); background: #F9F9F9; transition: border-color 0.15s, background 0.15s; user-select: none; }
-    .area-check:hover  { border-color: var(--laranja); background: var(--laranja-light); }
+    .area-check:hover   { border-color: var(--laranja); background: var(--laranja-light); }
     .area-check.marcada { border-color: var(--laranja); background: var(--laranja-light); }
-    .area-check input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--laranja); cursor: pointer; margin: 0; padding: 0; flex-shrink: 0; }
-
-    /* Radio Plug-IN */
+    .area-check input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--laranja); cursor: pointer; margin: 0; flex-shrink: 0; }
     .radio-grupo { display: flex; gap: 10px; }
-    .radio-item { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 20px; border-radius: 8px; border: 1.5px solid var(--cinza-linha); background: #F9F9F9; transition: border-color 0.15s, background 0.15s; user-select: none; font-size: 0.86rem; }
-    .radio-item:hover  { border-color: var(--laranja); background: var(--laranja-light); }
+    .radio-item  { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 20px; border-radius: 8px; border: 1.5px solid var(--cinza-linha); background: #F9F9F9; transition: border-color 0.15s, background 0.15s; user-select: none; font-size: 0.86rem; }
+    .radio-item:hover   { border-color: var(--laranja); background: var(--laranja-light); }
     .radio-item.marcada { border-color: var(--laranja); background: var(--laranja-light); }
     .radio-item input[type="radio"] { width: 15px; height: 15px; accent-color: var(--laranja); cursor: pointer; margin: 0; }
-
     .separador { border: none; border-top: 1px solid var(--cinza-linha); margin: 16px 0; }
 
     .spin { display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: girar 0.6s linear infinite; vertical-align: middle; margin-right: 6px; }
     @keyframes girar { to { transform: rotate(360deg); } }
 
-    /* Mobile */
     .menu-toggle { display: none; position: fixed; top: 14px; left: 14px; z-index: 200; background: var(--laranja); border: none; border-radius: 8px; padding: 8px 10px; cursor: pointer; color: white; font-size: 1.1rem; }
     .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 90; }
+
     @media (max-width: 1100px) { .grelha { grid-template-columns: repeat(2,1fr); } }
     @media (max-width: 768px) {
       .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
@@ -181,6 +226,7 @@
       .filtros .input-empresa { width: 140px; }
       .form-grid { grid-template-columns: 1fr; }
       .areas-grid { grid-template-columns: repeat(2,1fr); }
+      .detalhe-meta-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -193,7 +239,7 @@
   <div class="sidebar-logo"><span>ESMAD</span></div>
   <nav class="sidebar-nav">
     <a class="nav-item activo">Propostas</a>
-    <a class="nav-item" href="entrevistas.html">As Minhas Candidaturas</a>
+    <a class="nav-item" href="candidaturas.html">As Minhas Candidaturas</a>
     <a class="nav-item" href="perfil-estudante.html">O Meu Perfil</a>
   </nav>
   <div class="sidebar-footer">
@@ -205,85 +251,74 @@
 <main class="main">
   <div class="topbar">
     <div class="topbar-info">
-      <div class="titulo">Propostas Disponíveis</div>
-      <div class="subtitulo">Encontra o teu próximo projeto ou estágio</div>
+      <div class="titulo" id="topbarTitulo">Propostas</div>
+      <div class="subtitulo" id="topbarSub">Encontra o teu próximo projeto ou estágio</div>
     </div>
-    <div class="avatar" id="avatar" title="Logout">?</div>
+    <div class="avatar" id="avatar">?</div>
   </div>
   <div class="content">
-    <div class="barra-pesquisa">
-      <span class="icone-lupa">🔍</span>
-      <input type="text" id="inputPesquisa" placeholder="Pesquisar propostas…">
+
+    <div class="tabs">
+      <button class="tab activo"   id="tabDisp"   onclick="mudarTab('disponiveis')">Propostas Disponíveis</button>
+      <button class="tab inactivo" id="tabMinhas" onclick="mudarTab('minhas')">
+        As Minhas Propostas
+        <span class="badge-tab" id="badgeRejeicoes" style="display:none">!</span>
+      </button>
     </div>
-    <div class="filtros">
-      <select id="filtroTipo">
-        <option value="">Todos os tipos</option>
-        <option value="estagio">Estágio</option>
-        <option value="projecto">Projeto</option>
-      </select>
-      <select id="filtroArea">
-        <option value="">Todas as áreas</option>
-        <option value="UI/UX">UI/UX</option>
-        <option value="Front-end">Front-end</option>
-        <option value="Back-end">Back-end</option>
-        <option value="Full-stack">Full-stack</option>
-        <option value="Mobile">Mobile</option>
-        <option value="Games/Graphics">Games/Graphics</option>
-        <option value="Marketing Digital">Marketing Digital</option>
-        <option value="Outro">Outro</option>
-      </select>
-      <input type="text" class="input-empresa" id="filtroEmpresa" placeholder="Todas as empresas">
-      <div class="spacer"></div>
-      <button class="btn-nova" onclick="abrirModal()">Nova Proposta <span>+</span></button>
-    </div>
-    <div class="grelha" id="grelha">
-      <div class="proposta-card" style="pointer-events:none">
-        <div class="card-topo"></div>
-        <div class="card-body">
-          <div class="skeleton" style="height:16px;width:80%;margin-bottom:8px"></div>
-          <div class="skeleton" style="height:12px;width:50%;margin-bottom:10px"></div>
-          <div class="skeleton" style="height:11px;width:100%;margin-bottom:5px"></div>
-          <div class="skeleton" style="height:11px;width:90%"></div>
-        </div>
-        <div class="card-footer">
-          <div class="skeleton" style="height:10px;width:70px"></div>
-          <div class="skeleton" style="height:10px;width:50px"></div>
-        </div>
-      </div>
-    </div>
+
+    <!-- CONTEÚDO DA TAB -->
+    <div id="conteudoTab"></div>
+
   </div>
 </main>
 
-<!-- MODAL MULTI-PASSO -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <div class="modal-topo"></div>
-    <div class="modal-header">
-      <div>
-        <h2>Submeter Nova Proposta</h2>
-        <div class="sub"><span id="modalPassoLabel">Passo 1 de 7</span></div>
-      </div>
-      <button class="btn-fechar" onclick="fecharModal()">✕</button>
+<!-- MODAL DETALHES DA PROPOSTA -->
+<div class="modal-overlay" id="modalDetalhesProposta">
+  <div class="modal-base" style="max-width:600px">
+    <div class="modal-topo-base" id="detalhesTopoBarra" style="height:6px;border-radius:14px 14px 0 0;background:var(--laranja)"></div>
+    <div class="modal-header-b">
+      <div><h2 id="detalhesTitulo">—</h2><div class="sub" id="detalhesSub">—</div></div>
+      <button class="btn-fechar" onclick="fecharModalBase('modalDetalhesProposta')">✕</button>
     </div>
-    <div class="modal-progress">
+    <div class="modal-body-b" id="detalhesBody">
+      <div class="vazio-tabela"><div class="emoji">⏳</div>A carregar…</div>
+    </div>
+    <div class="modal-footer-b" id="detalhesFooter">
+      <button class="btn-m-cancelar" onclick="fecharModalBase('modalDetalhesProposta')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOVA / EDITAR PROPOSTA — MULTI-PASSO -->
+<div class="modal-overlay" id="modalProposta">
+  <div class="modal-mp">
+    <div class="modal-mp-topo" id="mpTopo"></div>
+    <div class="modal-mp-header">
+      <div>
+        <h2 id="mpTituloPrincipal">Submeter Nova Proposta</h2>
+        <div class="sub"><span id="mpPassoLabel">Passo 1 de 7</span></div>
+      </div>
+      <button class="btn-fechar" onclick="fecharModalProposta()">✕</button>
+    </div>
+    <div class="modal-mp-progress">
       <div class="progress-info">
-        <span class="progress-label" id="progressLabel">Sobre a Entidade</span>
-        <span class="progress-counter" id="progressCounter">1 / 7</span>
+        <span class="progress-label"  id="mpProgressLabel">Sobre a Entidade</span>
+        <span class="progress-counter" id="mpProgressCounter">1 / 7</span>
       </div>
       <div class="progress-track">
-        <div class="progress-fill" id="progressFill" style="width:14%"></div>
+        <div class="progress-fill" id="mpProgressFill" style="width:14%"></div>
       </div>
     </div>
-    <div class="modal-body" id="modalBody"></div>
-    <div class="modal-footer">
-      <button class="btn-anterior invisivel" id="btnAnterior" onclick="passo(-1)">&larr; Anterior</button>
-      <button class="btn-seguinte" id="btnSeguinte" onclick="passo(1)">Seguinte &rarr;</button>
+    <div class="modal-mp-body" id="mpBody"></div>
+    <div class="modal-mp-footer">
+      <button class="btn-mp-anterior invisivel" id="btnMpAnterior" onclick="mpPasso(-1)">← Anterior</button>
+      <button class="btn-mp-seguinte" id="btnMpSeguinte" onclick="mpPasso(1)">Seguinte →</button>
     </div>
   </div>
 </div>
 
 <script>
-  const API = 'http://localhost:5000/api';
+  const API   = 'http://localhost:5000/api';
   const token = localStorage.getItem('esmad_token');
   const user  = localStorage.getItem('esmad_user');
   if (!token || !user) { window.location.href = 'login.html'; }
@@ -292,7 +327,6 @@
 
   document.getElementById('sidebarNome').textContent = utilizador.nome;
   document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
-
   document.getElementById('avatar').addEventListener('click', () => {
     if (confirm('Tens a certeza que queres fazer logout?')) { localStorage.clear(); window.location.href = 'login.html'; }
   });
@@ -305,29 +339,137 @@
   function req(endpoint, opts = {}) {
     return fetch(API + endpoint, { ...opts, headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', ...(opts.headers||{}) } }).then(r => r.json());
   }
-  function formatarData(str) { return new Date(str).toLocaleDateString('pt-PT', { day:'2-digit', month:'2-digit', year:'2-digit' }); }
+  function formatarData(str) {
+    if (!str) return '—';
+    return new Date(str).toLocaleDateString('pt-PT', { day:'2-digit', month:'2-digit', year:'2-digit' });
+  }
 
-  // Carregar propostas
-  let todasPropostas = [];
-  const estadoLabels = { aprovada:'Aprovada', pendente:'Pendente', rejeitada:'Rejeitada', entrevista_agendada:'Entrevista', aceite:'Aceite' };
+  function fecharModalBase(id) {
+    document.getElementById(id).classList.remove('aberto');
+    document.body.style.overflow = '';
+  }
+  function abrirModalBase(id) {
+    document.getElementById(id).classList.add('aberto');
+    document.body.style.overflow = 'hidden';
+  }
+
+  document.querySelectorAll('.modal-overlay').forEach(el => {
+    el.addEventListener('click', e => {
+      if (e.target !== el) return;
+      if (el.id === 'modalProposta') fecharModalProposta();
+      else fecharModalBase(el.id);
+    });
+  });
+
+  // ── Estado ──
+  let tabActiva       = 'disponiveis';
+  let todasPropostas  = [];
+  let mpModoEdicao    = false;
+  let mpPropostaId    = null;
+  let mpCurso         = 'TeSP DTAM';
+
+  // ══════════════════════════════════════════════
+  // TABS
+  // ══════════════════════════════════════════════
+  function mudarTab(tab) {
+    tabActiva = tab;
+    document.getElementById('tabDisp').className   = tab === 'disponiveis' ? 'tab activo' : 'tab inactivo';
+    document.getElementById('tabMinhas').className = tab === 'minhas'      ? 'tab activo' : 'tab inactivo';
+    document.getElementById('topbarTitulo').textContent = tab === 'disponiveis' ? 'Propostas' : 'As Minhas Propostas';
+    document.getElementById('topbarSub').textContent    = tab === 'disponiveis' ? 'Encontra o teu próximo projeto ou estágio' : 'Acompanha o estado das tuas propostas submetidas';
+    if (tab === 'disponiveis') renderTabDisp();
+    else                       carregarMinhasPropostas();
+  }
+
+  // ══════════════════════════════════════════════
+  // TAB: PROPOSTAS DISPONÍVEIS
+  // ══════════════════════════════════════════════
+  function renderTabDisp() {
+    document.getElementById('conteudoTab').innerHTML = `
+      <div class="barra-pesquisa">
+        <span class="icone-lupa">🔍</span>
+        <input type="text" id="inputPesquisa" placeholder="Pesquisar propostas…">
+      </div>
+      <div class="filtros">
+        <select id="filtroTipo">
+          <option value="">Todos os tipos</option>
+          <option value="estagio">Estágio</option>
+          <option value="projecto">Projeto</option>
+        </select>
+        <select id="filtroArea">
+          <option value="">Todas as áreas</option>
+          <option value="UI/UX">UI/UX</option>
+          <option value="Front-end">Front-end</option>
+          <option value="Back-end">Back-end</option>
+          <option value="Full-stack">Full-stack</option>
+          <option value="Mobile">Mobile</option>
+          <option value="Games/Graphics">Games/Graphics</option>
+          <option value="Marketing Digital">Marketing Digital</option>
+          <option value="Outro">Outro</option>
+        </select>
+        <input type="text" class="input-empresa" id="filtroEmpresa" placeholder="Todas as empresas">
+        <div class="spacer"></div>
+        <button class="btn-nova" onclick="abrirModalProposta()">Nova Proposta <span>+</span></button>
+      </div>
+      <div class="grelha" id="grelha">
+        <div class="proposta-card" style="pointer-events:none">
+          <div class="card-topo"></div>
+          <div class="card-body">
+            <div class="skeleton" style="height:16px;width:80%;margin-bottom:8px"></div>
+            <div class="skeleton" style="height:12px;width:50%;margin-bottom:10px"></div>
+            <div class="skeleton" style="height:11px;width:100%;margin-bottom:5px"></div>
+            <div class="skeleton" style="height:11px;width:90%"></div>
+          </div>
+          <div class="card-footer">
+            <div class="skeleton" style="height:10px;width:70px"></div>
+            <div class="skeleton" style="height:10px;width:50px"></div>
+          </div>
+        </div>
+      </div>`;
+
+    carregarPropostas();
+
+    // Bind filtros (após render)
+    setTimeout(() => {
+      document.getElementById('inputPesquisa')?.addEventListener('input', filtrar);
+      document.getElementById('filtroTipo')?.addEventListener('change', filtrar);
+      document.getElementById('filtroArea')?.addEventListener('change', filtrar);
+      document.getElementById('filtroEmpresa')?.addEventListener('input', filtrar);
+    }, 0);
+  }
 
   async function carregarPropostas() {
     try {
       const dados = await req('/propostas');
       if (!dados.sucesso) throw new Error(dados.mensagem);
-      todasPropostas = dados.propostas || [];
+      todasPropostas = (dados.propostas || []).filter(p => p.estado === 'aprovada');
       renderPropostas(todasPropostas);
     } catch {
-      document.getElementById('grelha').innerHTML = '<div class="vazio"><div class="emoji">⚠️</div><p>Erro ao carregar. Servidor ligado?</p></div>';
+      const g = document.getElementById('grelha');
+      if (g) g.innerHTML = '<div class="vazio"><div class="emoji">⚠️</div><p>Erro ao carregar. Servidor ligado?</p></div>';
     }
   }
 
   function renderPropostas(lista) {
     const g = document.getElementById('grelha');
+    if (!g) return;
     if (!lista.length) { g.innerHTML = '<div class="vazio"><div class="emoji">📭</div><p>Não há propostas disponíveis.</p></div>'; return; }
+    const estadoLabels = { aprovada:'Aprovada', pendente:'Pendente', rejeitada:'Rejeitada', entrevista_agendada:'Entrevista', aceite:'Aceite' };
     g.innerHTML = lista.map(p => {
       const tipo = p.tipo === 'estagio' ? 'Estágio' : 'Projecto';
-      return '<div class="proposta-card" onclick="window.location.href=\'detalhe-proposta.html?id=' + p._id + '\'"><div class="card-topo"><span class="card-tipo' + (p.tipo==='projecto'?' projecto':'') + '">' + tipo + '</span></div><div class="card-body"><div class="card-titulo">' + p.titulo + '</div><div class="card-entidade">' + (p.nomeEntidade||p.proponenteId?.nome||'—') + '</div>' + (p.areas?.[0]?'<span class="card-area">'+p.areas[0]+'</span>':'') + '<div class="card-descricao">' + (p.descricao||'') + '</div></div><div class="card-footer"><span class="estado ' + p.estado + '">' + (estadoLabels[p.estado]||p.estado) + '</span><span class="card-data">' + formatarData(p.criadaEm) + '</span></div></div>';
+      return `<div class="proposta-card" onclick="window.location.href='detalhe-proposta.html?id=${p._id}'">
+        <div class="card-topo"><span class="card-tipo${p.tipo==='projecto'?' projecto':''}">${tipo}</span></div>
+        <div class="card-body">
+          <div class="card-titulo">${p.titulo}</div>
+          <div class="card-entidade">${p.nomeEntidade||p.proponenteId?.nome||'—'}</div>
+          ${p.areas?.[0]?`<span class="card-area">${p.areas[0]}</span>`:''}
+          <div class="card-descricao">${p.descricao||''}</div>
+        </div>
+        <div class="card-footer">
+          <span class="estado ${p.estado}">${estadoLabels[p.estado]||p.estado}</span>
+          <span class="card-data">${formatarData(p.criadaEm)}</span>
+        </div>
+      </div>`;
     }).join('');
   }
 
@@ -335,230 +477,416 @@
   function filtrar() {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
-      const pesq    = document.getElementById('inputPesquisa').value.toLowerCase().trim();
-      const tipo    = document.getElementById('filtroTipo').value;
-      const area    = document.getElementById('filtroArea').value;
-      const empresa = document.getElementById('filtroEmpresa').value.toLowerCase().trim();
+      const pesq    = document.getElementById('inputPesquisa')?.value.toLowerCase().trim() || '';
+      const tipo    = document.getElementById('filtroTipo')?.value || '';
+      const area    = document.getElementById('filtroArea')?.value || '';
+      const empresa = document.getElementById('filtroEmpresa')?.value.toLowerCase().trim() || '';
       renderPropostas(todasPropostas.filter(p => {
-        if (tipo    && p.tipo !== tipo)                                          return false;
-        if (area    && !p.areas?.includes(area))                                 return false;
-        if (empresa && !(p.nomeEntidade||'').toLowerCase().includes(empresa))    return false;
+        if (tipo    && p.tipo !== tipo) return false;
+        if (area    && !p.areas?.includes(area)) return false;
+        if (empresa && !(p.nomeEntidade||'').toLowerCase().includes(empresa)) return false;
         if (pesq    && !p.titulo.toLowerCase().includes(pesq) && !p.descricao?.toLowerCase().includes(pesq)) return false;
         return true;
       }));
     }, 250);
   }
-  document.getElementById('inputPesquisa').addEventListener('input', filtrar);
-  document.getElementById('filtroTipo').addEventListener('change', filtrar);
-  document.getElementById('filtroArea').addEventListener('change', filtrar);
-  document.getElementById('filtroEmpresa').addEventListener('input', filtrar);
 
-  // ══ MODAL MULTI-PASSO ══
-  const PASSOS = [
-    'Sobre a Entidade',
-    'Tutor na Entidade',
-    'Dados da Proposta',
-    'Objetivos',
-    'Resultados Esperados',
-    'Plano e Perfil',
-    'Plug-IN e Resumo'
-  ];
+  // ══════════════════════════════════════════════
+  // TAB: AS MINHAS PROPOSTAS
+  // ══════════════════════════════════════════════
+  async function carregarMinhasPropostas() {
+    document.getElementById('conteudoTab').innerHTML = `
+      <div class="painel">
+        <div class="painel-header">
+          <h2>As Minhas Propostas</h2>
+          <button class="btn-nova" onclick="abrirModalProposta()">Nova Proposta <span>+</span></button>
+        </div>
+        <table>
+          <thead><tr><th>Título</th><th>Tipo</th><th>Estado</th><th>Submetida</th><th>Ações</th></tr></thead>
+          <tbody id="tbMinhas"><tr><td colspan="5"><div class="vazio-tabela"><div class="emoji">⏳</div><p>A carregar…</p></div></td></tr></tbody>
+        </table>
+      </div>`;
 
-  let passoActual = 0;
-  let dadosProposta = {};
-  let cursoProposta = 'TeSP DTAM';
+    try {
+      const dados = await req('/propostas');
+      if (!dados.sucesso) throw new Error(dados.mensagem);
 
-  function esc(s) {
-    return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      const minhas = (dados.propostas || []).filter(p =>
+        (p.proponenteId?._id || p.proponenteId) === utilizador.id ||
+        p.proponenteId?.toString() === utilizador.id
+      );
+
+      // Badge de rejeições
+      const rejeicoes = minhas.filter(p => p.estado === 'rejeitada').length;
+      const badge = document.getElementById('badgeRejeicoes');
+      badge.textContent = rejeicoes;
+      badge.style.display = rejeicoes > 0 ? '' : 'none';
+
+      const tbody = document.getElementById('tbMinhas');
+      if (!minhas.length) {
+        tbody.innerHTML = `<tr><td colspan="5"><div class="vazio-tabela"><div class="emoji">📭</div><p>Ainda não submeteste nenhuma proposta.<br><button class="btn-nova" style="margin-top:12px;display:inline-flex" onclick="abrirModalProposta()">Submeter Proposta +</button></p></div></td></tr>`;
+        return;
+      }
+
+      const estadoLabel = { aprovada:'Aprovada', pendente:'Pendente', rejeitada:'Rejeitada', atribuida:'Atribuída' };
+      tbody.innerHTML = minhas.map(p => `
+        <tr>
+          <td>
+            <span class="titulo-link" onclick="abrirDetalhesProposta('${p._id}')">${p.titulo}</span>
+            <div style="font-size:0.74rem;color:var(--cinza-texto);margin-top:2px">${p.curso||''}</div>
+          </td>
+          <td><span class="tag ${p.tipo}">${p.tipo === 'estagio' ? 'Estágio' : 'Projecto'}</span></td>
+          <td><span class="estado ${p.estado}">${estadoLabel[p.estado]||p.estado}</span></td>
+          <td style="color:var(--cinza-texto)">${formatarData(p.criadaEm)}</td>
+          <td>
+            <div class="acoes-tabela">
+              <button class="btn-detalhes" onclick="abrirDetalhesProposta('${p._id}')">📋 Detalhes</button>
+              ${p.estado === 'rejeitada'
+                ? `<button class="btn-editar-proposta" onclick="abrirEditarProposta('${p._id}')">✏️ Editar</button>`
+                : ''}
+            </div>
+          </td>
+        </tr>`).join('');
+
+    } catch (err) {
+      document.getElementById('tbMinhas').innerHTML = `<tr><td colspan="5"><div class="vazio-tabela"><div class="emoji">⚠️</div><p>${err.message}</p></div></td></tr>`;
+    }
   }
 
-  function abrirModal() {
-    passoActual = 0;
-    dadosProposta = { nomeEntidade:'', emailContacto:'', moradaEntidade:'', moradaLocal:'', tutorNome:'', tutorEmail:'', tutorCargo:'', curso: cursoProposta, tipo:'estagio', areas:[], titulo:'', objetivos:'', resultados:'', plano:'', perfilCand:'', plugIN: false };
+  // ══════════════════════════════════════════════
+  // MODAL DETALHES
+  // ══════════════════════════════════════════════
+  async function abrirDetalhesProposta(id) {
+    document.getElementById('detalhesTitulo').textContent = '—';
+    document.getElementById('detalhesSub').textContent    = '—';
+    document.getElementById('detalhesBody').innerHTML     = '<div class="vazio-tabela"><div class="emoji">⏳</div>A carregar…</div>';
+    document.getElementById('detalhesFooter').innerHTML   = '<button class="btn-m-cancelar" onclick="fecharModalBase(\'modalDetalhesProposta\')">Fechar</button>';
+    abrirModalBase('modalDetalhesProposta');
+
+    try {
+      const dados = await req('/propostas/' + id);
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+      const p = dados.proposta;
+
+      const topoCores = { aprovada: 'var(--verde)', pendente: 'var(--amarelo)', rejeitada: 'var(--vermelho)', atribuida: 'var(--azul)' };
+      document.getElementById('detalhesTopoBarra').style.background = topoCores[p.estado] || 'var(--laranja)';
+      document.getElementById('detalhesTitulo').textContent = p.titulo;
+      document.getElementById('detalhesSub').textContent    = `${p.tipo === 'estagio' ? 'Estágio' : 'Projecto'} · ${p.curso||''} · submetido em ${new Date(p.criadaEm).toLocaleDateString('pt-PT')}`;
+
+      const estadoLabel = { aprovada:'Aprovada', pendente:'Pendente a aprovação', rejeitada:'Rejeitada', atribuida:'Atribuída' };
+      let html = '<hr class="linha-modal">';
+
+      html += `<div class="detalhe-meta-grid">
+        <div class="detalhe-bloco"><div class="db-label">Estado</div><div class="db-valor"><span class="estado ${p.estado}">${estadoLabel[p.estado]||p.estado}</span></div></div>
+        <div class="detalhe-bloco"><div class="db-label">Entidade</div><div class="db-valor">${p.nomeEntidade||'—'}</div></div>
+        ${p.tutorNome ? `
+        <div class="detalhe-bloco"><div class="db-label">Tutor</div><div class="db-valor">${p.tutorNome}${p.tutorCargo?' · '+p.tutorCargo:''}</div></div>
+        <div class="detalhe-bloco"><div class="db-label">Email do Tutor</div><div class="db-valor">${p.tutorEmail||'—'}</div></div>` : ''}
+      </div>`;
+
+      // Feedback de rejeição
+      if (p.estado === 'rejeitada' && p.feedbackCCA) {
+        html += `<div class="detalhe-bloco vermelho">
+          <div class="db-label">⚠️ Motivo de rejeição pela CCA</div>
+          <div class="db-valor">${p.feedbackCCA}</div>
+        </div>`;
+      }
+
+      // Sugestão da CCA
+      if (p.sugestaoCCA) {
+        html += `<div class="detalhe-bloco amarelo">
+          <div class="db-label">💡 Sugestão de melhoria da CCA</div>
+          <div class="db-valor">${p.sugestaoCCA}</div>
+        </div>`;
+      }
+
+      // Estado pendente
+      if (p.estado === 'pendente') {
+        html += `<div class="detalhe-bloco" style="background:var(--amarelo-light)">
+          <div class="db-label" style="color:var(--amarelo)">⏳ A aguardar aprovação</div>
+          <div class="db-valor" style="color:#5a4000;font-weight:500">A proposta está a ser analisada pela CCA. Receberás uma notificação quando houver uma decisão.</div>
+        </div>`;
+      }
+
+      // Estado aprovado
+      if (p.estado === 'aprovada') {
+        html += `<div class="detalhe-bloco verde">
+          <div class="db-label">✅ Aprovada pela CCA</div>
+          <div class="db-valor">A proposta foi aprovada. Os estudantes já podem manifestar interesse.</div>
+        </div>`;
+      }
+
+      // Conteúdo
+      if (p.objetivos || p.descricao) {
+        html += `<div style="margin-top:14px"><div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--cinza-texto);margin-bottom:6px">Objetivos</div>
+          <p style="font-size:0.86rem;color:#444;line-height:1.7">${(p.objetivos||p.descricao||'').replace(/\n/g,'<br>')}</p></div>`;
+      }
+      if (p.resultadosEsperados) {
+        html += `<div style="margin-top:14px"><div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--cinza-texto);margin-bottom:6px">Resultados Esperados</div>
+          <p style="font-size:0.86rem;color:#444;line-height:1.7">${p.resultadosEsperados.replace(/\n/g,'<br>')}</p></div>`;
+      }
+
+      document.getElementById('detalhesBody').innerHTML = html;
+
+      // Footer
+      const footer = document.getElementById('detalhesFooter');
+      if (p.estado === 'rejeitada') {
+        footer.innerHTML = `
+          <button class="btn-m-cancelar" onclick="fecharModalBase('modalDetalhesProposta')">Fechar</button>
+          <button class="btn-m-amarelo" onclick="fecharModalBase('modalDetalhesProposta');abrirEditarProposta('${p._id}')">✏️ Editar e Resubmeter</button>`;
+      } else {
+        footer.innerHTML = `<button class="btn-m-cancelar" onclick="fecharModalBase('modalDetalhesProposta')">Fechar</button>`;
+      }
+
+    } catch (err) {
+      document.getElementById('detalhesBody').innerHTML = `<div class="vazio-tabela"><div class="emoji">⚠️</div><p>${err.message}</p></div>`;
+    }
+  }
+
+  // ══════════════════════════════════════════════
+  // MODAL MULTI-PASSO
+  // ══════════════════════════════════════════════
+  const MP_PASSOS = ['Sobre a Entidade','Tutor na Entidade','Dados da Proposta','Objetivos','Resultados Esperados','Plano e Perfil','Plug-IN e Resumo'];
+  let mpPassoActual = 0;
+  let mpDados = {};
+
+  function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  function abrirModalProposta() {
+    mpModoEdicao = false; mpPropostaId = null;
+    mpPassoActual = 0;
+    mpDados = { nomeEntidade:'', emailContacto:'', moradaEntidade:'', moradaLocal:'', tutorNome:'', tutorEmail:'', tutorCargo:'', curso: mpCurso, tipo:'estagio', areas:[], titulo:'', objetivos:'', resultados:'', plano:'', perfilCand:'', plugIN: false };
     req('/utilizadores/perfil').then(r => {
-      if (r.sucesso && r.dadosExtra?.curso) { cursoProposta = r.dadosExtra.curso; dadosProposta.curso = cursoProposta; }
-      renderPasso();
-    }).catch(() => renderPasso());
-    document.getElementById('modalOverlay').classList.add('aberto');
-    document.body.style.overflow = 'hidden';
+      if (r.sucesso && r.dadosExtra?.curso) { mpCurso = r.dadosExtra.curso; mpDados.curso = mpCurso; }
+      mpIniciarModal();
+    }).catch(() => mpIniciarModal());
   }
 
-  function fecharModal() {
-    document.getElementById('modalOverlay').classList.remove('aberto');
+  async function abrirEditarProposta(id) {
+    mpModoEdicao = true; mpPropostaId = id;
+    mpPassoActual = 0;
+    try {
+      const dados = await req('/propostas/' + id);
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+      const p = dados.proposta;
+      mpDados = {
+        nomeEntidade:   p.nomeEntidade  || '',
+        emailContacto:  p.emailContacto || '',
+        moradaEntidade: p.moradaEntidade|| '',
+        moradaLocal:    p.moradaLocalEstagio || '',
+        tutorNome:      p.tutorNome     || '',
+        tutorEmail:     p.tutorEmail    || '',
+        tutorCargo:     p.tutorCargo    || '',
+        curso:          p.curso         || mpCurso,
+        tipo:           p.tipo          || 'estagio',
+        areas:          p.areas         || [],
+        titulo:         p.titulo        || '',
+        objetivos:      p.objetivos     || p.descricao || '',
+        resultados:     p.resultadosEsperados || '',
+        plano:          p.planoTrabalho || '',
+        perfilCand:     p.perfilCandidato || '',
+        plugIN:         p.plugIN        || false
+      };
+      mpIniciarModal();
+    } catch(err) { alert('Erro ao carregar proposta: ' + err.message); }
+  }
+
+  function mpIniciarModal() {
+    document.getElementById('mpTopo').className = mpModoEdicao ? 'modal-mp-topo amarelo' : 'modal-mp-topo';
+    document.getElementById('mpProgressFill').className = mpModoEdicao ? 'progress-fill amarelo' : 'progress-fill';
+    document.getElementById('btnMpSeguinte').className  = mpModoEdicao ? 'btn-mp-seguinte amarelo' : 'btn-mp-seguinte';
+    document.getElementById('mpTituloPrincipal').textContent = mpModoEdicao ? 'Editar e Resubmeter Proposta' : 'Submeter Nova Proposta';
+    mpRenderPasso();
+    abrirModalBase('modalProposta');
+  }
+
+  function fecharModalProposta() {
+    document.getElementById('modalProposta').classList.remove('aberto');
     document.body.style.overflow = '';
   }
-  document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === document.getElementById('modalOverlay')) fecharModal(); });
 
-  function actualizarProgress() {
-    const n = passoActual + 1, t = PASSOS.length;
-    document.getElementById('progressLabel').textContent   = PASSOS[passoActual];
-    document.getElementById('progressCounter').textContent = n + ' / ' + t;
-    document.getElementById('progressFill').style.width    = Math.round(n/t*100) + '%';
-    document.getElementById('modalPassoLabel').textContent = 'Passo ' + n + ' de ' + t;
-    const btnA = document.getElementById('btnAnterior');
-    btnA.className = passoActual === 0 ? 'btn-anterior invisivel' : 'btn-anterior';
-    const btnS = document.getElementById('btnSeguinte');
-    btnS.textContent = passoActual === PASSOS.length - 1 ? 'Submeter Proposta' : 'Seguinte →';
+  function mpAtualizarProgress() {
+    const n = mpPassoActual + 1, t = MP_PASSOS.length;
+    document.getElementById('mpProgressLabel').textContent   = MP_PASSOS[mpPassoActual];
+    document.getElementById('mpProgressCounter').textContent = n + ' / ' + t;
+    document.getElementById('mpProgressFill').style.width    = Math.round(n/t*100) + '%';
+    document.getElementById('mpPassoLabel').textContent      = 'Passo ' + n + ' de ' + t;
+    document.getElementById('btnMpAnterior').className = mpPassoActual === 0 ? 'btn-mp-anterior invisivel' : 'btn-mp-anterior';
+    const btnS = document.getElementById('btnMpSeguinte');
+    btnS.textContent = mpPassoActual === MP_PASSOS.length - 1 ? (mpModoEdicao ? 'Guardar e Resubmeter' : 'Submeter Proposta') : 'Seguinte →';
     btnS.disabled = false;
   }
 
-  function getPassoHTML(p) {
+  function mpGetPassoHTML(p) {
     const areas = ['UI/UX','Front-end','Back-end','Full-stack','Mobile','Games/Graphics','Marketing Digital','Outro'];
     switch(p) {
-      case 0: return '<div class="form-grid">' +
-        '<div class="form-campo"><label>Nome da entidade <span class="obg">*</span></label><input class="campo-input" type="text" id="f0" value="' + esc(dadosProposta.nomeEntidade) + '" placeholder="Ex: TechLisboa, Lda."></div>' +
-        '<div class="form-campo"><label>Email de contacto <span class="obg">*</span></label><input class="campo-input" type="email" id="f1" value="' + esc(dadosProposta.emailContacto) + '" placeholder="email@empresa.pt"></div>' +
-        '<div class="form-campo"><label>Morada da entidade <span class="obg">*</span></label><input class="campo-input" type="text" id="f2" value="' + esc(dadosProposta.moradaEntidade) + '" placeholder="Rua, n.º, Cidade"></div>' +
-        '<div class="form-campo"><label>Morada do local de estágio</label><input class="campo-input" type="text" id="f3" value="' + esc(dadosProposta.moradaLocal) + '" placeholder="Se diferente da entidade"></div>' +
-        '</div>';
-
-      case 1: return '<div class="form-grid">' +
-        '<div class="form-campo"><label>Nome do tutor <span class="obg">*</span></label><input class="campo-input" type="text" id="f0" value="' + esc(dadosProposta.tutorNome) + '" placeholder="Nome completo"></div>' +
-        '<div class="form-campo"><label>Email do tutor <span class="obg">*</span></label><input class="campo-input" type="email" id="f1" value="' + esc(dadosProposta.tutorEmail) + '" placeholder="tutor@empresa.pt"></div>' +
-        '</div>' +
-        '<div class="form-campo" style="margin-top:14px"><label>Cargo do tutor</label><input class="campo-input" type="text" id="f2" value="' + esc(dadosProposta.tutorCargo) + '" placeholder="Ex: Director de Tecnologia"></div>';
-
-      case 2: return '<div class="form-grid" style="margin-bottom:16px">' +
-        '<div class="form-campo"><label>Curso destinatário <span class="obg">*</span></label>' +
-        '<input class="campo-input readonly" type="text" readonly value="' + esc(dadosProposta.curso) + '">' +
-        '<p class="campo-nota">A proposta será submetida para o teu curso.</p></div>' +
-        '<div class="form-campo"><label>Tipo de proposta <span class="obg">*</span></label>' +
-        '<select class="campo-select" id="f0"><option value="estagio"' + (dadosProposta.tipo==='estagio'?' selected':'') + '>Estágio</option><option value="projecto"' + (dadosProposta.tipo==='projecto'?' selected':'') + '>Projecto</option></select></div>' +
-        '</div>' +
-        '<div class="form-campo" style="margin-bottom:16px"><label>Área(s) de atuação <span class="obg">*</span></label>' +
-        '<div class="areas-grid">' + areas.map(a => '<label class="area-check' + (dadosProposta.areas.includes(a)?' marcada':'') + '"><input type="checkbox" value="' + a + '" class="area-cb"' + (dadosProposta.areas.includes(a)?' checked':'') + '> ' + a + '</label>').join('') + '</div></div>' +
-        '<div class="form-campo"><label>Título da proposta <span class="obg">*</span> <span style="font-size:0.7rem;color:var(--cinza-texto);text-transform:none;font-weight:400">(máx. 50 car.)</span></label>' +
-        '<input class="campo-input" type="text" id="f1" value="' + esc(dadosProposta.titulo) + '" placeholder="Ex: Sistema de Gestão de Encomendas" maxlength="50"></div>';
-
-      case 3: return '<div class="form-campo" style="margin-bottom:10px"><label>Objectivos <span class="obg">*</span></label>' +
-        '<p class="campo-nota">O que se pretende alcançar com este estágio.</p></div>' +
-        '<textarea class="campo-textarea" id="f0" placeholder="Descreve os objectivos esperados no final do estágio…" style="min-height:240px">' + esc(dadosProposta.objetivos) + '</textarea>';
-
-      case 4: return '<div class="form-campo" style="margin-bottom:10px"><label>Resultados Esperados <span class="obg">*</span></label>' +
-        '<p class="campo-nota">O que o estudante deverá entregar ou produzir.</p></div>' +
-        '<textarea class="campo-textarea" id="f0" placeholder="Descreve os resultados e entregas esperadas…" style="min-height:240px">' + esc(dadosProposta.resultados) + '</textarea>';
-
-      case 5: return '<div class="form-campo" style="margin-bottom:8px"><label>Plano Provisório de Trabalho</label>' +
-        '<p class="campo-nota">Opcional — resumo das tarefas ao longo do estágio.</p></div>' +
-        '<textarea class="campo-textarea" id="f0" placeholder="Descreve o plano de trabalho…" style="min-height:120px">' + esc(dadosProposta.plano) + '</textarea>' +
-        '<hr class="separador">' +
-        '<div class="form-campo" style="margin-bottom:8px"><label>Perfil do Candidato Desejado</label>' +
-        '<p class="campo-nota">Opcional — competências e requisitos pretendidos.</p></div>' +
-        '<textarea class="campo-textarea" id="f1" placeholder="Descreve o perfil ideal do candidato…" style="min-height:120px">' + esc(dadosProposta.perfilCand) + '</textarea>';
-
-      case 6: return '<div class="form-campo" style="margin-bottom:22px"><label>Pretende participar no Plug-IN?</label>' +
-        '<div class="radio-grupo" style="margin-top:10px">' +
-        '<label class="radio-item' + (dadosProposta.plugIN?'':' marcada') + '"><input type="radio" name="plugin" value="false"' + (dadosProposta.plugIN?'':' checked') + '> Não</label>' +
-        '<label class="radio-item' + (dadosProposta.plugIN?' marcada':'') + '"><input type="radio" name="plugin" value="true"' + (dadosProposta.plugIN?' checked':'') + '> Sim</label>' +
-        '</div></div>' +
-        '<div style="background:#F5F5F5;border-radius:10px;padding:16px 18px">' +
-        '<div style="font-size:0.8rem;font-weight:700;color:var(--preto);margin-bottom:10px">Resumo da proposta</div>' +
-        '<div style="font-size:0.82rem;color:#555;display:grid;gap:6px">' +
-        '<div><b>Entidade:</b> ' + esc(dadosProposta.nomeEntidade) + '</div>' +
-        '<div><b>Tutor:</b> ' + esc(dadosProposta.tutorNome) + '</div>' +
-        '<div><b>Curso:</b> ' + esc(dadosProposta.curso) + '</div>' +
-        '<div><b>Tipo:</b> ' + (dadosProposta.tipo==='estagio'?'Estágio':'Projecto') + '</div>' +
-        '<div><b>Áreas:</b> ' + (dadosProposta.areas.join(', ')||'—') + '</div>' +
-        '<div><b>Título:</b> ' + esc(dadosProposta.titulo) + '</div>' +
-        '</div></div>';
+      case 0: return `<div class="form-grid">
+        <div class="form-campo"><label>Nome da entidade <span class="obg">*</span></label><input class="mp-input" type="text" id="f0" value="${esc(mpDados.nomeEntidade)}" placeholder="Ex: TechLisboa, Lda."></div>
+        <div class="form-campo"><label>Email de contacto <span class="obg">*</span></label><input class="mp-input" type="email" id="f1" value="${esc(mpDados.emailContacto)}" placeholder="email@empresa.pt"></div>
+        <div class="form-campo"><label>Morada da entidade <span class="obg">*</span></label><input class="mp-input" type="text" id="f2" value="${esc(mpDados.moradaEntidade)}" placeholder="Rua, n.º, Cidade"></div>
+        <div class="form-campo"><label>Morada do local de estágio</label><input class="mp-input" type="text" id="f3" value="${esc(mpDados.moradaLocal)}" placeholder="Se diferente da entidade"></div></div>`;
+      case 1: return `<div class="form-grid">
+        <div class="form-campo"><label>Nome do tutor <span class="obg">*</span></label><input class="mp-input" type="text" id="f0" value="${esc(mpDados.tutorNome)}" placeholder="Nome completo"></div>
+        <div class="form-campo"><label>Email do tutor <span class="obg">*</span></label><input class="mp-input" type="email" id="f1" value="${esc(mpDados.tutorEmail)}" placeholder="tutor@empresa.pt"></div></div>
+        <div class="form-campo" style="margin-top:14px"><label>Cargo do tutor</label><input class="mp-input" type="text" id="f2" value="${esc(mpDados.tutorCargo)}" placeholder="Ex: Diretor de Tecnologia"></div>`;
+      case 2: return `<div class="form-grid" style="margin-bottom:16px">
+        <div class="form-campo"><label>Curso destinatário <span class="obg">*</span></label><input class="mp-input readonly" type="text" readonly value="${esc(mpDados.curso)}"><p class="campo-nota">A proposta será submetida para o teu curso.</p></div>
+        <div class="form-campo"><label>Tipo de proposta <span class="obg">*</span></label><select class="mp-select" id="f0"><option value="estagio"${mpDados.tipo==='estagio'?' selected':''}>Estágio</option><option value="projecto"${mpDados.tipo==='projecto'?' selected':''}>Projecto</option></select></div></div>
+        <div class="form-campo" style="margin-bottom:16px"><label>Área(s) de actuação <span class="obg">*</span></label>
+        <div class="areas-grid">${areas.map(a=>`<label class="area-check${mpDados.areas.includes(a)?' marcada':''}"><input type="checkbox" value="${a}" class="area-cb"${mpDados.areas.includes(a)?' checked':''}> ${a}</label>`).join('')}</div></div>
+        <div class="form-campo"><label>Título da proposta <span class="obg">*</span> <span style="font-size:0.7rem;color:var(--cinza-texto);text-transform:none;font-weight:400">(máx. 50 car.)</span></label>
+        <input class="mp-input" type="text" id="f1" value="${esc(mpDados.titulo)}" placeholder="Ex: Sistema de Gestão de Encomendas" maxlength="50"></div>`;
+      case 3: return `<div class="form-campo" style="margin-bottom:10px"><label>Objetivos <span class="obg">*</span></label><p class="campo-nota">O que se pretende alcançar com este estágio.</p></div>
+        <textarea class="mp-textarea" id="f0" placeholder="Descreve os objetivos esperados…" style="min-height:240px">${esc(mpDados.objetivos)}</textarea>`;
+      case 4: return `<div class="form-campo" style="margin-bottom:10px"><label>Resultados Esperados <span class="obg">*</span></label><p class="campo-nota">O que o estudante deverá entregar ou produzir.</p></div>
+        <textarea class="mp-textarea" id="f0" placeholder="Descreve os resultados e entregas esperadas…" style="min-height:240px">${esc(mpDados.resultados)}</textarea>`;
+      case 5: return `<div class="form-campo" style="margin-bottom:8px"><label>Plano Provisório de Trabalho</label><p class="campo-nota">Opcional.</p></div>
+        <textarea class="mp-textarea" id="f0" placeholder="Descreve o plano de trabalho…" style="min-height:110px">${esc(mpDados.plano)}</textarea>
+        <hr class="separador">
+        <div class="form-campo" style="margin-bottom:8px"><label>Perfil do Candidato Desejado</label><p class="campo-nota">Opcional.</p></div>
+        <textarea class="mp-textarea" id="f1" placeholder="Descreve o perfil ideal do candidato…" style="min-height:110px">${esc(mpDados.perfilCand)}</textarea>`;
+      case 6: return `<div class="form-campo" style="margin-bottom:22px"><label>Pretende participar no Plug-IN?</label>
+        <div class="radio-grupo" style="margin-top:10px">
+        <label class="radio-item${mpDados.plugIN?'':' marcada'}"><input type="radio" name="plugin" value="false"${mpDados.plugIN?'':' checked'}> Não</label>
+        <label class="radio-item${mpDados.plugIN?' marcada':''}"><input type="radio" name="plugin" value="true"${mpDados.plugIN?' checked':''}> Sim</label></div></div>
+        ${mpModoEdicao ? `<div style="background:var(--amarelo-light);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:0.83rem;color:#5a4000;font-weight:500">⚠️ Ao resubmeter, a proposta volta ao estado <b>Pendente</b> e a CCA terá de votar novamente.</div>` : ''}
+        <div style="background:#F5F5F5;border-radius:10px;padding:16px 18px">
+        <div style="font-size:0.8rem;font-weight:700;color:var(--preto);margin-bottom:10px">Resumo da proposta</div>
+        <div style="font-size:0.82rem;color:#555;display:grid;gap:6px">
+        <div><b>Entidade:</b> ${esc(mpDados.nomeEntidade)}</div>
+        <div><b>Tutor:</b> ${esc(mpDados.tutorNome)}</div>
+        <div><b>Curso:</b> ${esc(mpDados.curso)}</div>
+        <div><b>Tipo:</b> ${mpDados.tipo==='estagio'?'Estágio':'Projecto'}</div>
+        <div><b>Áreas:</b> ${mpDados.areas.join(', ')||'—'}</div>
+        <div><b>Título:</b> ${esc(mpDados.titulo)}</div>
+        </div></div>`;
     }
     return '';
   }
 
-  function renderPasso() {
-    actualizarProgress();
-    const body = document.getElementById('modalBody');
-    body.innerHTML = '<div id="alertaModal" class="alerta-modal"></div>' + getPassoHTML(passoActual);
-
-    // Bind checkboxes de área (passo 2)
-    if (passoActual === 2) {
+  function mpRenderPasso() {
+    mpAtualizarProgress();
+    const body = document.getElementById('mpBody');
+    body.innerHTML = '<div id="alertaMp" class="alerta-mp"></div>' + mpGetPassoHTML(mpPassoActual);
+    if (mpPassoActual === 2) {
       document.querySelectorAll('.area-cb').forEach(cb => {
         cb.addEventListener('change', () => {
           cb.closest('.area-check').classList.toggle('marcada', cb.checked);
-          dadosProposta.areas = [...document.querySelectorAll('.area-cb:checked')].map(c => c.value);
+          mpDados.areas = [...document.querySelectorAll('.area-cb:checked')].map(c => c.value);
         });
       });
     }
-
-    // Bind radios Plug-IN (passo 6)
-    if (passoActual === 6) {
+    if (mpPassoActual === 6) {
       document.querySelectorAll('input[name="plugin"]').forEach(r => {
         r.addEventListener('change', () => {
           document.querySelectorAll('.radio-item').forEach(el => el.classList.remove('marcada'));
           r.closest('.radio-item').classList.add('marcada');
-          dadosProposta.plugIN = r.value === 'true';
+          mpDados.plugIN = r.value === 'true';
         });
       });
     }
-
     body.scrollTop = 0;
   }
 
-  function guardarPasso() {
-    const g = (id) => document.getElementById(id)?.value.trim() || '';
-    switch(passoActual) {
-      case 0: dadosProposta.nomeEntidade=g('f0'); dadosProposta.emailContacto=g('f1'); dadosProposta.moradaEntidade=g('f2'); dadosProposta.moradaLocal=g('f3'); break;
-      case 1: dadosProposta.tutorNome=g('f0'); dadosProposta.tutorEmail=g('f1'); dadosProposta.tutorCargo=g('f2'); break;
-      case 2: dadosProposta.tipo=document.getElementById('f0')?.value||'estagio'; dadosProposta.titulo=g('f1'); dadosProposta.areas=[...document.querySelectorAll('.area-cb:checked')].map(c=>c.value); break;
-      case 3: dadosProposta.objetivos=g('f0'); break;
-      case 4: dadosProposta.resultados=g('f0'); break;
-      case 5: dadosProposta.plano=g('f0'); dadosProposta.perfilCand=g('f1'); break;
+  function mpGuardarPasso() {
+    const g = id => document.getElementById(id)?.value.trim() || '';
+    switch(mpPassoActual) {
+      case 0: mpDados.nomeEntidade=g('f0'); mpDados.emailContacto=g('f1'); mpDados.moradaEntidade=g('f2'); mpDados.moradaLocal=g('f3'); break;
+      case 1: mpDados.tutorNome=g('f0'); mpDados.tutorEmail=g('f1'); mpDados.tutorCargo=g('f2'); break;
+      case 2: mpDados.tipo=document.getElementById('f0')?.value||'estagio'; mpDados.titulo=g('f1'); mpDados.areas=[...document.querySelectorAll('.area-cb:checked')].map(c=>c.value); break;
+      case 3: mpDados.objetivos=g('f0'); break;
+      case 4: mpDados.resultados=g('f0'); break;
+      case 5: mpDados.plano=g('f0'); mpDados.perfilCand=g('f1'); break;
     }
   }
 
-  function validarPasso() {
-    const al = document.getElementById('alertaModal');
-    al.className = 'alerta-modal';
-    const err = (msg) => { al.textContent = msg; al.className = 'alerta-modal erro'; al.scrollIntoView({behavior:'smooth',block:'nearest'}); return false; };
-    switch(passoActual) {
-      case 0: if (!dadosProposta.nomeEntidade) return err('O nome da entidade é obrigatório.'); if (!dadosProposta.emailContacto) return err('O email de contacto é obrigatório.'); if (!dadosProposta.moradaEntidade) return err('A morada da entidade é obrigatória.'); break;
-      case 1: if (!dadosProposta.tutorNome) return err('O nome do tutor é obrigatório.'); if (!dadosProposta.tutorEmail) return err('O email do tutor é obrigatório.'); break;
-      case 2: if (!dadosProposta.areas.length) return err('Selecciona pelo menos uma área.'); if (!dadosProposta.titulo) return err('O título da proposta é obrigatório.'); break;
-      case 3: if (!dadosProposta.objetivos) return err('Os objectivos são obrigatórios.'); break;
-      case 4: if (!dadosProposta.resultados) return err('Os resultados esperados são obrigatórios.'); break;
+  function emailValido(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+  }
+
+  function mpValidarPasso() {
+    const al = document.getElementById('alertaMp');
+    al.className = 'alerta-mp';
+    const err = msg => { al.textContent = msg; al.className = 'alerta-mp erro'; al.scrollIntoView({behavior:'smooth',block:'nearest'}); return false; };
+    switch(mpPassoActual) {
+      case 0:
+        if (!mpDados.nomeEntidade)  return err('O nome da entidade é obrigatório.');
+        if (!mpDados.emailContacto) return err('O email de contacto é obrigatório.');
+        if (!emailValido(mpDados.emailContacto)) return err('Introduz um email de contacto válido (ex: info@empresa.pt).');
+        if (!mpDados.moradaEntidade) return err('A morada da entidade é obrigatória.');
+        break;
+      case 1:
+        if (!mpDados.tutorNome)  return err('O nome do tutor é obrigatório.');
+        if (!mpDados.tutorEmail) return err('O email do tutor é obrigatório.');
+        if (!emailValido(mpDados.tutorEmail)) return err('Introduz um email de tutor válido (ex: tutor@empresa.pt).');
+        break;
+      case 2: if (!mpDados.areas.length) return err('Seleciona pelo menos uma área.'); if (!mpDados.titulo) return err('O título da proposta é obrigatório.'); break;
+      case 3: if (!mpDados.objetivos) return err('Os objetivos são obrigatórios.'); break;
+      case 4: if (!mpDados.resultados) return err('Os resultados esperados são obrigatórios.'); break;
     }
     return true;
   }
 
-  async function passo(dir) {
-    guardarPasso();
-    if (dir === 1 && !validarPasso()) return;
-    if (dir === 1 && passoActual === PASSOS.length - 1) { await submeter(); return; }
-    passoActual = Math.max(0, Math.min(PASSOS.length-1, passoActual+dir));
-    renderPasso();
+  async function mpPasso(dir) {
+    mpGuardarPasso();
+    if (dir === 1 && !mpValidarPasso()) return;
+    if (dir === 1 && mpPassoActual === MP_PASSOS.length - 1) {
+      mpModoEdicao ? await mpSubmeterEdicao() : await mpSubmeterNova();
+      return;
+    }
+    mpPassoActual = Math.max(0, Math.min(MP_PASSOS.length-1, mpPassoActual+dir));
+    mpRenderPasso();
   }
 
-  async function submeter() {
-    const btn = document.getElementById('btnSeguinte');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spin"></span>A submeter…';
+  const mpPayload = () => ({
+    titulo: mpDados.titulo, tipo: mpDados.tipo, curso: mpDados.curso,
+    areas: mpDados.areas, plugIN: mpDados.plugIN,
+    descricao: mpDados.objetivos, objetivos: mpDados.objetivos,
+    resultadosEsperados: mpDados.resultados, planoTrabalho: mpDados.plano,
+    perfilCandidato: mpDados.perfilCand, nomeEntidade: mpDados.nomeEntidade,
+    emailContacto: mpDados.emailContacto, moradaEntidade: mpDados.moradaEntidade,
+    moradaLocalEstagio: mpDados.moradaLocal, tutorNome: mpDados.tutorNome,
+    tutorEmail: mpDados.tutorEmail, tutorCargo: mpDados.tutorCargo
+  });
+
+  async function mpSubmeterNova() {
+    const btn = document.getElementById('btnMpSeguinte');
+    btn.disabled = true; btn.innerHTML = '<span class="spin"></span>A submeter…';
     try {
-      const resp = await req('/propostas', { method:'POST', body: JSON.stringify({
-        titulo: dadosProposta.titulo, tipo: dadosProposta.tipo, curso: dadosProposta.curso,
-        areas: dadosProposta.areas, plugIN: dadosProposta.plugIN,
-        descricao: dadosProposta.objetivos, objetivos: dadosProposta.objetivos,
-        resultadosEsperados: dadosProposta.resultados, planoTrabalho: dadosProposta.plano,
-        perfilCandidato: dadosProposta.perfilCand, nomeEntidade: dadosProposta.nomeEntidade,
-        emailContacto: dadosProposta.emailContacto, moradaEntidade: dadosProposta.moradaEntidade,
-        moradaLocalEstagio: dadosProposta.moradaLocal, tutorNome: dadosProposta.tutorNome,
-        tutorEmail: dadosProposta.tutorEmail, tutorCargo: dadosProposta.tutorCargo
-      })});
+      const resp = await req('/propostas', { method:'POST', body: JSON.stringify(mpPayload()) });
       if (!resp.sucesso) throw new Error(resp.mensagem);
-      const al = document.getElementById('alertaModal');
-      al.textContent = '✔ Proposta submetida com sucesso! Aguarda aprovação da CCA.';
-      al.className = 'alerta-modal sucesso';
+      const al = document.getElementById('alertaMp');
+      al.textContent = '✔ Proposta submetida! Aguarda aprovação da CCA.';
+      al.className = 'alerta-mp sucesso';
       btn.innerHTML = '✔ Submetida';
-      setTimeout(() => { fecharModal(); carregarPropostas(); btn.disabled=false; btn.textContent='Submeter Proposta'; }, 1600);
+      setTimeout(() => { fecharModalProposta(); btn.disabled=false; btn.textContent='Submeter Proposta'; mudarTab('minhas'); }, 1600);
     } catch(err) {
-      const al = document.getElementById('alertaModal');
-      al.textContent = err.message;
-      al.className = 'alerta-modal erro';
-      btn.disabled = false;
-      btn.textContent = 'Submeter Proposta';
+      document.getElementById('alertaMp').textContent = err.message;
+      document.getElementById('alertaMp').className = 'alerta-mp erro';
+      btn.disabled=false; btn.textContent='Submeter Proposta';
     }
   }
 
-  carregarPropostas();
+  async function mpSubmeterEdicao() {
+    const btn = document.getElementById('btnMpSeguinte');
+    btn.disabled = true; btn.innerHTML = '<span class="spin"></span>A resubmeter…';
+    try {
+      const resp = await req('/propostas/' + mpPropostaId, { method:'PUT', body: JSON.stringify(mpPayload()) });
+      if (!resp.sucesso) throw new Error(resp.mensagem);
+      const al = document.getElementById('alertaMp');
+      al.textContent = '✔ Proposta atualizada e resubmetida para aprovação!';
+      al.className = 'alerta-mp sucesso';
+      btn.innerHTML = '✔ Resubmetida';
+      setTimeout(() => { fecharModalProposta(); btn.disabled=false; btn.textContent='Guardar e Resubmeter'; mudarTab('minhas'); }, 1600);
+    } catch(err) {
+      document.getElementById('alertaMp').textContent = err.message;
+      document.getElementById('alertaMp').className = 'alerta-mp erro';
+      btn.disabled=false; btn.textContent='Guardar e Resubmeter';
+    }
+  }
+
+  // ── Iniciar ──
+  mudarTab('disponiveis');
 </script>
 </body>
 </html>
