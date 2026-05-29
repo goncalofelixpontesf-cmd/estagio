@@ -136,3 +136,61 @@ exports.manifestarInteresse = async (req, res) => {
     res.status(500).json({ sucesso: false, mensagem: err.message });
   }
 };
+
+// PUT /api/propostas/:id — entidade edita proposta rejeitada
+exports.editarProposta = async (req, res) => {
+  try {
+    const proposta = await Proposta.findById(req.params.id);
+    if (!proposta) return res.status(404).json({ sucesso: false, mensagem: 'Proposta não encontrada.' });
+
+    // Apenas o proponente pode editar
+    if (proposta.proponenteId.toString() !== req.utilizador._id.toString()) {
+      return res.status(403).json({ sucesso: false, mensagem: 'Sem permissão para editar esta proposta.' });
+    }
+
+    // Só pode editar se estiver rejeitada
+    if (proposta.estado !== 'rejeitada') {
+      return res.status(400).json({ sucesso: false, mensagem: 'Só é possível editar propostas rejeitadas.' });
+    }
+
+    const campos = ['titulo','tipo','areas','descricao','objetivos','resultadosEsperados',
+      'planoTrabalho','perfilCandidato','plugIN','nomeEntidade','emailContacto',
+      'moradaEntidade','moradaLocalEstagio','tutorNome','tutorEmail','tutorCargo'];
+
+    campos.forEach(c => { if (req.body[c] !== undefined) proposta[c] = req.body[c]; });
+
+    // Repõe a proposta como pendente para nova votação
+    proposta.estado      = 'pendente';
+    proposta.feedbackCCA = null;
+    await proposta.save();
+
+    // Notificar CCA
+    const Utilizador  = require('../models/Utilizador');
+    const Notificacao = require('../models/Notificacao');
+    const membros = await Utilizador.find({ perfil: 'comissao', ativo: true });
+    if (membros.length) {
+      await Notificacao.insertMany(membros.map(m => ({
+        destinatarioId: m._id,
+        tipo: 'proposta_editada',
+        mensagem: `A proposta "${proposta.titulo}" foi editada e resubmetida para aprovação.`,
+        referenciaId: proposta._id
+      })));
+    }
+
+    res.json({ sucesso: true, proposta });
+  } catch (err) {
+    res.status(500).json({ sucesso: false, mensagem: err.message });
+  }
+};
+
+// GET /api/propostas/:id — obter proposta individual
+exports.obterProposta = async (req, res) => {
+  try {
+    const proposta = await Proposta.findById(req.params.id)
+      .populate('proponenteId', 'nome email');
+    if (!proposta) return res.status(404).json({ sucesso: false, mensagem: 'Proposta não encontrada.' });
+    res.json({ sucesso: true, proposta });
+  } catch (err) {
+    res.status(500).json({ sucesso: false, mensagem: err.message });
+  }
+};

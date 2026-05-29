@@ -193,6 +193,7 @@
   <div class="sidebar-logo"><span>ESMAD</span></div>
   <nav class="sidebar-nav">
     <a class="nav-item activo">Propostas</a>
+    <a class="nav-item" href="entrevistas.html">As Minhas Candidaturas</a>
     <a class="nav-item" href="perfil-estudante.html">O Meu Perfil</a>
   </nav>
   <div class="sidebar-footer">
@@ -357,7 +358,7 @@
     'Sobre a Entidade',
     'Tutor na Entidade',
     'Dados da Proposta',
-    'Objectivos',
+    'Objetivos',
     'Resultados Esperados',
     'Plano e Perfil',
     'Plug-IN e Resumo'
@@ -424,7 +425,7 @@
         '<div class="form-campo"><label>Tipo de proposta <span class="obg">*</span></label>' +
         '<select class="campo-select" id="f0"><option value="estagio"' + (dadosProposta.tipo==='estagio'?' selected':'') + '>Estágio</option><option value="projecto"' + (dadosProposta.tipo==='projecto'?' selected':'') + '>Projecto</option></select></div>' +
         '</div>' +
-        '<div class="form-campo" style="margin-bottom:16px"><label>Área(s) de actuação <span class="obg">*</span></label>' +
+        '<div class="form-campo" style="margin-bottom:16px"><label>Área(s) de atuação <span class="obg">*</span></label>' +
         '<div class="areas-grid">' + areas.map(a => '<label class="area-check' + (dadosProposta.areas.includes(a)?' marcada':'') + '"><input type="checkbox" value="' + a + '" class="area-cb"' + (dadosProposta.areas.includes(a)?' checked':'') + '> ' + a + '</label>').join('') + '</div></div>' +
         '<div class="form-campo"><label>Título da proposta <span class="obg">*</span> <span style="font-size:0.7rem;color:var(--cinza-texto);text-transform:none;font-weight:400">(máx. 50 car.)</span></label>' +
         '<input class="campo-input" type="text" id="f1" value="' + esc(dadosProposta.titulo) + '" placeholder="Ex: Sistema de Gestão de Encomendas" maxlength="50"></div>';

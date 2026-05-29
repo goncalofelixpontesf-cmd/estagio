@@ -16,13 +16,19 @@ const candidaturaSchema = new mongoose.Schema({
     enum: ['pendente', 'entrevista_agendada', 'aceite', 'rejeitada'],
     default: 'pendente'
   },
-  dataEntrevista:    { type: Date },
-  localEntrevista:   { type: String },
-  notaEntidade:      { type: String }
+
+  // Entrevista
+  dataEntrevista:  { type: Date,   default: null },
+  localEntrevista: { type: String, default: null },
+
+  // O estudante confirmou que tomou conhecimento da entrevista
+  conhecimentoEntrevista: { type: Boolean, default: false },
+  conhecimentoEm:         { type: Date,    default: null },
+
+  // Feedback quando rejeitado
+  feedback: { type: String, default: null }
 }, {
   timestamps: { createdAt: 'criadaEm', updatedAt: 'atualizadaEm' }
 });
-
-candidaturaSchema.index({ propostaId: 1, estudanteId: 1 }, { unique: true });
 
 module.exports = mongoose.model('Candidatura', candidaturaSchema);
