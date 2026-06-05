@@ -353,10 +353,16 @@
 
   async function carregar() {
     try {
-      const dados = await req('/propostas/stats/estudante');
+      const dados = await req('/candidaturas/minhas');
       if (!dados.sucesso) throw new Error(dados.mensagem);
 
-      const { stats, candidaturas } = dados;
+      const candidaturas = dados.candidaturas || [];
+
+      const stats = dados.stats || {
+      totalCandidaturas: candidaturas.length,
+      entrevistasAgendadas: candidaturas.filter(c => c.estado === 'entrevista_agendada').length,
+      aceite: candidaturas.filter(c => c.estado === 'aceite').length
+      };
       todasCandidaturas = candidaturas;
 
       // Stats

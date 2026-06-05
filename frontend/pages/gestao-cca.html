@@ -360,7 +360,7 @@
     <div class="modal-body">
       <div id="alertaAtribuir" class="alerta-modal"></div>
       <div class="linha-modal"></div>
-      <label class="campo-label">Seleccionar docente</label>
+      <label class="campo-label">Selecionar docente</label>
       <select class="campo-select" id="selectOrientador"><option value="">Selecionar…</option></select>
     </div>
     <div class="modal-footer">
@@ -691,7 +691,7 @@
 
         ${jaVotou ? `
         <div style="background:var(--verde-light);border-radius:8px;padding:12px 16px;margin-top:8px;font-size:0.84rem;color:var(--verde);font-weight:600">
-          ✔ Já votaste nesta proposta — ${meuVoto === 'aprovado' ? 'Aprovaste' : 'Rejeitaste'}
+          ✔ Já votou nesta proposta — ${meuVoto === 'aprovado' ? 'Aprovou' : 'Rejeitou'}
         </div>` : ''}
       `;
 
@@ -762,7 +762,7 @@
         const meuVoto = votosMap[p._id];
 
         const botoesAcao = jaVotou
-          ? `<span class="badge-votado">✔ ${meuVoto === 'aprovado' ? 'Aprovaste' : 'Rejeitaste'}</span>`
+          ? `<span class="badge-votado">✔ ${meuVoto === 'aprovado' ? 'Aprovou' : 'Rejeitou'}</span>`
           : `<button class="btn-aprovar"  onclick="aprovar('${p._id}','${p.titulo.replace(/'/g,"\\'")}','${(p.nomeEntidade||p.proponenteId?.nome||'').replace(/'/g,"\\'")}')">Aprovar</button>
              <button class="btn-rejeitar" onclick="abrirRejeitar('${p._id}','${p.titulo.replace(/'/g,"\\'")}','${(p.nomeEntidade||p.proponenteId?.nome||'').replace(/'/g,"\\'")}')">Rejeitar</button>`;
 
@@ -837,7 +837,7 @@
         let botoesAcao = '';
         if (p.estado === 'pendente') {
           botoesAcao = jaVotou
-            ? `<span class="badge-votado">✔ ${meuVoto === 'aprovado' ? 'Aprovaste' : 'Rejeitaste'}</span>`
+            ? `<span class="badge-votado">✔ ${meuVoto === 'aprovado' ? 'Aprovou' : 'Rejeitou'}</span>`
             : `<button class="btn-aprovar" onclick="aprovar('${p._id}','${p.titulo.replace(/'/g,"\\'")}','')">Aprovar</button><button class="btn-rejeitar" onclick="abrirRejeitar('${p._id}','${p.titulo.replace(/'/g,"\\'")}','')">Rejeitar</button>`;
         }
 
@@ -969,7 +969,7 @@
   async function confirmarAtribuir() {
     const orientadorId = document.getElementById('selectOrientador').value;
     const al = document.getElementById('alertaAtribuir');
-    if (!orientadorId) { al.textContent = 'Selecciona um docente.'; al.className = 'alerta-modal erro'; return; }
+    if (!orientadorId) { al.textContent = 'Seleciona um docente.'; al.className = 'alerta-modal erro'; return; }
     const btn = document.getElementById('btnConfirmarAtribuir');
     btn.disabled = true; btn.innerHTML = '<span class="spin"></span>A atribuir…';
     try {
@@ -1046,10 +1046,10 @@
     const btn = document.getElementById('btnAdicionarDocente');
     al.className = 'alerta-modal';
     const cursosCCA = getCursosSeleccionados('.curso-cb');
-    if (!cursosCCA.length) { al.textContent = 'Seleciona pelo menos um curso.'; al.className = 'alerta-modal erro'; return; }
+    if (!cursosCCA.length) { al.textContent = 'Selecione pelo menos um curso.'; al.className = 'alerta-modal erro'; return; }
     if (tabDocenteActiva === 'existente') {
       const docenteId = document.getElementById('selectDocente').value;
-      if (!docenteId) { al.textContent = 'Seleciona um docente.'; al.className = 'alerta-modal erro'; return; }
+      if (!docenteId) { al.textContent = 'Selecione um docente.'; al.className = 'alerta-modal erro'; return; }
       btn.disabled = true; btn.innerHTML = '<span class="spin"></span>A adicionar…';
       try {
         const dados = await req('/cca/membros/adicionar', { method: 'POST', body: JSON.stringify({ docenteId, cursosCCA }) });
@@ -1060,7 +1060,7 @@
       } catch (err) { al.textContent = err.message; al.className = 'alerta-modal erro'; btn.disabled = false; btn.textContent = 'Adicionar à CCA'; }
     } else {
       const email = document.getElementById('emailConvite').value.trim();
-      if (!email || !email.includes('@')) { al.textContent = 'Introduz um email válido.'; al.className = 'alerta-modal erro'; return; }
+      if (!email || !email.includes('@')) { al.textContent = 'Introduza um email válido.'; al.className = 'alerta-modal erro'; return; }
       btn.disabled = true; btn.innerHTML = '<span class="spin"></span>A enviar convite…';
       try {
         const dados = await req('/cca/convite', { method: 'POST', body: JSON.stringify({ email, cursosCCA }) });
@@ -1087,7 +1087,7 @@
     const cursosCCA = getCursosSeleccionados('.edit-curso-cb');
     const al  = document.getElementById('alertaEditarCursos');
     const btn = document.getElementById('btnGuardarCursos');
-    if (!cursosCCA.length) { al.textContent = 'Seleciona pelo menos um curso.'; al.className = 'alerta-modal erro'; return; }
+    if (!cursosCCA.length) { al.textContent = 'Selecione pelo menos um curso.'; al.className = 'alerta-modal erro'; return; }
     btn.disabled = true; btn.innerHTML = '<span class="spin"></span>A guardar…';
     try {
       const dados = await req('/cca/membros/' + membroEditarId + '/cursos', { method: 'PUT', body: JSON.stringify({ cursosCCA }) });
@@ -1117,7 +1117,7 @@
   }
   function confirmarAdicionarCurso() {
     const nome=document.getElementById('nomeCurso').value.trim(),sigla=document.getElementById('siglaCurso').value.trim(),al=document.getElementById('alertaCurso');
-    if(!nome||!sigla){al.textContent='Preenche o nome e a sigla.';al.className='alerta-modal erro';return;}
+    if(!nome||!sigla){al.textContent='Preencha o nome e a sigla.';al.className='alerta-modal erro';return;}
     const cursos=getCursos();cursos.push({id:'c'+Date.now(),nome,sigla});saveCursos(cursos);
     al.textContent='Curso adicionado.';al.className='alerta-modal sucesso';
     setTimeout(()=>{fecharModal('modalCurso');renderCursos();},900);
@@ -1134,7 +1134,7 @@
   }
   function confirmarAdicionarArea(){
     const nome=document.getElementById('nomeArea').value.trim(),al=document.getElementById('alertaArea');
-    if(!nome){al.textContent='Introduz o nome.';al.className='alerta-modal erro';return;}
+    if(!nome){al.textContent='Introduza o nome.';al.className='alerta-modal erro';return;}
     const areas=getAreas();if(areas.includes(nome)){al.textContent='Área já existe.';al.className='alerta-modal erro';return;}
     areas.push(nome);saveAreas(areas);al.textContent='Área adicionada.';al.className='alerta-modal sucesso';
     setTimeout(()=>{fecharModal('modalArea');renderAreas();},900);
