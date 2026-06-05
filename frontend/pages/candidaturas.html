@@ -216,7 +216,6 @@
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo"><span>ESMAD</span></div>
   <nav class="sidebar-nav">
-    <a class="nav-item" href="dashboard-estudante.html">Início</a>
     <a class="nav-item" href="lista-propostas.html">Propostas</a>
     <a class="nav-item activo">As Minhas Candidaturas</a>
     <a class="nav-item" href="perfil-estudante.html">O Meu Perfil</a>
@@ -354,10 +353,16 @@
 
   async function carregar() {
     try {
-      const dados = await req('/propostas/stats/estudante');
+      const dados = await req('/candidaturas/minhas');
       if (!dados.sucesso) throw new Error(dados.mensagem);
 
-      const { stats, candidaturas } = dados;
+      const candidaturas = dados.candidaturas || [];
+
+      const stats = dados.stats || {
+      totalCandidaturas: candidaturas.length,
+      entrevistasAgendadas: candidaturas.filter(c => c.estado === 'entrevista_agendada').length,
+      aceite: candidaturas.filter(c => c.estado === 'aceite').length
+      };
       todasCandidaturas = candidaturas;
 
       // Stats

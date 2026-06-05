@@ -237,7 +237,11 @@
       font-size: 0.72rem; font-weight: 600;
     }
     .badge::before {
-      content: ''; width: 6px; height: 6px; border-radius: 50; flex-shrink: 0;
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
     }
     .badge.concluida { background: var(--verde-light); color: var(--verde); }
     .badge.concluida::before { background: var(--verde); border-radius: 50%; }
@@ -412,8 +416,14 @@
   const user  = localStorage.getItem('esmad_user');
   if (!token || !user) { window.location.href = 'login.html'; }
 
-  const utilizador = JSON.parse(user);
-  if (utilizador.perfil !== 'estudante') { window.location.href = 'login.html'; }
+  let utilizador;
+
+try {
+  utilizador = JSON.parse(user);
+} catch {
+  localStorage.clear();
+  window.location.href = 'login.html';
+}
 
   document.getElementById('sidebarNome').textContent = utilizador.nome;
   document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
@@ -446,13 +456,34 @@
     setTimeout(() => { t.className = `toast ${tipo}`; }, 3000);
   }
 
-  // Helpers
-  function req(endpoint, opts = {}) {
-    return fetch(`${API}${endpoint}`, {
-      ...opts,
-      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...(opts.headers || {}) }
-    }).then(r => r.json());
+async function req(endpoint, opts = {}) {
+  console.log('Endpoint chamado:', endpoint);
+
+  const response = await fetch(`${API}${endpoint}`, {
+    ...opts,
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      ...(opts.headers || {})
+    }
+  });
+
+  let data = null;
+
+  try {
+    data = await response.json();
+  } catch {}
+
+  if (!response.ok) {
+    throw new Error(
+      data?.mensagem ||
+      data?.message ||
+      `HTTP ${response.status}`
+    );
   }
+
+  return data;
+}
 
   function formatarData(str) {
     return new Date(str).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: '2-digit' });
@@ -503,8 +534,8 @@
       }
 
       // Candidaturas
-      const dados2 = await req('/propostas/stats/estudante');
-      const cands = dados2.candidaturas || [];
+      const dados2 = await req('/candidaturas/minhas');
+      const cands = dados2.candidaturas || dados2 || [];
       const tbCand = document.getElementById('tabelaCandidaturas');
       if (!cands.length) {
         tbCand.innerHTML = `<tr><td colspan="3"><div class="vazio"><div class="emoji">📭</div>Ainda não te candidataste a nenhuma proposta.<br><a href="lista-propostas.html">Ver propostas →</a></div></td></tr>`;
@@ -526,9 +557,13 @@
       }
 
     } catch (err) {
-      console.error(err);
-      mostrarToast('Erro ao carregar perfil. O servidor está ligado?', 'erro');
-    }
+    console.error('Erro ao carregar perfil:', err);
+
+    mostrarToast(
+    `Erro ao carregar perfil: ${err.message}`,
+    'erro'
+  );
+}
   }
 
   function renderCardPerfil(u, est) {
@@ -537,18 +572,6 @@
     const ano     = est?.ano ? `${est.ano}.º Ano` : '';
     const propostaEscolhida = est?.propostaEscolhidaId;
 
-    // Card escolha de proposta
-    const cardEscolha = propostaEscolhida
-      ? `<div class="card-escolha">
-          <div class="escolha-titulo">✔ Proposta Escolhida</div>
-          <div class="escolha-proposta">${propostaEscolhida?.titulo || 'Proposta selecionada'}</div>
-          <a href="lista-propostas.html" class="btn-escolha">Ver Propostas</a>
-        </div>`
-      : `<div class="card-escolha">
-          <div class="escolha-titulo">Escolher Proposta</div>
-          <div class="escolha-texto">Ainda não escolheste nenhuma proposta.</div>
-          <a href="lista-propostas.html" class="btn-escolha">Ir para as Propostas</a>
-        </div>`;
 
     document.getElementById('cardPerfil').innerHTML = `
       <div class="avatar-grande">${inicial}</div>
@@ -569,12 +592,12 @@
         ${est?.portfolio ? `
         <div class="contacto-linha">
           <span class="label">Portfólio:</span>
-          <span class="valor"><a href="${est.portfolio.startsWith('http') ? est.portfolio : 'https://'+est.portfolio}" target="_blank">${est.portfolio}</a></span>
+          <span class="valor"><a href="${est.portfolio.startsWith('http') ? est.portfolio : 'https://'+est.portfolio}" target="_blank" rel="noopener noreferrer">${est.portfolio}</a></span>
         </div>` : ''}
         ${est?.linkedin ? `
         <div class="contacto-linha">
           <span class="label">LinkedIn:</span>
-          <span class="valor"><a href="${est.linkedin.startsWith('http') ? est.linkedin : 'https://'+est.linkedin}" target="_blank">${est.linkedin}</a></span>
+          <span class="valor"><a href="${est.linkedin.startsWith('http') ? est.linkedin : 'https://'+est.linkedin}" target="_blank" rel="noopener noreferrer">${est.linkedin}</a></span>
         </div>` : ''}
       </div>
 
@@ -595,12 +618,11 @@
             : `<strong>Clica para fazer upload</strong>PDF exportado do DOMUS (máx. 5MB)`}
         </div>
       </div>
-
-      ${cardEscolha}
     `;
 
     // Re-bind input domus
-    document.getElementById('inputDomus').addEventListener('change', handleDomus);
+    const inputDomus = document.getElementById('inputDomus');
+    inputDomus.onchange = handleDomus;
   }
 
   // ── Upload DOMUS (armazenamento local por agora) ──
