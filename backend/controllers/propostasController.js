@@ -1,8 +1,9 @@
-const Proposta    = require('../models/Proposta');
-const Candidatura = require('../models/Candidatura');
-const Estudante   = require('../models/Estudante');
-const Notificacao = require('../models/Notificacao');
-const Utilizador  = require('../models/Utilizador');
+const Proposta      = require('../models/Proposta');
+const Candidatura   = require('../models/Candidatura');
+const Estudante     = require('../models/Estudante');
+const Notificacao   = require('../models/Notificacao');
+const Utilizador    = require('../models/Utilizador');
+const AprovacaoCCA  = require('../models/AprovacaoCCA');
 
 // GET /api/propostas
 exports.listar = async (req, res) => {
@@ -153,29 +154,34 @@ exports.editarProposta = async (req, res) => {
       return res.status(400).json({ sucesso: false, mensagem: 'Só é possível editar propostas rejeitadas.' });
     }
 
+    // Atualizar todos os campos enviados
     const campos = ['titulo','tipo','areas','descricao','objetivos','resultadosEsperados',
       'planoTrabalho','perfilCandidato','plugIN','nomeEntidade','emailContacto',
       'moradaEntidade','moradaLocalEstagio','tutorNome','tutorEmail','tutorCargo'];
 
     campos.forEach(c => { if (req.body[c] !== undefined) proposta[c] = req.body[c]; });
 
-    // Repõe a proposta como pendente para nova votação
+    // Repõe como pendente e limpa feedback anterior
     proposta.estado      = 'pendente';
     proposta.feedbackCCA = null;
+    proposta.sugestaoCCA = null;
     await proposta.save();
 
-    // Notificar CCA
-    const Utilizador  = require('../models/Utilizador');
-    const Notificacao = require('../models/Notificacao');
-    const membros = await Utilizador.find({ perfil: 'comissao', ativo: true });
-    if (membros.length) {
-      await Notificacao.insertMany(membros.map(m => ({
-        destinatarioId: m._id,
-        tipo: 'proposta_editada',
-        mensagem: `A proposta "${proposta.titulo}" foi editada e resubmetida para aprovação.`,
-        referenciaId: proposta._id
-      })));
-    }
+    // Limpar votos antigos para que a CCA possa votar de novo
+    await AprovacaoCCA.deleteMany({ propostaId: proposta._id });
+
+    // Notificar membros da CCA (isolado para não afetar a resposta)
+    try {
+      const membros = await Utilizador.find({ perfil: { $in: ['comissao','admin'] } });
+      if (membros.length) {
+        await Notificacao.insertMany(membros.map(m => ({
+          destinatarioId: m._id,
+          tipo: 'proposta_editada',
+          mensagem: `A proposta "${proposta.titulo}" foi editada e resubmetida para aprovação.`,
+          referenciaId: proposta._id
+        })));
+      }
+    } catch { /* notificação opcional — não bloqueia */ }
 
     res.json({ sucesso: true, proposta });
   } catch (err) {

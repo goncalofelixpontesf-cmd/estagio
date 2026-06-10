@@ -3,62 +3,69 @@ const mongoose = require('mongoose');
 const propostaSchema = new mongoose.Schema({
   titulo: {
     type: String,
-    required: [true, 'O titulo e obrigatorio'],
-    maxlength: [50, 'Max. 50 caracteres'],
+    required: true,
+    maxlength: 50,
     trim: true
   },
   tipo: {
     type: String,
     enum: ['estagio', 'projecto'],
-    required: true
+    default: 'estagio'
   },
-  descricao:           { type: String, required: true },
-  objetivos:           { type: String, required: true },
-  resultadosEsperados: { type: String, required: true },
-  perfilCandidato:     { type: String },
-  planoTrabalho:       { type: String },
-  areas: [{
+  curso: {
     type: String,
-    enum: ['UI/UX','Front-end','Back-end','Full-stack','Mobile','Games/Graphics','Marketing Digital','Outro']
-  }],
-  plugIN: { type: Boolean, default: false },
+    enum: ['TeSP DTAM', 'Lic. TSI Web'],
+    default: 'TeSP DTAM'
+  },
+  areas:    { type: [String], default: [] },
+  plugIN:   { type: Boolean, default: false },
 
-  // Dados da entidade (quando submetido por entidade externa)
-  nomeEntidade:      { type: String },
-  moradaEntidade:    { type: String },
-  emailContacto:     { type: String },
-  moradaLocalEstagio:{ type: String },
-  tutorNome:         { type: String },
-  tutorCargo:        { type: String },
-  tutorEmail:        { type: String },
+  // Conteúdo
+  descricao:            { type: String, default: '' },
+  objetivos:            { type: String, default: '' },
+  resultadosEsperados:  { type: String, default: '' },
+  planoTrabalho:        { type: String, default: '' },
+  perfilCandidato:      { type: String, default: '' },
 
+  // Entidade
+  nomeEntidade:        { type: String, default: '' },
+  emailContacto:       { type: String, default: '' },
+  moradaEntidade:      { type: String, default: '' },
+  moradaLocalEstagio:  { type: String, default: '' },
+
+  // Tutor
+  tutorNome:  { type: String, default: '' },
+  tutorEmail: { type: String, default: '' },
+  tutorCargo: { type: String, default: '' },
+
+  // Estado e fluxo
   estado: {
     type: String,
     enum: ['pendente', 'aprovada', 'rejeitada', 'atribuida'],
     default: 'pendente'
   },
+
+  // Feedback da CCA quando rejeitada
+  feedbackCCA: { type: String, default: null },
+
+  // Sugestão de melhoria da CCA quando aprovada
+  sugestaoCCA: { type: String, default: null },
+
+  // Quem submeteu a proposta
   proponenteId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Utilizador',
     required: true
   },
-  tipoProponente: {
-    type: String,
-    enum: ['entidade', 'docente', 'estudante'],
-    required: true
-  },
-  curso: {
-    type: String,
-    required: true,
-    default: 'TeSP DTAM'
-  },
-  feedbackCCA:  { type: String },
-  orientadorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Utilizador', default: null },
-  estudanteId:  { type: mongoose.Schema.Types.ObjectId, ref: 'Estudante',  default: null }
+
+  // Orientador atribuído pela CCA
+  orientadorId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Utilizador',
+    default: null
+  }
 }, {
   timestamps: { createdAt: 'criadaEm', updatedAt: 'atualizadaEm' }
 });
-
-propostaSchema.index({ titulo: 'text', descricao: 'text' });
 
 module.exports = mongoose.model('Proposta', propostaSchema);
