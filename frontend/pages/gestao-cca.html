@@ -94,7 +94,6 @@
     .btn-ver-votos  { background: var(--amarelo-light);  color: var(--amarelo); }
     .btn-aprovar:hover, .btn-rejeitar:hover, .btn-atribuir:hover, .btn-ver-votos:hover { opacity: 0.8; }
 
-    /* Badge "Já votaste" */
     .badge-votado { display: inline-flex; align-items: center; gap: 5px; background: var(--verde-light); color: var(--verde); border-radius: 6px; padding: 5px 12px; font-size: 0.76rem; font-weight: 700; }
 
     .titulo-link { font-weight: 600; cursor: pointer; color: var(--laranja); transition: color 0.15s; text-decoration: underline; }
@@ -112,6 +111,9 @@
     .voto-badge.aprovado  { background: var(--verde-light);    color: var(--verde); }
     .voto-badge.rejeitado { background: var(--vermelho-light); color: var(--vermelho); }
     .voto-badge.pendente  { background: var(--amarelo-light);  color: var(--amarelo); }
+
+    /* Badge de voto desactualizado (proposta resubmetida) */
+    .badge-resubmetido { display: inline-flex; align-items: center; gap: 5px; background: var(--amarelo-light); color: var(--amarelo); border-radius: 6px; padding: 5px 10px; font-size: 0.74rem; font-weight: 700; }
 
     .datas-form { padding: 22px 24px; }
     .datas-grupo { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--cinza-linha); }
@@ -132,7 +134,6 @@
     .vazio { padding: 36px 18px; text-align: center; color: var(--cinza-texto); font-size: 0.86rem; }
     .vazio .emoji { font-size: 1.8rem; margin-bottom: 8px; }
 
-    /* MODAIS */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.42); z-index: 400; align-items: center; justify-content: center; padding: 16px; }
     .modal-overlay.aberto { display: flex; }
     .modal { background: var(--branco); border-radius: 14px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.18); }
@@ -187,7 +188,6 @@
     .btn-m-azul:disabled { opacity: 0.65; cursor: not-allowed; }
     .btn-m-verde { background: var(--verde); color: var(--branco); border: none; border-radius: 8px; padding: 10px 22px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; }
 
-    /* Detalhe proposta */
     .detalhe-secao { margin-bottom: 20px; }
     .detalhe-secao h3 { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--preto); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--cinza-linha); }
     .detalhe-secao p { font-size: 0.87rem; color: #444; line-height: 1.7; }
@@ -584,33 +584,60 @@
     if (tab === 'datas')     renderDatas();
   }
 
+  // ══════════════════════════════════════════════════════════════
+  // FUNÇÃO CENTRAL: verificar se o membro JÁ VOTOU nesta versão
+  // da proposta (i.e., após a última resubmissão).
+  //
+  // A lógica: o voto só conta se a sua data (decididoEm) for
+  // POSTERIOR à data de última actualização da proposta (updatedAt
+  // ou resubmetidaEm). Se o voto é anterior à resubmissão, a
+  // proposta mudou entretanto e o membro tem de votar de novo.
+  // ══════════════════════════════════════════════════════════════
+  function verificarVotoValido(membro, dataResubmissao) {
+    if (!membro || membro.decisao === 'pendente') return false;
+    if (!membro.decididoEm) return false;
+    // Se não há data de resubmissão conhecida, aceita qualquer voto
+    if (!dataResubmissao) return true;
+    return new Date(membro.decididoEm) >= new Date(dataResubmissao);
+  }
+
+  // Obtém os dados de aprovação E a data de resubmissão da proposta
+  async function obterDadosVotacao(propostaId) {
+    const [dadosAprov, dadosProp] = await Promise.all([
+      req(`/cca/propostas/${propostaId}/aprovacoes`),
+      req(`/propostas/${propostaId}`)
+    ]);
+    const dataResubmissao = dadosProp.sucesso
+      ? (dadosProp.proposta.resubmetidaEm || dadosProp.proposta.updatedAt || null)
+      : null;
+    return { dadosAprov, dataResubmissao };
+  }
+
   // ══ DETALHE DA PROPOSTA ══
   async function abrirDetalhe(id, titulo, entidade) {
     document.getElementById('detalheTitulo').textContent = titulo;
     document.getElementById('detalheSub').textContent    = entidade || '—';
     document.getElementById('detalheBody').innerHTML     = '<div class="vazio"><div class="emoji">⏳</div>A carregar…</div>';
-
-    // Footer com botões de acção (depende se já votou)
-    document.getElementById('detalheFooter').innerHTML = '<button class="btn-m-cancelar" onclick="fecharModal(\'modalDetalhe\')">Fechar</button>';
-
+    document.getElementById('detalheFooter').innerHTML   = '<button class="btn-m-cancelar" onclick="fecharModal(\'modalDetalhe\')">Fechar</button>';
     abrirModal('modalDetalhe');
 
     try {
-      const [dadosProp, dadosAprov] = await Promise.all([
+      const [dadosProp, dadosVotacao] = await Promise.all([
         req(`/propostas/${id}`),
-        req(`/cca/propostas/${id}/aprovacoes`)
+        obterDadosVotacao(id)
       ]);
 
       if (!dadosProp.sucesso) throw new Error(dadosProp.mensagem);
       const p = dadosProp.proposta;
+      const { dadosAprov, dataResubmissao } = dadosVotacao;
 
-      // Verificar se o utilizador já votou
-      let jaVotou = false;
+      // Verificar se o utilizador já votou NESTA versão da proposta
+      let jaVotouNestaVersao = false;
       let meuVoto = null;
       if (dadosAprov.sucesso) {
         const meuRegisto = dadosAprov.membros.find(m => m.membroId?.toString() === utilizador.id?.toString());
-        if (meuRegisto && meuRegisto.decisao !== 'pendente') {
-          jaVotou = true;
+        if (meuRegisto) {
+          jaVotouNestaVersao = verificarVotoValido(meuRegisto, dataResubmissao);
           meuVoto = meuRegisto.decisao;
         }
       }
@@ -619,7 +646,6 @@
 
       document.getElementById('detalheBody').innerHTML = `
         <div class="linha-modal"></div>
-
         <div class="detalhe-meta">
           <div class="detalhe-meta-item">
             <div class="dm-label">Entidade</div>
@@ -652,52 +678,44 @@
             <div class="dm-valor">${p.moradaEntidade}</div>
           </div>` : ''}
         </div>
-
         ${p.areas?.length ? `
         <div class="detalhe-secao">
           <h3>Áreas de Atuação</h3>
-          <div>${p.areas.map(a => `<span class="area-tag-d">${a}</span>`).join('')}</div>
+          <div>${p.areas.map(a => '<span class="area-tag-d">' + a + '</span>').join('')}</div>
         </div>` : ''}
-
         ${p.descricao || p.objetivos ? `
         <div class="detalhe-secao">
           <h3>Objetivos</h3>
           <p>${(p.objetivos || p.descricao || '').replace(/\n/g, '<br>')}</p>
         </div>` : ''}
-
         ${p.resultadosEsperados ? `
         <div class="detalhe-secao">
           <h3>Resultados Esperados</h3>
           <p>${p.resultadosEsperados.replace(/\n/g, '<br>')}</p>
         </div>` : ''}
-
         ${p.planoTrabalho ? `
         <div class="detalhe-secao">
           <h3>Plano Provisório de Trabalho</h3>
           <p>${p.planoTrabalho.replace(/\n/g, '<br>')}</p>
         </div>` : ''}
-
         ${p.perfilCandidato ? `
         <div class="detalhe-secao">
           <h3>Perfil do Candidato</h3>
           <p>${p.perfilCandidato.replace(/\n/g, '<br>')}</p>
         </div>` : ''}
-
         ${p.feedbackCCA ? `
         <div class="detalhe-secao">
           <h3>Feedback da CCA</h3>
           <p style="color:var(--vermelho)">${p.feedbackCCA}</p>
         </div>` : ''}
-
-        ${jaVotou ? `
+        ${jaVotouNestaVersao ? `
         <div style="background:var(--verde-light);border-radius:8px;padding:12px 16px;margin-top:8px;font-size:0.84rem;color:var(--verde);font-weight:600">
-          ✔ Já votou nesta proposta — ${meuVoto === 'aprovado' ? 'Aprovou' : 'Rejeitou'}
+          ✔ Já votou nesta versão da proposta — ${meuVoto === 'aprovado' ? 'Aprovou' : 'Rejeitou'}
         </div>` : ''}
       `;
 
-      // Footer com acções conforme estado e voto
       const footer = document.getElementById('detalheFooter');
-      if (p.estado === 'pendente' && !jaVotou) {
+      if (p.estado === 'pendente' && !jaVotouNestaVersao) {
         footer.innerHTML = `
           <button class="btn-m-cancelar" onclick="fecharModal('modalDetalhe')">Fechar</button>
           <button class="btn-m-vermelho" onclick="fecharModal('modalDetalhe');abrirRejeitar('${p._id}','${p.titulo.replace(/'/g,"\\'")}','${(p.nomeEntidade||'').replace(/'/g,"\\'")}')">
@@ -745,23 +763,30 @@
       const tbody = document.getElementById('tbPendentes');
       if (!total) { tbody.innerHTML = `<tr><td colspan="6"><div class="vazio"><div class="emoji">✅</div>Não há propostas pendentes.</div></td></tr>`; return; }
 
-      // Verificar votos do utilizador actual para cada proposta
+      // Para cada proposta pendente, verificar votos comparando com a data de resubmissão
       const votosMap = {};
       await Promise.all(dados.propostas.map(async p => {
         try {
-          const av = await req(`/cca/propostas/${p._id}/aprovacoes`);
-          if (av.sucesso) {
-            const meu = av.membros.find(m => m.membroId?.toString() === utilizador.id?.toString());
-            votosMap[p._id] = meu?.decisao || 'pendente';
+          const { dadosAprov, dataResubmissao } = await obterDadosVotacao(p._id);
+          if (dadosAprov.sucesso) {
+            const meu = dadosAprov.membros.find(m => m.membroId?.toString() === utilizador.id?.toString());
+            // Guardar também a dataResubmissao para uso na tabela
+            votosMap[p._id] = {
+              decisao: meu?.decisao || 'pendente',
+              valido: verificarVotoValido(meu, dataResubmissao),
+              dataResubmissao
+            };
           }
-        } catch { votosMap[p._id] = 'pendente'; }
+        } catch { votosMap[p._id] = { decisao: 'pendente', valido: false }; }
       }));
 
       tbody.innerHTML = dados.propostas.map(p => {
-        const jaVotou = votosMap[p._id] && votosMap[p._id] !== 'pendente';
-        const meuVoto = votosMap[p._id];
+        const voto = votosMap[p._id] || { decisao: 'pendente', valido: false };
+        // Só considera "já votou" se o voto é válido para esta versão da proposta
+        const jaVotouNestaVersao = voto.valido;
+        const meuVoto = voto.decisao;
 
-        const botoesAcao = jaVotou
+        const botoesAcao = jaVotouNestaVersao
           ? `<span class="badge-votado">✔ ${meuVoto === 'aprovado' ? 'Aprovou' : 'Rejeitou'}</span>`
           : `<button class="btn-aprovar"  onclick="aprovar('${p._id}','${p.titulo.replace(/'/g,"\\'")}','${(p.nomeEntidade||p.proponenteId?.nome||'').replace(/'/g,"\\'")}')">Aprovar</button>
              <button class="btn-rejeitar" onclick="abrirRejeitar('${p._id}','${p.titulo.replace(/'/g,"\\'")}','${(p.nomeEntidade||p.proponenteId?.nome||'').replace(/'/g,"\\'")}')">Rejeitar</button>`;
@@ -817,26 +842,30 @@
       if (!dados.total) { tbody.innerHTML = `<tr><td colspan="6"><div class="vazio"><div class="emoji">📭</div>Sem propostas.</div></td></tr>`; return; }
       const el = { aprovada:'Aprovada', pendente:'Pendente', rejeitada:'Rejeitada', atribuida:'Atribuída' };
 
-      // Verificar votos apenas nas propostas pendentes
+      // Verificar votos apenas nas propostas pendentes, com comparação por data
       const votosMap = {};
       const pendentes = dados.propostas.filter(p => p.estado === 'pendente');
       await Promise.all(pendentes.map(async p => {
         try {
-          const av = await req(`/cca/propostas/${p._id}/aprovacoes`);
-          if (av.sucesso) {
-            const meu = av.membros.find(m => m.membroId?.toString() === utilizador.id?.toString());
-            votosMap[p._id] = meu?.decisao || 'pendente';
+          const { dadosAprov, dataResubmissao } = await obterDadosVotacao(p._id);
+          if (dadosAprov.sucesso) {
+            const meu = dadosAprov.membros.find(m => m.membroId?.toString() === utilizador.id?.toString());
+            votosMap[p._id] = {
+              decisao: meu?.decisao || 'pendente',
+              valido: verificarVotoValido(meu, dataResubmissao)
+            };
           }
-        } catch { votosMap[p._id] = 'pendente'; }
+        } catch { votosMap[p._id] = { decisao: 'pendente', valido: false }; }
       }));
 
       tbody.innerHTML = dados.propostas.map(p => {
-        const jaVotou = p.estado === 'pendente' && votosMap[p._id] && votosMap[p._id] !== 'pendente';
-        const meuVoto = votosMap[p._id];
+        const voto = votosMap[p._id] || { decisao: 'pendente', valido: false };
+        const jaVotouNestaVersao = p.estado === 'pendente' && voto.valido;
+        const meuVoto = voto.decisao;
 
         let botoesAcao = '';
         if (p.estado === 'pendente') {
-          botoesAcao = jaVotou
+          botoesAcao = jaVotouNestaVersao
             ? `<span class="badge-votado">✔ ${meuVoto === 'aprovado' ? 'Aprovou' : 'Rejeitou'}</span>`
             : `<button class="btn-aprovar" onclick="aprovar('${p._id}','${p.titulo.replace(/'/g,"\\'")}','')">Aprovar</button><button class="btn-rejeitar" onclick="abrirRejeitar('${p._id}','${p.titulo.replace(/'/g,"\\'")}','')">Rejeitar</button>`;
         }
@@ -937,14 +966,28 @@
     document.getElementById('barraProgLabel').textContent = '—';
     abrirModal('modalAprovacoes');
     try {
-      const dados = await req('/cca/propostas/' + id + '/aprovacoes');
-      if (!dados.sucesso) throw new Error(dados.mensagem);
-      const pct = dados.total > 0 ? Math.round((dados.aprovados / dados.total) * 100) : 0;
+      const { dadosAprov, dataResubmissao } = await obterDadosVotacao(id);
+      if (!dadosAprov.sucesso) throw new Error(dadosAprov.mensagem);
+
+      // Contar apenas votos válidos (posteriores à resubmissão)
+      const aprovadosValidos = dadosAprov.membros.filter(m =>
+        m.decisao === 'aprovado' && verificarVotoValido(m, dataResubmissao)
+      ).length;
+
+      const pct = dadosAprov.total > 0 ? Math.round((aprovadosValidos / dadosAprov.total) * 100) : 0;
       document.getElementById('barraProgFill').style.width = pct + '%';
-      document.getElementById('barraProgLabel').textContent = `${dados.aprovados} de ${dados.total} membros aprovaram`;
-      const vB = d => ({ aprovado:'<span class="voto-badge aprovado">✔ Aprovado</span>', rejeitado:'<span class="voto-badge rejeitado">✕ Rejeitado</span>', pendente:'<span class="voto-badge pendente">⏳ Pendente</span>' }[d] || d);
-      document.getElementById('tabelaVotos').innerHTML = dados.membros.map(m =>
-        `<tr><td style="font-weight:500">${m.nome}</td><td>${renderCursosBadge(m.cursosCCA)}</td><td>${vB(m.decisao)}</td><td style="font-size:0.78rem;color:var(--cinza-texto)">${formatarData(m.decididoEm)}</td></tr>`
+      document.getElementById('barraProgLabel').textContent = `${aprovadosValidos} de ${dadosAprov.total} membros aprovaram`;
+
+      const vB = (m) => {
+        const valido = verificarVotoValido(m, dataResubmissao);
+        if (m.decisao === 'aprovado' && valido)  return '<span class="voto-badge aprovado">✔ Aprovado</span>';
+        if (m.decisao === 'rejeitado' && valido) return '<span class="voto-badge rejeitado">✕ Rejeitado</span>';
+        if (m.decisao !== 'pendente' && !valido) return '<span class="voto-badge pendente" title="Voto anterior à resubmissão — precisa de votar novamente">⟳ Pendente (resubmissão)</span>';
+        return '<span class="voto-badge pendente">⏳ Pendente</span>';
+      };
+
+      document.getElementById('tabelaVotos').innerHTML = dadosAprov.membros.map(m =>
+        `<tr><td style="font-weight:500">${m.nome}</td><td>${renderCursosBadge(m.cursosCCA)}</td><td>${vB(m)}</td><td style="font-size:0.78rem;color:var(--cinza-texto)">${formatarData(m.decididoEm)}</td></tr>`
       ).join('');
     } catch (err) {
       document.getElementById('tabelaVotos').innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--vermelho);padding:16px">${err.message}</td></tr>`;

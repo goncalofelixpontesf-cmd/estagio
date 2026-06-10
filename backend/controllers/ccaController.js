@@ -79,7 +79,7 @@ exports.aprovar = async (req, res) => {
 
     await AprovacaoCCA.findOneAndUpdate(
       { propostaId: proposta._id, membroId: req.utilizador._id },
-      { decisao: 'aprovado', decididoEm: new Date() },
+      { decisao: 'aprovado', sugestao: req.body.sugestao || null, decididoEm: new Date() },
       { upsert: true, new: true }
     );
 
@@ -89,6 +89,9 @@ exports.aprovar = async (req, res) => {
 
     if (aprovados >= membros.length) {
       proposta.estado = 'aprovada';
+      // Guardar sugestão na proposta se algum membro a deixou
+      const comSugestao = await AprovacaoCCA.findOne({ propostaId: proposta._id, sugestao: { $ne: null } });
+      if (comSugestao?.sugestao) proposta.sugestaoCCA = comSugestao.sugestao;
       await proposta.save();
       await Notificacao.create({
         destinatarioId: proposta.proponenteId,

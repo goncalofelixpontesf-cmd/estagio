@@ -168,33 +168,7 @@
     }
 
     /* Card escolher proposta */
-    .card-escolha {
-      background: var(--laranja-light);
-      border: 1.5px solid var(--laranja);
-      border-radius: 12px;
-      padding: 18px 20px;
-      margin-top: 6px;
-    }
-    .card-escolha .escolha-titulo {
-      font-size: 0.88rem; font-weight: 700; color: var(--laranja); margin-bottom: 6px;
-    }
-    .card-escolha .escolha-texto {
-      font-size: 0.78rem; color: #666; margin-bottom: 14px; line-height: 1.5;
-    }
-    .card-escolha .escolha-proposta {
-      font-size: 0.82rem; font-weight: 600; color: var(--preto);
-      background: var(--branco); border-radius: 6px; padding: 8px 12px;
-      margin-bottom: 10px; border: 1px solid var(--cinza-linha);
-    }
-    .btn-escolha {
-      display: block; width: 100%;
-      background: var(--laranja); color: var(--branco);
-      border: none; border-radius: 8px; padding: 10px;
-      font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 700;
-      cursor: pointer; text-align: center; transition: background 0.15s;
-      text-decoration: none;
-    }
-    .btn-escolha:hover { background: var(--laranja-hover); }
+
 
     /* ══ COLUNA DIREITA ══ */
     .col-dir { display: flex; flex-direction: column; gap: 20px; }
@@ -237,11 +211,7 @@
       font-size: 0.72rem; font-weight: 600;
     }
     .badge::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      flex-shrink: 0;
+      content: ''; width: 6px; height: 6px; border-radius: 50; flex-shrink: 0;
     }
     .badge.concluida { background: var(--verde-light); color: var(--verde); }
     .badge.concluida::before { background: var(--verde); border-radius: 50%; }
@@ -333,8 +303,9 @@
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo"><span>ESMAD</span></div>
   <nav class="sidebar-nav">
+    <a class="nav-item" href="dashboard-estudante.html">Início</a>
     <a class="nav-item" href="lista-propostas.html">Propostas</a>
-    <a class="nav-item" href="entrevistas.html">As Minhas Candidaturas</a>
+    <a class="nav-item" href="dashboard-estudante.html">As Minhas Candidaturas</a>
     <a class="nav-item activo">O Meu Perfil</a>
   </nav>
   <div class="sidebar-footer">
@@ -357,6 +328,7 @@
 
   <div class="content">
     <div class="layout">
+
       <!-- COLUNA ESQUERDA -->
       <div id="colEsq">
         <div class="card-perfil" id="cardPerfil">
@@ -373,6 +345,7 @@
 
       <!-- COLUNA DIREITA -->
       <div class="col-dir">
+
         <!-- Percurso Académico -->
         <div class="card">
           <div class="card-header"><h2>Percurso Académico</h2></div>
@@ -416,14 +389,8 @@
   const user  = localStorage.getItem('esmad_user');
   if (!token || !user) { window.location.href = 'login.html'; }
 
-  let utilizador;
-
-try {
-  utilizador = JSON.parse(user);
-} catch {
-  localStorage.clear();
-  window.location.href = 'login.html';
-}
+  const utilizador = JSON.parse(user);
+  if (utilizador.perfil !== 'estudante') { window.location.href = 'login.html'; }
 
   document.getElementById('sidebarNome').textContent = utilizador.nome;
   document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
@@ -456,34 +423,13 @@ try {
     setTimeout(() => { t.className = `toast ${tipo}`; }, 3000);
   }
 
-async function req(endpoint, opts = {}) {
-  console.log('Endpoint chamado:', endpoint);
-
-  const response = await fetch(`${API}${endpoint}`, {
-    ...opts,
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      ...(opts.headers || {})
-    }
-  });
-
-  let data = null;
-
-  try {
-    data = await response.json();
-  } catch {}
-
-  if (!response.ok) {
-    throw new Error(
-      data?.mensagem ||
-      data?.message ||
-      `HTTP ${response.status}`
-    );
+  // Helpers
+  function req(endpoint, opts = {}) {
+    return fetch(`${API}${endpoint}`, {
+      ...opts,
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...(opts.headers || {}) }
+    }).then(r => r.json());
   }
-
-  return data;
-}
 
   function formatarData(str) {
     return new Date(str).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: '2-digit' });
@@ -535,7 +481,7 @@ async function req(endpoint, opts = {}) {
 
       // Candidaturas
       const dados2 = await req('/candidaturas/minhas');
-      const cands = dados2.candidaturas || dados2 || [];
+      const cands = dados2.candidaturas || [];
       const tbCand = document.getElementById('tabelaCandidaturas');
       if (!cands.length) {
         tbCand.innerHTML = `<tr><td colspan="3"><div class="vazio"><div class="emoji">📭</div>Ainda não te candidataste a nenhuma proposta.<br><a href="lista-propostas.html">Ver propostas →</a></div></td></tr>`;
@@ -557,22 +503,15 @@ async function req(endpoint, opts = {}) {
       }
 
     } catch (err) {
-    console.error('Erro ao carregar perfil:', err);
-
-    mostrarToast(
-    `Erro ao carregar perfil: ${err.message}`,
-    'erro'
-  );
-}
+      console.error(err);
+      mostrarToast('Erro ao carregar perfil. O servidor está ligado?', 'erro');
+    }
   }
 
   function renderCardPerfil(u, est) {
     const inicial = u.nome.charAt(0).toUpperCase();
     const curso   = est?.curso || 'TeSP DTAM';
     const ano     = est?.ano ? `${est.ano}.º Ano` : '';
-    const propostaEscolhida = est?.propostaEscolhidaId;
-
-
     document.getElementById('cardPerfil').innerHTML = `
       <div class="avatar-grande">${inicial}</div>
       <div class="perfil-nome">${u.nome}</div>
@@ -592,12 +531,12 @@ async function req(endpoint, opts = {}) {
         ${est?.portfolio ? `
         <div class="contacto-linha">
           <span class="label">Portfólio:</span>
-          <span class="valor"><a href="${est.portfolio.startsWith('http') ? est.portfolio : 'https://'+est.portfolio}" target="_blank" rel="noopener noreferrer">${est.portfolio}</a></span>
+          <span class="valor"><a href="${est.portfolio.startsWith('http') ? est.portfolio : 'https://'+est.portfolio}" target="_blank">${est.portfolio}</a></span>
         </div>` : ''}
         ${est?.linkedin ? `
         <div class="contacto-linha">
           <span class="label">LinkedIn:</span>
-          <span class="valor"><a href="${est.linkedin.startsWith('http') ? est.linkedin : 'https://'+est.linkedin}" target="_blank" rel="noopener noreferrer">${est.linkedin}</a></span>
+          <span class="valor"><a href="${est.linkedin.startsWith('http') ? est.linkedin : 'https://'+est.linkedin}" target="_blank">${est.linkedin}</a></span>
         </div>` : ''}
       </div>
 
@@ -618,11 +557,11 @@ async function req(endpoint, opts = {}) {
             : `<strong>Clica para fazer upload</strong>PDF exportado do DOMUS (máx. 5MB)`}
         </div>
       </div>
+
     `;
 
     // Re-bind input domus
-    const inputDomus = document.getElementById('inputDomus');
-    inputDomus.onchange = handleDomus;
+    document.getElementById('inputDomus').addEventListener('change', handleDomus);
   }
 
   // ── Upload DOMUS (armazenamento local por agora) ──

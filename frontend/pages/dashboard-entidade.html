@@ -240,7 +240,7 @@
   <nav class="sidebar-nav">
     <a class="nav-item activo" id="navPropostas" onclick="mostrarSecao('propostas')">As Minhas Propostas</a>
     <a class="nav-item" href="estudantes-interessados.html">Estudantes Interessados</a>
-    <a class="nav-item" href="entrevistas-entidade.html">Entrevistas</a>
+    <a class="nav-item" href="entrevistas.html">Entrevistas</a>
   </nav>
   <div class="sidebar-footer">
     <div class="nome" id="sidebarNome">—</div>
@@ -483,7 +483,7 @@
         return `<tr>
           <td>
             <span class="titulo-link" onclick="abrirDetalhesProposta('${p._id}')">${p.titulo}</span>
-            <div style="font-size:0.74rem;color:var(--cinza-texto);margin-top:2px">${p.tipo === 'estagio' ? 'Estágio' : 'Projeto'} · ${p.curso}</div>
+            <div style="font-size:0.74rem;color:var(--cinza-texto);margin-top:2px">${p.tipo === 'estagio' ? 'Estágio' : 'Projecto'} · ${p.curso}</div>
           </td>
           <td>${(p.areas||[]).slice(0,2).map(a=>`<span class="tag area">${a}</span>`).join(' ')}${p.areas?.length > 2 ? `<span style="font-size:0.72rem;color:var(--cinza-texto);margin-left:4px">+${p.areas.length-2}</span>` : ''}</td>
           <td><span class="estado ${p.estado}">${estadoLabel[p.estado]||p.estado}</span></td>
@@ -520,7 +520,7 @@
       document.getElementById('detalhesTopoBarra').style.cssText = `height:6px;border-radius:14px 14px 0 0;${topoCores[p.estado]||'background:var(--laranja)'}`;
 
       document.getElementById('detalhesTitulo').textContent = p.titulo;
-      document.getElementById('detalhesSub').textContent    = `${p.tipo === 'estagio' ? 'Estágio' : 'Projeto'} · ${p.curso} · submetido em ${new Date(p.criadaEm).toLocaleDateString('pt-PT')}`;
+      document.getElementById('detalhesSub').textContent    = `${p.tipo === 'estagio' ? 'Estágio' : 'Projecto'} · ${p.curso} · submetido em ${new Date(p.criadaEm).toLocaleDateString('pt-PT')}`;
 
       let html = '<div class="linha-modal"></div>';
 
@@ -765,7 +765,7 @@
         <div class="form-campo" style="margin-top:14px"><label>Cargo do tutor</label><input class="mp-input" type="text" id="f2" value="${esc(mpDados.tutorCargo)}" placeholder="Ex: Diretor de Tecnologia"></div>`;
       case 2: return `<div class="form-grid" style="margin-bottom:16px">
         <div class="form-campo"><label>Curso destinatário <span class="obg">*</span></label><input class="mp-input readonly" type="text" readonly value="${esc(mpDados.curso)}"><p class="campo-nota">Definido pelo curso do proponente.</p></div>
-        <div class="form-campo"><label>Tipo de proposta <span class="obg">*</span></label><select class="mp-select" id="f0"><option value="estagio"${mpDados.tipo==='estagio'?' selected':''}>Estágio</option><option value="projecto"${mpDados.tipo==='projecto'?' selected':''}>Projeto</option></select></div>
+        <div class="form-campo"><label>Tipo de proposta <span class="obg">*</span></label><select class="mp-select" id="f0"><option value="estagio"${mpDados.tipo==='estagio'?' selected':''}>Estágio</option><option value="projecto"${mpDados.tipo==='projecto'?' selected':''}>Projecto</option></select></div>
         </div>
         <div class="form-campo" style="margin-bottom:16px"><label>Área(s) de actuação <span class="obg">*</span></label>
         <div class="areas-grid">${areas.map(a=>`<label class="area-check${mpDados.areas.includes(a)?' marcada':''}"><input type="checkbox" value="${a}" class="area-cb"${mpDados.areas.includes(a)?' checked':''}> ${a}</label>`).join('')}</div></div>
@@ -839,14 +839,27 @@
     }
   }
 
+  function emailValido(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+  }
+
   function mpValidarPasso() {
     const al = document.getElementById('alertaMp');
     al.className = 'alerta-mp';
     const err = msg => { al.textContent = msg; al.className = 'alerta-mp erro'; al.scrollIntoView({behavior:'smooth',block:'nearest'}); return false; };
     switch(mpPassoActual) {
-      case 0: if (!mpDados.nomeEntidade) return err('O nome da entidade é obrigatório.'); if (!mpDados.emailContacto) return err('O email de contacto é obrigatório.'); if (!mpDados.moradaEntidade) return err('A morada da entidade é obrigatória.'); break;
-      case 1: if (!mpDados.tutorNome) return err('O nome do tutor é obrigatório.'); if (!mpDados.tutorEmail) return err('O email do tutor é obrigatório.'); break;
-      case 2: if (!mpDados.areas.length) return err('Selecione pelo menos uma área.'); if (!mpDados.titulo) return err('O título da proposta é obrigatório.'); break;
+      case 0:
+        if (!mpDados.nomeEntidade)  return err('O nome da entidade é obrigatório.');
+        if (!mpDados.emailContacto) return err('O email de contacto é obrigatório.');
+        if (!emailValido(mpDados.emailContacto)) return err('Introduz um email de contacto válido (ex: info@empresa.pt).');
+        if (!mpDados.moradaEntidade) return err('A morada da entidade é obrigatória.');
+        break;
+      case 1:
+        if (!mpDados.tutorNome)  return err('O nome do tutor é obrigatório.');
+        if (!mpDados.tutorEmail) return err('O email do tutor é obrigatório.');
+        if (!emailValido(mpDados.tutorEmail)) return err('Introduz um email de tutor válido (ex: tutor@empresa.pt).');
+        break;
+      case 2: if (!mpDados.areas.length) return err('Seleciona pelo menos uma área.'); if (!mpDados.titulo) return err('O título da proposta é obrigatório.'); break;
       case 3: if (!mpDados.objetivos) return err('Os objetivos são obrigatórios.'); break;
       case 4: if (!mpDados.resultados) return err('Os resultados esperados são obrigatórios.'); break;
     }
