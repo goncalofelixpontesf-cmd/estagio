@@ -159,6 +159,10 @@ exports.editarProposta = async (req, res) => {
       'planoTrabalho','perfilCandidato','plugIN','nomeEntidade','emailContacto',
       'moradaEntidade','moradaLocalEstagio','tutorNome','tutorEmail','tutorCargo'];
 
+    // Guardar snapshot antes de editar (para mostrar alterações à CCA)
+    proposta.versaoAnterior = {};
+    campos.forEach(c => { proposta.versaoAnterior[c] = proposta[c]; });
+
     campos.forEach(c => { if (req.body[c] !== undefined) proposta[c] = req.body[c]; });
 
     // Repõe como pendente e limpa feedback anterior

@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESMAD</title>
+  <title>ESMAD — As Minhas Candidaturas</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/png" href="favicon.ico">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -357,38 +356,38 @@
       if (!dados.sucesso) throw new Error(dados.mensagem);
 
       const candidaturas = dados.candidaturas || [];
-
-      const stats = dados.stats || {
-      totalCandidaturas: candidaturas.length,
-      entrevistasAgendadas: candidaturas.filter(c => c.estado === 'entrevista_agendada').length,
-      aceite: candidaturas.filter(c => c.estado === 'aceite').length
-      };
       todasCandidaturas = candidaturas;
+
+      // Calcular stats a partir das candidaturas
+      const totalCandidaturas   = candidaturas.length;
+      const entrevistasAgendadas = candidaturas.filter(c => c.estado === 'entrevista_agendada').length;
+      const emEspera            = candidaturas.filter(c => c.estado === 'pendente').length;
+      const aceite              = candidaturas.filter(c => c.estado === 'aceite').length;
 
       // Stats
       document.getElementById('statsGrid').innerHTML = `
         <div class="stat-card laranja">
-          <div class="num">${stats.totalCandidaturas}</div>
+          <div class="num">${totalCandidaturas}</div>
           <div class="label">Total de Candidaturas</div>
         </div>
         <div class="stat-card azul">
-          <div class="num">${stats.entrevistasAgendadas}</div>
+          <div class="num">${entrevistasAgendadas}</div>
           <div class="label">Entrevistas Agendadas</div>
         </div>
         <div class="stat-card amarelo">
-          <div class="num">${candidaturas.filter(c => c.estado === 'pendente').length}</div>
+          <div class="num">${emEspera}</div>
           <div class="label">Aguardam Resposta</div>
         </div>
         <div class="stat-card verde">
-          <div class="num">${stats.aceite}</div>
+          <div class="num">${aceite}</div>
           <div class="label">Aceite</div>
         </div>`;
 
       // Alerta aceite
-      if (stats.aceite > 0) {
-        const aceite = candidaturas.find(c => c.estado === 'aceite');
-        if (aceite) {
-          document.getElementById('alertaAceiteTitulo').textContent = aceite.propostaId?.titulo || '—';
+      if (aceite > 0) {
+        const c = candidaturas.find(c => c.estado === 'aceite');
+        if (c) {
+          document.getElementById('alertaAceiteTitulo').textContent = c.propostaId?.titulo || '—';
           document.getElementById('alertaAceite').style.display = 'flex';
         }
       }
@@ -430,6 +429,7 @@
       const fav    = guardadas.includes(p?._id);
 
       // Bloco de entrevista (se agendada)
+      const jaConfirmou = cand.conhecimentoEntrevista;
       const entrevistaHtml = estado === 'entrevista_agendada' && cand.dataEntrevista
         ? `<div class="entrevista-box">
             <div>
@@ -444,6 +444,17 @@
                 ? `<a class="ei-link" href="${cand.localEntrevista}" target="_blank">🔗 Entrar na reunião</a>`
                 : `<div class="ei-valor">📍 ${cand.localEntrevista}</div>`}
             </div>` : ''}
+            <div class="ei-sep"></div>
+            <div>
+              ${jaConfirmou
+                ? `<div style="display:flex;align-items:center;gap:6px;background:var(--verde-light);color:var(--verde);border-radius:6px;padding:7px 14px;font-size:0.78rem;font-weight:700">
+                    ✔ Conhecimento confirmado
+                   </div>`
+                : `<button onclick="tomarConhecimento('${cand._id}',this)"
+                    style="background:var(--azul);color:#fff;border:none;border-radius:6px;padding:8px 14px;font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer">
+                    ✔ Tomar conhecimento
+                   </button>`}
+            </div>
           </div>` : '';
 
       // Bloco aceite
@@ -461,7 +472,7 @@
               <div class="cand-titulo" onclick="window.location.href='detalhe-proposta.html?id=${p?._id}'">${titulo}</div>
               <div class="cand-meta">
                 <span>🏢 ${entidade}</span>
-                <span class="tag-tipo ${tipo}">${tipo === 'estagio' ? 'Estágio' : 'Projecto'}</span>
+                <span class="tag-tipo ${tipo}">${tipo === 'estagio' ? 'Estágio' : 'Projeto'}</span>
                 <span>📅 Candidatura em ${formatarData(cand.criadaEm)}</span>
               </div>
               ${areas.length ? `
@@ -499,6 +510,23 @@
       : todasCandidaturas.filter(c => c.estado === estado);
 
     renderLista(filtradas);
+  }
+
+  async function tomarConhecimento(candidaturaId, btn) {
+    btn.disabled = true;
+    btn.textContent = 'A confirmar…';
+    try {
+      const dados = await req(`/candidaturas/${candidaturaId}/conhecimento`, { method: 'PUT' });
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+      // Substituir o botão pelo badge verde sem recarregar tudo
+      btn.outerHTML = `<div style="display:flex;align-items:center;gap:6px;background:var(--verde-light);color:var(--verde);border-radius:6px;padding:7px 14px;font-size:0.78rem;font-weight:700">✔ Conhecimento confirmado</div>`;
+      // Atualizar a lista para reflectir o estado
+      setTimeout(carregarCandidaturas, 400);
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = '✔ Tomar conhecimento';
+      alert('Erro: ' + err.message);
+    }
   }
 
   function toggleFav(propostaId, btn) {

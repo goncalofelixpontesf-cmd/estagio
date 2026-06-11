@@ -14,7 +14,7 @@ router.post('/', ctrl.criar);
 // Obter proposta individual
 router.get('/:id', ctrl.obterProposta);
 
-// Entidade edita proposta rejeitada
-router.put('/:id', restringir('docente', 'entidade'), ctrl.editarProposta);
+// Proponente edita proposta rejeitada (estudante, docente ou entidade)
+router.put('/:id', restringir('estudante', 'docente', 'entidade'), ctrl.editarProposta);
 
 module.exports = router;

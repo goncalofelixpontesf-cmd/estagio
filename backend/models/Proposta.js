@@ -51,6 +51,9 @@ const propostaSchema = new mongoose.Schema({
   // Sugestão de melhoria da CCA quando aprovada
   sugestaoCCA: { type: String, default: null },
 
+  // Snapshot dos campos antes da última edição (para mostrar o que mudou à CCA)
+  versaoAnterior: { type: mongoose.Schema.Types.Mixed, default: null },
+
   // Quem submeteu a proposta
   proponenteId: {
     type: mongoose.Schema.Types.ObjectId,
