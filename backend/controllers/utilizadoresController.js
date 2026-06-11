@@ -31,13 +31,20 @@ exports.editarPerfil = async (req, res) => {
     }
 
     if (req.utilizador.perfil === 'estudante') {
-      await Estudante.findOneAndUpdate(
-        { utilizadorId: req.utilizador._id },
-        { ...(telefone !== undefined && { telefone }),
-          ...(linkedin  !== undefined && { linkedin  }),
-          ...(portfolio !== undefined && { portfolio }) },
-        { new: true }
-      );
+      const updateEstudante = {};
+      if (telefone  !== undefined) updateEstudante.telefone  = telefone;
+      if (linkedin  !== undefined) updateEstudante.linkedin  = linkedin;
+      if (portfolio !== undefined) updateEstudante.portfolio = portfolio;
+      // Disciplinas extraídas do DOMUS
+      if (req.body.disciplinas !== undefined) updateEstudante.disciplinas = req.body.disciplinas;
+
+      if (Object.keys(updateEstudante).length) {
+        await Estudante.findOneAndUpdate(
+          { utilizadorId: req.utilizador._id },
+          updateEstudante,
+          { new: true }
+        );
+      }
     }
 
     const utilizador = await Utilizador.findById(req.utilizador._id);
@@ -80,4 +87,4 @@ exports.uploadCV = async (req, res) => {
   } catch (err) {
     res.status(500).json({ sucesso: false, mensagem: err.message });
   }
-};  
+};

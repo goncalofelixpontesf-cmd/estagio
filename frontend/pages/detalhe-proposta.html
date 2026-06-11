@@ -801,7 +801,7 @@
     btn.innerHTML = '<span class="spin"></span>A processar…';
 
     try {
-      const dados = await req(`/propostas/${propostaId}/interesse`, { method: 'POST' });
+      const dados = await req(`/candidaturas/${propostaId}`, { method: 'POST' });
       if (!dados.sucesso) throw new Error(dados.mensagem);
 
       jaInteresse = true;
@@ -852,4 +852,4 @@
   carregar();
 </script>
 </body>
-</html>
+</html>     

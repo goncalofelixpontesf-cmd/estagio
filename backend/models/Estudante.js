@@ -31,6 +31,13 @@ const estudanteSchema = new mongoose.Schema({
   // O ficheiro fica em /uploads/ no servidor
   cv: { type: String, default: null },
 
+  // Percurso académico extraído do DOMUS
+  disciplinas: [{
+    nome:   { type: String, required: true },
+    nota:   { type: Number, default: null },
+    estado: { type: String, enum: ['concluida','em_curso','reprovada','pendente'], default: 'pendente' }
+  }],
+
   propostaEscolhidaId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Proposta',

@@ -156,13 +156,17 @@ exports.aprovacoes = async (req, res) => {
 
     const resultado = membros.map(m => {
       const voto = votos.find(v => v.membroId?._id?.toString() === m._id.toString());
+      // Ignorar votos antigos de rondas anteriores (anteriores à última resubmissão)
+      const votoValido = voto && proposta.atualizadaEm
+        ? voto.decididoEm >= proposta.atualizadaEm
+        : !!voto;
       return {
         membroId:   m._id,
         nome:       m.nome,
         email:      m.email,
         cursosCCA:  m.cursosCCA || [],
-        decisao:    voto?.decisao || 'pendente',
-        decididoEm: voto?.decididoEm || null
+        decisao:    votoValido ? voto.decisao : 'pendente',
+        decididoEm: votoValido ? voto.decididoEm : null
       };
     });
 

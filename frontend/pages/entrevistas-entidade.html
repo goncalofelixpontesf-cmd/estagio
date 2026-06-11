@@ -260,6 +260,7 @@
   const token = localStorage.getItem('esmad_token');
   const user  = localStorage.getItem('esmad_user');
   if (!token || !user) { window.location.href = 'login.html'; }
+  if (!['docente','entidade'].includes(JSON.parse(user).perfil)) { window.location.href = 'login.html'; }
 
   const utilizador = JSON.parse(user);
   if (!['docente','entidade'].includes(utilizador.perfil)) { window.location.href = 'login.html'; }

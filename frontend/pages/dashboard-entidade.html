@@ -355,6 +355,7 @@
   const token = localStorage.getItem('esmad_token');
   const user  = localStorage.getItem('esmad_user');
   if (!token || !user) { window.location.href = 'login.html'; }
+  if (!['docente','entidade'].includes(JSON.parse(user).perfil)) { window.location.href = 'login.html'; }
 
   const utilizador = JSON.parse(user);
   if (!['docente','entidade'].includes(utilizador.perfil)) { window.location.href = 'login.html'; }
@@ -483,7 +484,7 @@
         return `<tr>
           <td>
             <span class="titulo-link" onclick="abrirDetalhesProposta('${p._id}')">${p.titulo}</span>
-            <div style="font-size:0.74rem;color:var(--cinza-texto);margin-top:2px">${p.tipo === 'estagio' ? 'Estágio' : 'Projecto'} · ${p.curso}</div>
+            <div style="font-size:0.74rem;color:var(--cinza-texto);margin-top:2px">${p.tipo === 'estagio' ? 'Estágio' : 'Projeto'} · ${p.curso}</div>
           </td>
           <td>${(p.areas||[]).slice(0,2).map(a=>`<span class="tag area">${a}</span>`).join(' ')}${p.areas?.length > 2 ? `<span style="font-size:0.72rem;color:var(--cinza-texto);margin-left:4px">+${p.areas.length-2}</span>` : ''}</td>
           <td><span class="estado ${p.estado}">${estadoLabel[p.estado]||p.estado}</span></td>
@@ -765,9 +766,9 @@
         <div class="form-campo" style="margin-top:14px"><label>Cargo do tutor</label><input class="mp-input" type="text" id="f2" value="${esc(mpDados.tutorCargo)}" placeholder="Ex: Diretor de Tecnologia"></div>`;
       case 2: return `<div class="form-grid" style="margin-bottom:16px">
         <div class="form-campo"><label>Curso destinatário <span class="obg">*</span></label><input class="mp-input readonly" type="text" readonly value="${esc(mpDados.curso)}"><p class="campo-nota">Definido pelo curso do proponente.</p></div>
-        <div class="form-campo"><label>Tipo de proposta <span class="obg">*</span></label><select class="mp-select" id="f0"><option value="estagio"${mpDados.tipo==='estagio'?' selected':''}>Estágio</option><option value="projecto"${mpDados.tipo==='projecto'?' selected':''}>Projecto</option></select></div>
+        <div class="form-campo"><label>Tipo de proposta <span class="obg">*</span></label><select class="mp-select" id="f0"><option value="estagio"${mpDados.tipo==='estagio'?' selected':''}>Estágio</option><option value="projecto"${mpDados.tipo==='projecto'?' selected':''}>Projeto</option></select></div>
         </div>
-        <div class="form-campo" style="margin-bottom:16px"><label>Área(s) de actuação <span class="obg">*</span></label>
+        <div class="form-campo" style="margin-bottom:16px"><label>Área(s) de atuação <span class="obg">*</span></label>
         <div class="areas-grid">${areas.map(a=>`<label class="area-check${mpDados.areas.includes(a)?' marcada':''}"><input type="checkbox" value="${a}" class="area-cb"${mpDados.areas.includes(a)?' checked':''}> ${a}</label>`).join('')}</div></div>
         <div class="form-campo"><label>Título da proposta <span class="obg">*</span> <span style="font-size:0.7rem;color:var(--cinza-texto);text-transform:none;font-weight:400">(máx. 50 car.)</span></label>
         <input class="mp-input" type="text" id="f1" value="${esc(mpDados.titulo)}" placeholder="Ex: Sistema de Gestão de Encomendas" maxlength="50"></div>`;

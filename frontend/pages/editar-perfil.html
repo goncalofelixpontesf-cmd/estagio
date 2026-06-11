@@ -237,6 +237,24 @@
       .content { padding: 20px 16px; }
       .form-grid, .form-grid.tres { grid-template-columns: 1fr; }
     }
+
+    /* Percurso Académico */
+    .disc-tabela { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+    .disc-tabela thead tr { background: #F8F8F8; }
+    .disc-tabela th { padding: 9px 12px; font-size: 0.7rem; font-weight: 700; color: var(--cinza-texto); text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid var(--cinza-linha); text-align: left; }
+    .disc-tabela td { padding: 7px 6px; border-bottom: 1px solid var(--cinza-linha); vertical-align: middle; }
+    .disc-tabela tr:last-child td { border-bottom: none; }
+    .disc-input { width: 100%; background: var(--cinza-input); border: 1.5px solid transparent; border-radius: 6px; padding: 7px 10px; font-family: 'Inter', sans-serif; font-size: 0.83rem; color: var(--preto); outline: none; }
+    .disc-input:focus { background: var(--branco); border-color: var(--laranja); }
+    .disc-select { width: 100%; background: var(--cinza-input); border: 1.5px solid transparent; border-radius: 6px; padding: 7px 28px 7px 10px; font-family: 'Inter', sans-serif; font-size: 0.83rem; color: var(--preto); outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; }
+    .disc-select:focus { background-color: var(--branco); border-color: var(--laranja); }
+    .btn-rem-disc { background: none; border: none; color: #ccc; font-size: 1rem; cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: color 0.15s, background 0.15s; }
+    .btn-rem-disc:hover { color: var(--vermelho); background: var(--vermelho-light); }
+    .disc-acoes { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+    .btn-add-disc { background: #F0F0F0; color: #555; border: none; border-radius: 7px; padding: 8px 16px; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+    .btn-add-disc:hover { background: #E4E4E4; }
+    .btn-pdf { display: flex; align-items: center; gap: 6px; background: var(--laranja-light); color: var(--laranja); border: none; border-radius: 7px; padding: 8px 16px; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+    .btn-pdf:hover { background: var(--laranja); color: var(--branco); }
   </style>
 </head>
 <body>
@@ -418,6 +436,24 @@
         </p>
       </div>
 
+      <!-- Percurso Académico (editável) -->
+      <div class="painel-secao">
+        <div class="secao-titulo">Percurso Académico</div>
+        <p style="font-size:0.8rem;color:var(--cinza-texto);margin-bottom:14px">
+          Adiciona as tuas disciplinas e notas. Depois gera o PDF e faz upload no perfil para confirmar.
+        </p>
+        <table class="disc-tabela">
+          <thead><tr><th style="width:50%">Disciplina</th><th style="width:14%">Nota</th><th style="width:22%">Estado</th><th style="width:8%"></th></tr></thead>
+          <tbody id="linhasDisc">
+            ${(est?.disciplinas || []).map((d, i) => gerarLinhaDisc(d, i)).join('') || ''}
+          </tbody>
+        </table>
+        <div class="disc-acoes">
+          <button class="btn-add-disc" onclick="adicionarLinhaDisc()">+ Adicionar Disciplina</button>
+          <button class="btn-pdf" onclick="gerarPDFNotas()">📄 Gerar PDF do Percurso</button>
+        </div>
+      </div>
+
       <!-- CV -->
       <div class="painel-secao">
         <div class="secao-titulo">CV</div>
@@ -498,7 +534,7 @@
       btn.innerHTML = '<span class="spin"></span>A guardar perfil…';
       const dados = await req('/utilizadores/perfil', {
         method: 'PUT',
-        body: JSON.stringify({ nome, telefone, portfolio, linkedin })
+        body: JSON.stringify({ nome, telefone, portfolio, linkedin, disciplinas: recolherDisciplinas() })
       });
 
       if (!dados.sucesso) throw new Error(dados.mensagem);
@@ -516,6 +552,154 @@
       btn.disabled = false;
       btn.textContent = 'Guardar Alterações';
     }
+  }
+
+  // ── Percurso Académico ──
+  let discIdx = 0;
+
+  function gerarLinhaDisc(d = {}, i = null) {
+    const idx = i !== null ? i : discIdx++;
+    const estadoOpts = ['concluida','em_curso','reprovada','pendente'];
+    const estadoLabel = { concluida:'Concluída', em_curso:'Em Curso', reprovada:'Reprovada', pendente:'Pendente' };
+    const opts = estadoOpts.map(e => `<option value="${e}"${(d.estado||'pendente')===e?' selected':''}>${estadoLabel[e]}</option>`).join('');
+    return `<tr id="disc-${idx}">
+      <td><input class="disc-input" type="text" placeholder="Ex: Programação Web" value="${(d.nome||'').replace(/"/g,'&quot;')}"></td>
+      <td><input class="disc-input" type="number" placeholder="—" min="0" max="20" style="width:64px" value="${d.nota??''}"></td>
+      <td><select class="disc-select">${opts}</select></td>
+      <td><button class="btn-rem-disc" onclick="removerLinhaDisc('disc-${idx}')" title="Remover">✕</button></td>
+    </tr>`;
+  }
+
+  function adicionarLinhaDisc() {
+    const tbody = document.getElementById('linhasDisc');
+    if (!tbody) return;
+    const idx = discIdx++;
+    const tr = document.createElement('tr');
+    tr.id = `disc-${idx}`;
+    const estadoOpts = ['concluida','em_curso','reprovada','pendente'];
+    const estadoLabel = { concluida:'Concluída', em_curso:'Em Curso', reprovada:'Reprovada', pendente:'Pendente' };
+    tr.innerHTML = `
+      <td><input class="disc-input" type="text" placeholder="Ex: Programação Web" value=""></td>
+      <td><input class="disc-input" type="number" placeholder="—" min="0" max="20" style="width:64px" value=""></td>
+      <td><select class="disc-select">${estadoOpts.map(e=>`<option value="${e}">${estadoLabel[e]}</option>`).join('')}</select></td>
+      <td><button class="btn-rem-disc" onclick="removerLinhaDisc('disc-${idx}')" title="Remover">✕</button></td>`;
+    tbody.appendChild(tr);
+    tr.querySelector('.disc-input').focus();
+  }
+
+  function removerLinhaDisc(id) {
+    document.getElementById(id)?.remove();
+  }
+
+  function recolherDisciplinas() {
+    const tbody = document.getElementById('linhasDisc');
+    if (!tbody) return [];
+    return [...tbody.querySelectorAll('tr')].map(tr => {
+      const inputs = tr.querySelectorAll('input');
+      const sel    = tr.querySelector('select');
+      const notaV  = inputs[1]?.value;
+      return {
+        nome:   inputs[0]?.value.trim() || '',
+        nota:   notaV !== '' && notaV !== undefined ? Number(notaV) : null,
+        estado: sel?.value || 'pendente'
+      };
+    }).filter(d => d.nome);
+  }
+
+  // ── Gerar PDF do percurso ──
+  function gerarPDFNotas() {
+    const disciplinas = recolherDisciplinas();
+    if (!disciplinas.length) {
+      mostrarAlerta('Adiciona pelo menos uma disciplina antes de gerar o PDF.');
+      return;
+    }
+
+    const uLocal  = JSON.parse(localStorage.getItem('esmad_user') || '{}');
+    const nome    = document.getElementById('f_nome')?.value || uLocal.nome || '—';
+    const cursoEl = document.querySelector('.disc-tabela')?.closest('.painel-secao')?.previousElementSibling;
+    const curso   = document.querySelector('input[readonly]')?.value || 'TeSP DTAM';
+
+    const estadoLabel = { concluida:'Concluída', em_curso:'Em Curso', reprovada:'Reprovada', pendente:'Pendente' };
+    const estadoCor   = { concluida:'#70AD47', em_curso:'#BF8F00', reprovada:'#C00000', pendente:'#888888' };
+
+    const linhas = disciplinas.map(d => `
+      <tr>
+        <td style="padding:10px 14px;border-bottom:1px solid #eee;font-size:13px">${d.nome}</td>
+        <td style="padding:10px 14px;border-bottom:1px solid #eee;font-size:13px;font-weight:700;text-align:center">${d.nota ?? '—'}</td>
+        <td style="padding:10px 14px;border-bottom:1px solid #eee;font-size:13px">
+          <span style="display:inline-block;padding:2px 10px;border-radius:4px;font-weight:600;font-size:12px;background:${estadoCor[d.estado]}22;color:${estadoCor[d.estado]}">${estadoLabel[d.estado]||d.estado}</span>
+        </td>
+      </tr>`).join('');
+
+    const media = disciplinas.filter(d => d.nota !== null).length
+      ? (disciplinas.filter(d => d.nota !== null).reduce((s, d) => s + d.nota, 0) / disciplinas.filter(d => d.nota !== null).length).toFixed(1)
+      : '—';
+
+    const html = `<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>Percurso Académico — ${nome}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Inter, sans-serif; background: #fff; color: #1A1A1A; padding: 48px 56px; }
+  .cab { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 20px; border-bottom: 3px solid #F15A24; margin-bottom: 28px; }
+  .cab-escola { font-size: 22px; font-weight: 800; color: #F15A24; letter-spacing: 2px; }
+  .cab-doc    { font-size: 11px; color: #888; margin-top: 3px; }
+  .aluno-nome { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .aluno-meta { font-size: 12px; color: #888; }
+  .secao-titulo { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #888; margin-bottom: 10px; margin-top: 24px; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: #F8F8F8; }
+  th { padding: 10px 14px; font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid #eee; text-align: left; }
+  .resumo { background: #F8F8F8; border-radius: 8px; padding: 14px 18px; margin-top: 20px; display: flex; gap: 32px; }
+  .resumo-item .label { font-size: 10px; color: #888; font-weight: 700; text-transform: uppercase; margin-bottom: 3px; }
+  .resumo-item .valor { font-size: 20px; font-weight: 800; color: #1A1A1A; }
+  .rodape { margin-top: 36px; padding-top: 14px; border-top: 1px solid #eee; font-size: 10px; color: #bbb; text-align: center; }
+  @media print { body { padding: 28px 36px; } button { display: none; } }
+</style>
+</head>
+<body>
+<div class="cab">
+  <div>
+    <div class="cab-escola">ESMAD</div>
+    <div class="cab-doc">Escola Superior de Media Artes e Design — P.Porto</div>
+  </div>
+  <div style="text-align:right">
+    <div style="font-size:13px;font-weight:700">Percurso Académico</div>
+    <div class="cab-doc">Gerado em ${new Date().toLocaleDateString('pt-PT')}</div>
+  </div>
+</div>
+
+<div class="aluno-nome">${nome}</div>
+<div class="aluno-meta">${curso} &nbsp;·&nbsp; ${new Date().getFullYear()}</div>
+
+<div class="secao-titulo">Unidades Curriculares</div>
+<table>
+  <thead><tr><th>Disciplina</th><th style="text-align:center">Nota</th><th>Estado</th></tr></thead>
+  <tbody>${linhas}</tbody>
+</table>
+
+<div class="resumo">
+  <div class="resumo-item"><div class="label">Total de Disciplinas</div><div class="valor">${disciplinas.length}</div></div>
+  <div class="resumo-item"><div class="label">Concluídas</div><div class="valor">${disciplinas.filter(d=>d.estado==='concluida').length}</div></div>
+  <div class="resumo-item"><div class="label">Média</div><div class="valor">${media}</div></div>
+</div>
+
+<div class="rodape">Documento gerado pela plataforma ESMAD · Para uso interno</div>
+
+<div style="margin-top:24px;text-align:center">
+  <button onclick="window.print()" style="background:#F15A24;color:#fff;border:none;border-radius:8px;padding:12px 28px;font-family:Inter,sans-serif;font-size:14px;font-weight:700;cursor:pointer">
+    🖨 Guardar como PDF (Ctrl+P)
+  </button>
+</div>
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: 'text/html' });
+    const url  = URL.createObjectURL(blob);
+    window.open(url, '_blank');
   }
 
   carregar();

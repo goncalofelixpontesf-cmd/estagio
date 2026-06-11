@@ -303,7 +303,6 @@
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo"><span>ESMAD</span></div>
   <nav class="sidebar-nav">
-    <a class="nav-item" href="dashboard-estudante.html">Início</a>
     <a class="nav-item" href="lista-propostas.html">Propostas</a>
     <a class="nav-item" href="dashboard-estudante.html">As Minhas Candidaturas</a>
     <a class="nav-item activo">O Meu Perfil</a>
@@ -564,30 +563,131 @@
     document.getElementById('inputDomus').addEventListener('change', handleDomus);
   }
 
-  // ── Upload DOMUS (armazenamento local por agora) ──
-  function handleDomus(e) {
+  // ── Upload DOMUS + extração de notas por IA ──
+  async function handleDomus(e) {
     const file = e.target.files[0];
     if (!file) return;
-    if (file.type !== 'application/pdf') {
-      mostrarToast('Só são aceites ficheiros PDF.', 'erro');
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      mostrarToast('O ficheiro não pode ter mais de 5MB.', 'erro');
-      return;
-    }
+    if (file.type !== 'application/pdf') { mostrarToast('Só são aceites ficheiros PDF.', 'erro'); return; }
+    if (file.size > 5 * 1024 * 1024) { mostrarToast('O ficheiro não pode ter mais de 5MB.', 'erro'); return; }
+
     domusNome = file.name;
     localStorage.setItem('esmad_domus_nome', domusNome);
-    mostrarToast(`Notas carregadas: ${file.name}`, 'sucesso');
 
-    // Actualizar UI
+    // Mostrar estado "a extrair"
     const zona = document.getElementById('domusZona');
-    const nota = document.getElementById('notaDomus');
     if (zona) {
       zona.className = 'domus-zona tem-ficheiro';
-      zona.innerHTML = `<div class="icone">✅</div><div class="texto"><strong>${file.name}</strong>Clica para substituir</div>`;
+      zona.innerHTML = `
+        <div class="icone">🤖</div>
+        <div class="texto"><strong>A extrair notas com IA…</strong>Aguarda um momento</div>
+        <div style="margin-top:8px;height:4px;background:#E2EFDA;border-radius:2px;overflow:hidden;width:100%">
+          <div style="height:100%;background:var(--verde);border-radius:2px;animation:shimmer 1.2s infinite;background-size:200% 100%"></div>
+        </div>`;
     }
-    if (nota) nota.textContent = `📄 ${file.name}`;
+
+    try {
+      const disciplinas = await extrairNotasDomus(file);
+      mostrarPreviewNotas(disciplinas, file.name);
+    } catch (err) {
+      mostrarToast('Não foi possível extrair as notas automaticamente.', 'erro');
+      if (zona) {
+        zona.className = 'domus-zona tem-ficheiro';
+        zona.innerHTML = `<div class="icone">✅</div><div class="texto"><strong>${file.name}</strong>Clica para substituir</div>`;
+      }
+    }
+  }
+
+  async function extrairNotasDomus(file) {
+    // Ler PDF como base64
+    const base64 = await new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload  = () => res(r.result.split(',')[1]);
+      r.onerror = () => rej(new Error('Erro ao ler ficheiro'));
+      r.readAsDataURL(file);
+    });
+
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
+            { type: 'text', text: 'Extrai todas as disciplinas/unidades curriculares e as respetivas notas deste documento académico do DOMUS (sistema de gestão académica português). Responde APENAS com um array JSON puro, sem markdown, sem texto adicional, no formato exato: [{"nome":"Nome da Disciplina","nota":15,"estado":"concluida"}]. Regras para estado: "concluida" se nota >= 10, "reprovada" se nota < 10, "em_curso" se a disciplina não tem nota final ainda. Se a nota não existir usa null. Inclui todas as disciplinas que encontrares.' }
+          ]
+        }]
+      })
+    });
+
+    const data = await resp.json();
+    const texto = data.content?.[0]?.text || '';
+    const limpo = texto.replace(/```json|```/g, '').trim();
+    return JSON.parse(limpo);
+  }
+
+  function mostrarPreviewNotas(disciplinas, fileName) {
+    const zona = document.getElementById('domusZona');
+    const estadoLabel = { concluida:'Concluída', em_curso:'Em Curso', reprovada:'Reprovada', pendente:'Pendente' };
+    const estadoCor   = { concluida:'var(--verde)', em_curso:'var(--amarelo)', reprovada:'var(--vermelho)', pendente:'var(--cinza-texto)' };
+
+    if (!disciplinas || !disciplinas.length) {
+      mostrarToast('Não foram encontradas disciplinas no documento.', 'erro');
+      if (zona) zona.innerHTML = `<div class="icone">✅</div><div class="texto"><strong>${fileName}</strong>Clica para substituir</div>`;
+      return;
+    }
+
+    if (zona) {
+      zona.className = 'domus-zona tem-ficheiro';
+      zona.innerHTML = `
+        <div class="icone">✅</div>
+        <div class="texto"><strong>${fileName}</strong>${disciplinas.length} disciplinas extraídas</div>`;
+    }
+
+    // Mostrar toast
+    mostrarToast(`✔ ${disciplinas.length} disciplinas extraídas!`, 'sucesso');
+
+    // Construir preview
+    const tbDisc = document.getElementById('tabelaDisciplinas');
+    if (!tbDisc) return;
+
+    tbDisc.innerHTML = `
+      <tr><td colspan="3" style="padding:12px 18px;background:var(--verde-light)">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <span style="font-size:0.84rem;font-weight:600;color:var(--verde)">✔ ${disciplinas.length} disciplinas extraídas do DOMUS</span>
+          <button onclick="guardarNotas()" style="background:var(--verde);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-family:Inter,sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer">
+            Guardar Notas
+          </button>
+        </div>
+      </td></tr>
+      ${disciplinas.map(d => `
+        <tr>
+          <td><span style="font-weight:500">${d.nome}</span></td>
+          <td><span style="font-weight:700">${d.nota ?? '—'}</span></td>
+          <td><span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:4px;font-size:0.72rem;font-weight:600;background:${estadoCor[d.estado]}22;color:${estadoCor[d.estado]}">${estadoLabel[d.estado] || d.estado}</span></td>
+        </tr>`).join('')}`;
+
+    // Guardar em memória para poder salvar
+    window._disciplinasExtraidas = disciplinas;
+  }
+
+  async function guardarNotas() {
+    const disciplinas = window._disciplinasExtraidas;
+    if (!disciplinas) return;
+    try {
+      const dados = await req('/utilizadores/perfil', {
+        method: 'PUT',
+        body: JSON.stringify({ disciplinas })
+      });
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+      mostrarToast('Notas guardadas no perfil!', 'sucesso');
+      // Recarregar para mostrar o estado atualizado
+      setTimeout(() => carregar(), 800);
+    } catch (err) {
+      mostrarToast('Erro ao guardar: ' + err.message, 'erro');
+    }
   }
 
   // ── Iniciar ──

@@ -16,7 +16,8 @@ const aprovacaoCCASchema = new mongoose.Schema({
     enum: ['pendente', 'aprovado', 'rejeitado'],
     default: 'pendente'
   },
-  feedback:   { type: String },
+  sugestao:   { type: String, default: null },
+  feedback:   { type: String, default: null },
   decididoEm: { type: Date }
 }, {
   timestamps: { createdAt: 'criadoEm' }
