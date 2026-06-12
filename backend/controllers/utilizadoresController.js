@@ -87,4 +87,55 @@ exports.uploadCV = async (req, res) => {
   } catch (err) {
     res.status(500).json({ sucesso: false, mensagem: err.message });
   }
+};  
+
+// POST /api/utilizadores/extrair-notas
+// Recebe um PDF em base64, chama a API Anthropic e devolve as disciplinas extraídas
+exports.extrairNotasDomus = async (req, res) => {
+  try {
+    const { pdfBase64 } = req.body;
+    if (!pdfBase64) return res.status(400).json({ sucesso: false, mensagem: 'PDF não fornecido.' });
+
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) return res.status(500).json({ sucesso: false, mensagem: 'ANTHROPIC_API_KEY não configurada no servidor.' });
+
+    const resposta = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1024,
+        messages: [{
+          role: 'user',
+          content: [
+            {
+              type: 'document',
+              source: { type: 'base64', media_type: 'application/pdf', data: pdfBase64 }
+            },
+            {
+              type: 'text',
+              text: 'Extrai todas as disciplinas/unidades curriculares e respetivas notas deste documento academico. Responde APENAS com um array JSON puro, sem markdown nem texto adicional, no formato: [{"nome":"Nome da Disciplina","nota":15,"estado":"concluida"}]. Regras de estado: "concluida" se nota >= 10, "reprovada" se nota < 10, "em_curso" se sem nota final. Usa null para nota ausente.'
+            }
+          ]
+        }]
+      })
+    });
+
+    const dados = await resposta.json();
+    if (!resposta.ok) {
+      return res.status(500).json({ sucesso: false, mensagem: dados.error?.message || 'Erro na API Anthropic.' });
+    }
+
+    const texto = dados.content?.[0]?.text || '';
+    const limpo = texto.replace(/```json|```/g, '').trim();
+    const disciplinas = JSON.parse(limpo);
+
+    res.json({ sucesso: true, disciplinas });
+  } catch (err) {
+    res.status(500).json({ sucesso: false, mensagem: 'Nao foi possivel extrair as notas: ' + err.message });
+  }
 };
