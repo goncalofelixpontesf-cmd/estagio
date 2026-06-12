@@ -10,121 +10,106 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --laranja:       #F15A24;
-      --laranja-hover: #d94d1c;
-      --laranja-light: #FEE8DF;
-      --preto:         #1A1A1A;
-      --cinza-bg:      #F4F4F4;
-      --cinza-texto:   #888888;
-      --cinza-linha:   #EEEEEE;
-      --cinza-input:   #F5F5F5;
-      --branco:        #FFFFFF;
-      --verde:         #70AD47;
-      --verde-light:   #E2EFDA;
-      --vermelho:      #C00000;
-      --sidebar-w:     220px;
+      --laranja: #F15A24; --laranja-hover: #d94d1c; --laranja-light: #FEE8DF;
+      --preto: #1A1A1A; --cinza-bg: #F0F0F0; --cinza-texto: #888;
+      --cinza-linha: #E8E8E8; --cinza-input: #F5F5F5; --branco: #FFFFFF;
+      --verde: #70AD47; --verde-light: #E2EFDA;
+      --vermelho: #C00000; --sidebar-w: 220px;
     }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--cinza-bg);
-      color: var(--preto);
-      min-height: 100vh;
-      display: flex;
-    }
+    body { font-family: 'Inter', sans-serif; background: var(--cinza-bg); color: var(--preto); min-height: 100vh; display: flex; }
 
     /* ══ SIDEBAR ══ */
-    .sidebar {
-      width: var(--sidebar-w); background: var(--laranja);
-      display: flex; flex-direction: column;
-      position: fixed; top: 0; left: 0; height: 100vh; z-index: 100;
-    }
+    .sidebar { width: var(--sidebar-w); background: var(--laranja); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
     .sidebar-logo { padding: 22px 0 18px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.18); }
-    .sidebar-logo span { color: var(--branco); font-size: 1.35rem; font-weight: 800; letter-spacing: 2px; }
+    .sidebar-logo span { color: #fff; font-size: 1.35rem; font-weight: 800; letter-spacing: 2px; }
     .sidebar-nav { flex: 1; padding: 12px 0; }
-    .nav-item {
-      display: block; padding: 13px 28px;
-      color: rgba(255,255,255,0.82); font-size: 0.88rem; font-weight: 500;
-      text-decoration: none; cursor: pointer; border: none; background: none;
-      width: 100%; text-align: left; transition: background 0.15s, color 0.15s;
-    }
-    .nav-item:hover  { background: rgba(0,0,0,0.12); color: var(--branco); }
-    .nav-item.activo { background: rgba(0,0,0,0.18); color: var(--branco); font-weight: 700; }
+    .nav-item { display: block; padding: 13px 28px; color: rgba(255,255,255,0.82); font-size: 0.88rem; font-weight: 500; text-decoration: none; cursor: pointer; border: none; background: none; width: 100%; text-align: left; transition: background 0.15s, color 0.15s; }
+    .nav-item:hover  { background: rgba(0,0,0,0.12); color: #fff; }
+    .nav-item.activo { background: rgba(0,0,0,0.18); color: #fff; font-weight: 700; }
     .sidebar-footer { padding: 18px 28px; border-top: 1px solid rgba(255,255,255,0.18); }
-    .sidebar-footer .nome   { color: var(--branco); font-size: 0.82rem; font-weight: 600; }
+    .sidebar-footer .nome   { color: #fff; font-size: 0.82rem; font-weight: 600; }
     .sidebar-footer .perfil { color: rgba(255,255,255,0.65); font-size: 0.75rem; margin-top: 2px; }
 
     /* ══ MAIN ══ */
     .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
 
-    .topbar {
-      background: var(--branco); padding: 18px 32px;
-      display: flex; align-items: center; justify-content: space-between;
-      border-bottom: 1px solid var(--cinza-linha);
-      position: sticky; top: 0; z-index: 50;
-    }
+    .topbar { background: var(--branco); padding: 18px 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--cinza-linha); position: sticky; top: 0; z-index: 50; }
     .topbar-centro { text-align: center; flex: 1; }
     .topbar-centro .titulo    { font-size: 1rem; font-weight: 700; }
     .topbar-centro .subtitulo { font-size: 0.78rem; color: var(--cinza-texto); margin-top: 1px; }
-    .avatar {
-      width: 38px; height: 38px; background: var(--laranja); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--branco); font-weight: 700; font-size: 0.95rem;
-      cursor: pointer; flex-shrink: 0;
-    }
+    .avatar { width: 38px; height: 38px; background: var(--laranja); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 0.95rem; cursor: pointer; flex-shrink: 0; }
     .topbar-left { width: 38px; }
 
-    .content { padding: 28px 32px; flex: 1; max-width: 820px; }
+    .content { padding: 32px; flex: 1; max-width: 860px; }
 
-    /* Alerta */
-    .alerta {
-      display: none; border-radius: 8px; padding: 12px 16px;
-      font-size: 0.84rem; font-weight: 500; margin-bottom: 20px;
+    /* ══ ALERTA ══ */
+    .alerta { display: none; border-radius: 10px; padding: 13px 18px; font-size: 0.84rem; font-weight: 500; margin-bottom: 22px; border-left: 4px solid transparent; }
+    .alerta.erro    { background: #FFF0F0; color: var(--vermelho); border-color: var(--vermelho); display: block; }
+    .alerta.sucesso { background: var(--verde-light); color: #2d5a1b; border-color: var(--verde); display: block; }
+
+    /* ══ AVATAR HERO ══ */
+    .avatar-hero {
+      display: flex; align-items: center; gap: 20px;
+      background: var(--branco); border-radius: 16px;
+      padding: 24px 28px; margin-bottom: 20px;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.06);
     }
-    .alerta.erro    { background: #FFDEDE; color: var(--vermelho); display: block; }
-    .alerta.sucesso { background: var(--verde-light); color: var(--verde); display: block; }
+    .avatar-circle {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: var(--laranja);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 1.6rem; font-weight: 800;
+      flex-shrink: 0;
+    }
+    .avatar-hero-info .av-nome   { font-size: 1.05rem; font-weight: 700; }
+    .avatar-hero-info .av-curso  { font-size: 0.8rem; color: var(--cinza-texto); margin-top: 3px; }
+    .avatar-hero-info .av-email  { font-size: 0.78rem; color: var(--laranja); font-weight: 500; margin-top: 2px; }
 
-    /* Painel branco */
-    .painel {
+    /* ══ FORM CARD ══ */
+    .form-card {
       background: var(--branco);
-      border-radius: 12px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+      border-radius: 16px;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.06);
       overflow: hidden;
-    }
-    .painel-secao { padding: 22px 28px; }
-    .painel-secao + .painel-secao { border-top: 1px solid var(--cinza-linha); }
-
-    .secao-titulo {
-      font-size: 0.88rem; font-weight: 700; color: var(--preto);
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
 
-    /* Grid de campos */
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
+    .form-card-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 18px 28px 16px;
+      border-bottom: 1px solid var(--cinza-linha);
     }
-    .form-grid.tres { grid-template-columns: 1fr 1fr 1fr; }
-    .form-grid.um   { grid-template-columns: 1fr; }
+    .form-card-header .icone-secao {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: var(--laranja-light);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
+    }
+    .form-card-header .header-texto .titulo-secao  { font-size: 0.9rem; font-weight: 700; }
+    .form-card-header .header-texto .subtitulo-secao { font-size: 0.74rem; color: var(--cinza-texto); margin-top: 2px; }
 
+    .form-card-body { padding: 22px 28px; }
+
+    /* ══ GRID ══ */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .form-grid.um { grid-template-columns: 1fr; }
+
+    /* ══ CAMPO ══ */
     .campo { display: flex; flex-direction: column; gap: 7px; }
-    .campo label {
-      font-size: 0.72rem; font-weight: 700; color: var(--preto);
-      text-transform: uppercase; letter-spacing: 0.5px;
-    }
-    .campo input,
-    .campo select {
+    .campo label { font-size: 0.72rem; font-weight: 700; color: var(--preto); text-transform: uppercase; letter-spacing: 0.5px; }
+    .campo label .opcional { color: var(--cinza-texto); font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 0.7rem; }
+
+    .campo input {
       background: var(--cinza-input);
       border: 1.5px solid transparent;
-      border-radius: 8px;
-      padding: 12px 14px;
+      border-radius: 10px;
+      padding: 12px 16px;
       font-family: 'Inter', sans-serif;
       font-size: 0.88rem;
       color: var(--preto);
       outline: none;
       transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
-      appearance: none;
     }
     .campo input::placeholder { color: #BBBBBB; }
     .campo input:focus {
@@ -132,100 +117,93 @@
       border-color: var(--laranja);
       box-shadow: 0 0 0 3px rgba(241,90,36,0.10);
     }
-    /* Campo não editável */
-    .campo input[readonly],
-    .campo select.readonly {
-      background: #EEEEEE;
-      color: var(--cinza-texto);
-      cursor: not-allowed;
-    }
-    .campo input[readonly]:focus {
+    .campo input[readonly] {
+      background: #EFEFEF; color: var(--cinza-texto); cursor: not-allowed;
       border-color: transparent;
-      box-shadow: none;
-      background: #EEEEEE;
     }
-    .campo select {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      background-color: #EEEEEE;
-      padding-right: 32px;
-      color: var(--cinza-texto);
-      cursor: not-allowed;
-    }
+    .campo input[readonly]:focus { border-color: transparent; box-shadow: none; background: #EFEFEF; }
+    .campo .campo-nota { font-size: 0.72rem; color: var(--cinza-texto); font-style: italic; }
 
-    /* Zona upload CV */
-    .upload-zona {
-      border: 1.5px dashed var(--cinza-linha);
-      border-radius: 8px;
-      padding: 20px;
+    /* ══ CV UPLOAD ══ */
+    .cv-area {
+      border: 2px dashed var(--cinza-linha);
+      border-radius: 12px;
+      padding: 28px 20px;
       text-align: center;
       cursor: pointer;
-      transition: border-color 0.15s, background 0.15s;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
       background: #FAFAFA;
-      margin-top: 2px;
+      position: relative;
+      overflow: hidden;
     }
-    .upload-zona:hover { border-color: var(--laranja); background: var(--laranja-light); }
-    .upload-zona.tem { border-color: var(--verde); background: var(--verde-light); }
-    .upload-zona .icone { font-size: 1.4rem; margin-bottom: 6px; }
-    .upload-zona .texto { font-size: 0.8rem; color: var(--cinza-texto); }
-    .upload-zona .texto strong { display: block; color: var(--preto); margin-bottom: 2px; font-size: 0.84rem; }
-    .upload-zona.tem .texto { color: var(--verde); }
+    .cv-area::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--laranja-light);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .cv-area:hover { border-color: var(--laranja); transform: translateY(-1px); }
+    .cv-area:hover::before { opacity: 1; }
+    .cv-area.tem { border-color: var(--verde); background: var(--verde-light); }
+    .cv-area.tem::before { display: none; }
+
+    .cv-area-icone { font-size: 2rem; margin-bottom: 10px; position: relative; z-index: 1; }
+    .cv-area-titulo { font-size: 0.88rem; font-weight: 700; color: var(--preto); margin-bottom: 4px; position: relative; z-index: 1; }
+    .cv-area-sub    { font-size: 0.76rem; color: var(--cinza-texto); position: relative; z-index: 1; }
+    .cv-area.tem .cv-area-titulo { color: #2d5a1b; }
+    .cv-area.tem .cv-area-sub    { color: #375623; }
+
+    .cv-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--branco); border-radius: 6px; padding: 5px 12px;
+      font-size: 0.76rem; font-weight: 600; margin-top: 10px;
+      border: 1px solid var(--cinza-linha);
+      position: relative; z-index: 1;
+    }
     #inputCV { display: none; }
 
-    /* Footer com botões */
-    .painel-footer {
+    /* ══ FOOTER ══ */
+    .form-footer {
+      background: var(--branco);
+      border-radius: 16px;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.06);
       padding: 18px 28px;
-      border-top: 1px solid var(--cinza-linha);
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 10px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px;
     }
+    .footer-hint { font-size: 0.78rem; color: var(--cinza-texto); }
+    .footer-hint span { color: var(--vermelho); }
+    .footer-btns { display: flex; gap: 10px; }
+
     .btn-cancelar {
-      background: #F0F0F0; color: #666;
-      border: none; border-radius: 8px; padding: 11px 22px;
+      background: #F0F0F0; color: #555;
+      border: none; border-radius: 10px; padding: 11px 24px;
       font-family: 'Inter', sans-serif; font-size: 0.86rem; font-weight: 500;
-      cursor: pointer; text-decoration: none;
-      transition: background 0.15s;
+      cursor: pointer; text-decoration: none; transition: background 0.15s;
     }
     .btn-cancelar:hover { background: #E4E4E4; }
-    .btn-guardar {
-      background: var(--laranja); color: var(--branco);
-      border: none; border-radius: 8px; padding: 11px 28px;
-      font-family: 'Inter', sans-serif; font-size: 0.86rem; font-weight: 700;
-      cursor: pointer; transition: background 0.15s;
-    }
-    .btn-guardar:hover   { background: var(--laranja-hover); }
-    .btn-guardar:disabled { opacity: 0.65; cursor: not-allowed; }
 
-    /* Spin */
-    .spin {
-      display: inline-block; width: 13px; height: 13px;
-      border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff;
-      border-radius: 50%; animation: girar 0.6s linear infinite;
-      vertical-align: middle; margin-right: 6px;
+    .btn-guardar {
+      background: var(--laranja); color: #fff;
+      border: none; border-radius: 10px; padding: 11px 28px;
+      font-family: 'Inter', sans-serif; font-size: 0.86rem; font-weight: 700;
+      cursor: pointer; transition: background 0.15s, transform 0.1s;
+      display: flex; align-items: center; gap: 8px;
     }
+    .btn-guardar:hover   { background: var(--laranja-hover); transform: translateY(-1px); }
+    .btn-guardar:active  { transform: translateY(0); }
+    .btn-guardar:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .spin { display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: girar 0.6s linear infinite; vertical-align: middle; }
     @keyframes girar { to { transform: rotate(360deg); } }
 
-    /* Skeleton */
-    .skeleton {
-      background: linear-gradient(90deg,#ececec 25%,#f5f5f5 50%,#ececec 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.2s infinite; border-radius: 6px;
-    }
+    .skeleton { background: linear-gradient(90deg,#ececec 25%,#f5f5f5 50%,#ececec 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 8px; }
     @keyframes shimmer { to { background-position: -200% 0; } }
 
     /* Mobile */
-    .menu-toggle {
-      display: none; position: fixed; top: 14px; left: 14px; z-index: 200;
-      background: var(--laranja); border: none; border-radius: 8px;
-      padding: 8px 10px; cursor: pointer; color: white; font-size: 1.1rem;
-    }
-    .sidebar-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.4); z-index: 90;
-    }
+    .menu-toggle { display: none; position: fixed; top: 14px; left: 14px; z-index: 200; background: var(--laranja); border: none; border-radius: 8px; padding: 8px 10px; cursor: pointer; color: white; font-size: 1.1rem; }
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 90; }
 
     @media (max-width: 768px) {
       .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
@@ -235,26 +213,27 @@
       .menu-toggle { display: block; }
       .topbar { padding-left: 56px; }
       .content { padding: 20px 16px; }
-      .form-grid, .form-grid.tres { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .avatar-hero { flex-direction: column; text-align: center; }
+      .form-footer { flex-direction: column; align-items: stretch; }
+      .footer-btns { flex-direction: column; }
     }
 
     /* Percurso Académico */
-    .disc-tabela { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
-    .disc-tabela thead tr { background: #F8F8F8; }
-    .disc-tabela th { padding: 9px 12px; font-size: 0.7rem; font-weight: 700; color: var(--cinza-texto); text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid var(--cinza-linha); text-align: left; }
-    .disc-tabela td { padding: 7px 6px; border-bottom: 1px solid var(--cinza-linha); vertical-align: middle; }
-    .disc-tabela tr:last-child td { border-bottom: none; }
-    .disc-input { width: 100%; background: var(--cinza-input); border: 1.5px solid transparent; border-radius: 6px; padding: 7px 10px; font-family: 'Inter', sans-serif; font-size: 0.83rem; color: var(--preto); outline: none; }
-    .disc-input:focus { background: var(--branco); border-color: var(--laranja); }
-    .disc-select { width: 100%; background: var(--cinza-input); border: 1.5px solid transparent; border-radius: 6px; padding: 7px 28px 7px 10px; font-family: 'Inter', sans-serif; font-size: 0.83rem; color: var(--preto); outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; }
-    .disc-select:focus { background-color: var(--branco); border-color: var(--laranja); }
-    .btn-rem-disc { background: none; border: none; color: #ccc; font-size: 1rem; cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: color 0.15s, background 0.15s; }
-    .btn-rem-disc:hover { color: var(--vermelho); background: var(--vermelho-light); }
-    .disc-acoes { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
-    .btn-add-disc { background: #F0F0F0; color: #555; border: none; border-radius: 7px; padding: 8px 16px; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
-    .btn-add-disc:hover { background: #E4E4E4; }
-    .btn-pdf { display: flex; align-items: center; gap: 6px; background: var(--laranja-light); color: var(--laranja); border: none; border-radius: 7px; padding: 8px 16px; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
-    .btn-pdf:hover { background: var(--laranja); color: var(--branco); }
+    .disc-tabela { width:100%;border-collapse:collapse;margin-bottom:12px }
+    .disc-tabela th { padding:9px 12px;font-size:0.7rem;font-weight:700;color:var(--cinza-texto);text-transform:uppercase;letter-spacing:0.4px;border-bottom:1px solid var(--cinza-linha);text-align:left;background:#f8f8f8 }
+    .disc-tabela td { padding:6px 6px;border-bottom:1px solid var(--cinza-linha);vertical-align:middle }
+    .disc-tabela tr:last-child td { border-bottom:none }
+    .disc-input  { width:100%;background:var(--cinza-input);border:1.5px solid transparent;border-radius:6px;padding:7px 10px;font-family:'Inter',sans-serif;font-size:0.83rem;color:var(--preto);outline:none }
+    .disc-input:focus { background:#fff;border-color:var(--laranja) }
+    .disc-select { width:100%;background:var(--cinza-input);border:1.5px solid transparent;border-radius:6px;padding:7px 8px;font-family:'Inter',sans-serif;font-size:0.83rem;color:var(--preto);outline:none }
+    .btn-rem-disc { background:none;border:none;color:#ccc;font-size:1rem;cursor:pointer;padding:4px 8px;border-radius:4px }
+    .btn-rem-disc:hover { color:var(--vermelho);background:#ffdede }
+    .disc-acoes { display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px }
+    .btn-add-disc { background:#f0f0f0;color:#555;border:none;border-radius:7px;padding:8px 16px;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer }
+    .btn-add-disc:hover { background:#e4e4e4 }
+    .btn-pdf { display:flex;align-items:center;gap:6px;background:var(--laranja-light);color:var(--laranja);border:none;border-radius:7px;padding:8px 16px;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer }
+    .btn-pdf:hover { background:var(--laranja);color:#fff }
   </style>
 </head>
 <body>
@@ -262,12 +241,11 @@
 <button class="menu-toggle" id="menuToggle">☰</button>
 <div class="sidebar-overlay" id="overlay"></div>
 
-<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo"><span>ESMAD</span></div>
   <nav class="sidebar-nav">
     <a class="nav-item" href="lista-propostas.html">Propostas</a>
-    <a class="nav-item" href="entrevistas.html">As Minhas Candidaturas</a>
+    <a class="nav-item" href="candidaturas.html">As Minhas Candidaturas</a>
     <a class="nav-item activo" href="perfil-estudante.html">O Meu Perfil</a>
   </nav>
   <div class="sidebar-footer">
@@ -276,9 +254,7 @@
   </div>
 </aside>
 
-<!-- MAIN -->
 <main class="main">
-
   <div class="topbar">
     <div class="topbar-left"></div>
     <div class="topbar-centro">
@@ -292,19 +268,34 @@
 
     <div id="alerta" class="alerta"></div>
 
-    <div class="painel" id="painel">
+    <!-- Avatar hero skeleton -->
+    <div class="avatar-hero" id="avatarHero">
+      <div class="skeleton" style="width:64px;height:64px;border-radius:50%;flex-shrink:0"></div>
+      <div style="flex:1">
+        <div class="skeleton" style="height:16px;width:180px;margin-bottom:8px"></div>
+        <div class="skeleton" style="height:12px;width:120px;margin-bottom:6px"></div>
+        <div class="skeleton" style="height:12px;width:160px"></div>
+      </div>
+    </div>
 
-      <!-- Skeleton enquanto carrega -->
-      <div class="painel-secao">
-        <div class="skeleton" style="height:14px;width:130px;margin-bottom:20px"></div>
-        <div class="form-grid">
-          <div><div class="skeleton" style="height:12px;width:80px;margin-bottom:8px"></div><div class="skeleton" style="height:42px;border-radius:8px"></div></div>
-          <div><div class="skeleton" style="height:12px;width:80px;margin-bottom:8px"></div><div class="skeleton" style="height:42px;border-radius:8px"></div></div>
-          <div><div class="skeleton" style="height:12px;width:80px;margin-bottom:8px"></div><div class="skeleton" style="height:42px;border-radius:8px"></div></div>
-          <div><div class="skeleton" style="height:12px;width:80px;margin-bottom:8px"></div><div class="skeleton" style="height:42px;border-radius:8px"></div></div>
+    <!-- Form cards skeleton -->
+    <div id="formCards">
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="skeleton" style="width:34px;height:34px;border-radius:8px"></div>
+          <div style="flex:1">
+            <div class="skeleton" style="height:13px;width:140px;margin-bottom:6px"></div>
+            <div class="skeleton" style="height:11px;width:200px"></div>
+          </div>
+        </div>
+        <div class="form-card-body">
+          <div class="form-grid">
+            <div><div class="skeleton" style="height:11px;width:80px;margin-bottom:8px"></div><div class="skeleton" style="height:44px;border-radius:10px"></div></div>
+            <div><div class="skeleton" style="height:11px;width:80px;margin-bottom:8px"></div><div class="skeleton" style="height:44px;border-radius:10px"></div></div>
+            <div><div class="skeleton" style="height:11px;width:80px;margin-bottom:8px"></div><div class="skeleton" style="height:44px;border-radius:10px"></div></div>
+          </div>
         </div>
       </div>
-
     </div>
 
   </div>
@@ -322,30 +313,21 @@
   if (utilizador.perfil !== 'estudante') { window.location.href = 'login.html'; }
 
   document.getElementById('sidebarNome').textContent = utilizador.nome;
-  document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
+  document.getElementById('avatar').textContent      = utilizador.nome.charAt(0).toUpperCase();
 
   document.getElementById('avatar').addEventListener('click', () => {
-    if (confirm('Tens a certeza que queres fazer logout?')) {
-      localStorage.clear();
-      window.location.href = 'login.html';
-    }
+    if (confirm('Tens a certeza que queres fazer logout?')) { localStorage.clear(); window.location.href = 'login.html'; }
   });
 
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('overlay');
-  document.getElementById('menuToggle').addEventListener('click', () => {
-    sidebar.classList.toggle('aberta');
-    overlay.classList.toggle('visivel');
-  });
-  overlay.addEventListener('click', () => {
-    sidebar.classList.remove('aberta');
-    overlay.classList.remove('visivel');
-  });
+  document.getElementById('menuToggle').addEventListener('click', () => { sidebar.classList.toggle('aberta'); overlay.classList.toggle('visivel'); });
+  overlay.addEventListener('click', () => { sidebar.classList.remove('aberta'); overlay.classList.remove('visivel'); });
 
   function req(endpoint, opts = {}) {
     return fetch(`${API}${endpoint}`, {
       ...opts,
-      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...(opts.headers || {}) }
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...(opts.headers||{}) }
     }).then(r => r.json());
   }
 
@@ -357,24 +339,18 @@
   }
 
   let cvNome = null;
-  let cvFile = null; // ficheiro selecionado, por enviar
+  let cvFile = null;
 
-  // ── Carregar dados e render ──
   async function carregar() {
     try {
       const dados = await req('/utilizadores/perfil');
       if (!dados.sucesso) throw new Error(dados.mensagem);
-
       const { utilizador: u, dadosExtra: est } = dados;
-      // Mostrar CV existente guardado na BD
-      if (est?.cv) {
-        cvNome = est.cv;
-      }
+      if (est?.cv) cvNome = est.cv;
       renderFormulario(u, est);
-
     } catch (err) {
-      document.getElementById('painel').innerHTML = `
-        <div style="padding:40px;text-align:center;color:var(--cinza-texto)">
+      document.getElementById('formCards').innerHTML = `
+        <div style="background:#fff;border-radius:16px;padding:40px;text-align:center;color:var(--cinza-texto)">
           <div style="font-size:2rem;margin-bottom:10px">⚠️</div>
           <p>${err.message}</p>
         </div>`;
@@ -382,125 +358,176 @@
   }
 
   function renderFormulario(u, est) {
-    document.getElementById('painel').innerHTML = `
+    // Avatar hero
+    document.getElementById('avatarHero').innerHTML = `
+      <div class="avatar-circle">${u.nome.charAt(0).toUpperCase()}</div>
+      <div class="avatar-hero-info">
+        <div class="av-nome">${u.nome}</div>
+        <div class="av-curso">${est?.curso || 'TeSP DTAM'}${est?.ano ? ' · ' + est.ano + '.º Ano' : ''}</div>
+        <div class="av-email">${u.email}</div>
+      </div>`;
+
+    // Form cards
+    document.getElementById('formCards').innerHTML = `
 
       <!-- Dados Pessoais -->
-      <div class="painel-secao">
-        <div class="secao-titulo">Dados Pessoais</div>
-        <div class="form-grid">
-          <div class="campo">
-            <label>Nome Completo</label>
-            <input type="text" id="f_nome" value="${u.nome || ''}" placeholder="Nome completo">
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="icone-secao">??</div>
+          <div class="header-texto">
+            <div class="titulo-secao">Dados Pessoais</div>
+            <div class="subtitulo-secao">Nome e contacto direto</div>
           </div>
-          <div class="campo">
-            <label>E-mail</label>
-            <input type="email" id="f_email" value="${u.email || ''}" readonly>
-          </div>
-          <div class="campo">
-            <label>Telefone</label>
-            <input type="tel" id="f_telefone" value="${est?.telefone || ''}" placeholder="+351 9XX XXX XXX">
+        </div>
+        <div class="form-card-body">
+          <div class="form-grid">
+            <div class="campo">
+              <label>Nome Completo</label>
+              <input type="text" id="f_nome" value="${u.nome||''}" placeholder="O teu nome completo">
+            </div>
+            <div class="campo">
+              <label>E-mail <span class="opcional">(não editável)</span></label>
+              <input type="email" id="f_email" value="${u.email||''}" readonly>
+            </div>
+            <div class="campo">
+              <label>Telefone <span class="opcional">(opcional)</span></label>
+              <input type="tel" id="f_telefone" value="${est?.telefone||''}" placeholder="+351 9XX XXX XXX">
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Links -->
-      <div class="painel-secao">
-        <div class="secao-titulo">Presença Online</div>
-        <div class="form-grid">
-          <div class="campo">
-            <label>Portefólio</label>
-            <input type="text" id="f_portfolio" value="${est?.portfolio || ''}" placeholder="gpontes.pt">
+      <!-- Presença Online -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="icone-secao">??</div>
+          <div class="header-texto">
+            <div class="titulo-secao">Presença Online</div>
+            <div class="subtitulo-secao">Links visíveis pelas entidades</div>
           </div>
-          <div class="campo">
-            <label>LinkedIn</label>
-            <input type="text" id="f_linkedin" value="${est?.linkedin || ''}" placeholder="linkedin.com/in/gpontes">
+        </div>
+        <div class="form-card-body">
+          <div class="form-grid">
+            <div class="campo">
+              <label>Portefólio <span class="opcional">(opcional)</span></label>
+              <input type="text" id="f_portfolio" value="${est?.portfolio||''}" placeholder="ex: gpontes.dev">
+            </div>
+            <div class="campo">
+              <label>LinkedIn <span class="opcional">(opcional)</span></label>
+              <input type="text" id="f_linkedin" value="${est?.linkedin||''}" placeholder="linkedin.com/in/gpontes">
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Dados Académicos (não editáveis) -->
-      <div class="painel-secao">
-        <div class="secao-titulo">Dados Académicos</div>
-        <div class="form-grid">
-          <div class="campo">
-            <label>Curso</label>
-            <input type="text" value="${est?.curso || 'TeSP DTAM'}" readonly>
-          </div>
-          <div class="campo">
-            <label>Ano</label>
-            <input type="text" value="${est?.ano ? est.ano + '.º Ano' : '—'}" readonly>
+      <!-- Dados Académicos -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="icone-secao">??</div>
+          <div class="header-texto">
+            <div class="titulo-secao">Dados Académicos</div>
+            <div class="subtitulo-secao">Geridos pela instituição — só leitura</div>
           </div>
         </div>
-        <p style="font-size:0.74rem;color:var(--cinza-texto);margin-top:10px;font-style:italic">
-          Os dados académicos são geridos pela instituição e não podem ser alterados aqui.
-        </p>
-      </div>
-
-      <!-- Percurso Académico (editável) -->
-      <div class="painel-secao">
-        <div class="secao-titulo">Percurso Académico</div>
-        <p style="font-size:0.8rem;color:var(--cinza-texto);margin-bottom:14px">
-          Adiciona as tuas disciplinas e notas. Depois gera o PDF e faz upload no perfil para confirmar.
-        </p>
-        <table class="disc-tabela">
-          <thead><tr><th style="width:50%">Disciplina</th><th style="width:14%">Nota</th><th style="width:22%">Estado</th><th style="width:8%"></th></tr></thead>
-          <tbody id="linhasDisc">
-            ${(est?.disciplinas || []).map((d, i) => gerarLinhaDisc(d, i)).join('') || ''}
-          </tbody>
-        </table>
-        <div class="disc-acoes">
-          <button class="btn-add-disc" onclick="adicionarLinhaDisc()">+ Adicionar Disciplina</button>
-          <button class="btn-pdf" onclick="gerarPDFNotas()">📄 Gerar PDF do Percurso</button>
+        <div class="form-card-body">
+          <div class="form-grid">
+            <div class="campo">
+              <label>Curso</label>
+              <input type="text" value="${est?.curso||'TeSP DTAM'}" readonly>
+            </div>
+            <div class="campo">
+              <label>Ano</label>
+              <input type="text" value="${est?.ano ? est.ano+'.º Ano' : '—'}" readonly>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- CV -->
-      <div class="painel-secao">
-        <div class="secao-titulo">CV</div>
-        <div class="upload-zona ${cvNome ? 'tem' : ''}" id="zonaCV" onclick="document.getElementById('inputCV').click()">
-          <div class="icone">${cvNome ? '✅' : '📄'}</div>
-          <div class="texto">
-            ${cvNome
-              ? `<strong>${cvNome}</strong>Clica para substituir`
-              : `<strong>Clica para fazer upload do teu CV</strong>PDF, máx. 5MB`}
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="icone-secao">??</div>
+          <div class="header-texto">
+            <div class="titulo-secao">Curriculum Vitae</div>
+            <div class="subtitulo-secao">PDF enviado às entidades quando te candidatas</div>
+          </div>
+        </div>
+        <div class="form-card-body">
+          <div class="cv-area ${cvNome?'tem':''}" id="zonaCV" onclick="document.getElementById('inputCV').click()">
+            <div class="cv-area-icone">${cvNome ? '✅' : '??'}</div>
+            <div class="cv-area-titulo">${cvNome ? 'CV carregado' : 'Carregar CV'}</div>
+            <div class="cv-area-sub">${cvNome ? 'Clica para substituir' : 'PDF · máx. 5MB'}</div>
+            ${cvNome ? `<div class="cv-badge">?? ${cvNome}</div>` : ''}
           </div>
         </div>
       </div>
 
       <!-- Footer -->
-      <div class="painel-footer">
-        <a href="perfil-estudante.html" class="btn-cancelar">Cancelar</a>
-        <button class="btn-guardar" id="btnGuardar" onclick="guardar()">Guardar Alterações</button>
+      <div class="form-footer">
+        <div class="footer-hint">Os campos com <span>*</span> são obrigatórios</div>
+        <div class="footer-btns">
+          <a href="perfil-estudante.html" class="btn-cancelar">Cancelar</a>
+          <button class="btn-guardar" id="btnGuardar" onclick="guardar()">
+            <span>Guardar Alterações</span>
+          </button>
+        </div>
       </div>
     `;
 
-    // Input CV
     document.getElementById('inputCV').addEventListener('change', handleCV);
+
+    // Adicionar card do percurso académico
+    const discCard = document.createElement('div');
+    discCard.className = 'form-card';
+    discCard.style.marginBottom = '16px';
+    discCard.innerHTML =
+      '<div class="form-card-header">' +
+        '<div class="icone-secao">&#127891;</div>' +
+        '<div class="header-texto">' +
+          '<div class="titulo-secao">Percurso Académico</div>' +
+          '<div class="subtitulo-secao">Insere as notas, gera o PDF e carrega no perfil para confirmar</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="form-card-body">' +
+        '<table class="disc-tabela">' +
+          '<thead><tr><th style="width:50%">Disciplina</th><th style="width:14%">Nota</th><th style="width:22%">Estado</th><th style="width:8%"></th></tr></thead>' +
+          '<tbody id="linhasDisc"></tbody>' +
+        '</table>' +
+        '<div class="disc-acoes">' +
+          '<button class="btn-add-disc" onclick="adicionarLinhaDisc()">+ Adicionar Disciplina</button>' +
+          '<button class="btn-pdf" onclick="gerarPDFNotas()">&#128196; Gerar PDF do Percurso</button>' +
+        '</div>' +
+      '</div>';
+
+    // Inserir antes do footer
+    const footer = document.querySelector('.form-footer');
+    if (footer) footer.parentNode.insertBefore(discCard, footer);
+    else document.getElementById('formCards').appendChild(discCard);
+
+    // Preencher disciplinas existentes
+    const tbDisc = document.getElementById('linhasDisc');
+    (est.disciplinas || []).forEach(function(d, i) {
+      tbDisc.insertAdjacentHTML('beforeend', gerarLinhaDisc(d, i));
+    });
   }
 
-  // ── Upload CV ──
   function handleCV(e) {
     const file = e.target.files[0];
     if (!file) return;
-    if (file.type !== 'application/pdf') {
-      mostrarAlerta('Só são aceites ficheiros PDF.');
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      mostrarAlerta('O ficheiro não pode ter mais de 5MB.');
-      return;
-    }
-    cvFile = file;
-    cvNome = file.name;
-
+    if (file.type !== 'application/pdf') { mostrarAlerta('Só são aceites ficheiros PDF.'); return; }
+    if (file.size > 5 * 1024 * 1024)    { mostrarAlerta('O ficheiro não pode ter mais de 5MB.'); return; }
+    cvFile = file; cvNome = file.name;
     const zona = document.getElementById('zonaCV');
-    zona.className = 'upload-zona tem';
-    zona.innerHTML = `<div class="icone">✅</div><div class="texto"><strong>${file.name}</strong>Clica para substituir</div>`;
+    zona.className = 'cv-area tem';
+    zona.innerHTML = `
+      <div class="cv-area-icone">✅</div>
+      <div class="cv-area-titulo">CV carregado</div>
+      <div class="cv-area-sub">Clica para substituir</div>
+      <div class="cv-badge">?? ${file.name}</div>`;
   }
 
-  // ── Guardar alterações ──
   async function guardar() {
-    const btn = document.getElementById('btnGuardar');
+    const btn  = document.getElementById('btnGuardar');
     document.getElementById('alerta').className = 'alerta';
 
     const nome      = document.getElementById('f_nome').value.trim();
@@ -511,197 +538,160 @@
     if (!nome) { mostrarAlerta('O nome não pode estar vazio.'); return; }
 
     btn.disabled = true;
-    btn.innerHTML = '<span class="spin"></span>A guardar…';
+    btn.innerHTML = '<span class="spin"></span><span>A guardar…</span>';
 
     try {
-      // 1 — Fazer upload do CV se foi selecionado um ficheiro novo
       if (cvFile) {
-        btn.innerHTML = '<span class="spin"></span>A enviar CV…';
-        const formData = new FormData();
-        formData.append('cv', cvFile);
-
+        btn.innerHTML = '<span class="spin"></span><span>A enviar CV…</span>';
+        const fd = new FormData();
+        fd.append('cv', cvFile);
         const resCV = await fetch(`${API}/utilizadores/cv`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` },
-          // Não definir Content-Type — o browser define com o boundary correto
-          body: formData
+          body: fd
         });
         const dadosCV = await resCV.json();
         if (!dadosCV.sucesso) throw new Error('Erro ao enviar CV: ' + dadosCV.mensagem);
       }
 
-      // 2 — Guardar restantes dados do perfil
-      btn.innerHTML = '<span class="spin"></span>A guardar perfil…';
+      btn.innerHTML = '<span class="spin"></span><span>A guardar perfil…</span>';
       const dados = await req('/utilizadores/perfil', {
         method: 'PUT',
         body: JSON.stringify({ nome, telefone, portfolio, linkedin, disciplinas: recolherDisciplinas() })
       });
-
       if (!dados.sucesso) throw new Error(dados.mensagem);
 
-      // Atualizar localStorage com novo nome
       const uLocal = JSON.parse(localStorage.getItem('esmad_user') || '{}');
       uLocal.nome = nome;
       localStorage.setItem('esmad_user', JSON.stringify(uLocal));
 
-      mostrarAlerta('Perfil atualizado com sucesso!', 'sucesso');
+      mostrarAlerta('✔ Perfil atualizado com sucesso!', 'sucesso');
       setTimeout(() => { window.location.href = 'perfil-estudante.html'; }, 1200);
 
     } catch (err) {
       mostrarAlerta(err.message);
       btn.disabled = false;
-      btn.textContent = 'Guardar Alterações';
+      btn.innerHTML = '<span>Guardar Alterações</span>';
     }
   }
 
   // ── Percurso Académico ──
-  let discIdx = 0;
+  var discIdx = 0;
 
-  function gerarLinhaDisc(d = {}, i = null) {
-    const idx = i !== null ? i : discIdx++;
-    const estadoOpts = ['concluida','em_curso','reprovada','pendente'];
-    const estadoLabel = { concluida:'Concluída', em_curso:'Em Curso', reprovada:'Reprovada', pendente:'Pendente' };
-    const opts = estadoOpts.map(e => `<option value="${e}"${(d.estado||'pendente')===e?' selected':''}>${estadoLabel[e]}</option>`).join('');
-    return `<tr id="disc-${idx}">
-      <td><input class="disc-input" type="text" placeholder="Ex: Programação Web" value="${(d.nome||'').replace(/"/g,'&quot;')}"></td>
-      <td><input class="disc-input" type="number" placeholder="—" min="0" max="20" style="width:64px" value="${d.nota??''}"></td>
-      <td><select class="disc-select">${opts}</select></td>
-      <td><button class="btn-rem-disc" onclick="removerLinhaDisc('disc-${idx}')" title="Remover">✕</button></td>
-    </tr>`;
+  function gerarLinhaDisc(d, i) {
+    d = d || {};
+    var idx  = (i !== null && i !== undefined) ? i : discIdx++;
+    var nome = (d.nome || '').replace(/"/g, '&quot;');
+    var nota = (d.nota !== null && d.nota !== undefined) ? d.nota : '';
+    var est  = d.estado || 'pendente';
+    var lbls = { concluida:'Concluída', em_curso:'Em Curso', reprovada:'Reprovada', pendente:'Pendente' };
+    var opts = ['concluida','em_curso','reprovada','pendente'].map(function(e) {
+      return '<option value="' + e + '"' + (est === e ? ' selected' : '') + '>' + lbls[e] + '</option>';
+    }).join('');
+    return '<tr id="disc-' + idx + '">' +
+      '<td><input class="disc-input" type="text" placeholder="Ex: Programação Web" value="' + nome + '"></td>' +
+      '<td><input class="disc-input" type="number" placeholder="—" min="0" max="20" style="width:64px" value="' + nota + '"></td>' +
+      '<td><select class="disc-select">' + opts + '</select></td>' +
+      '<td><button class="btn-rem-disc" onclick="this.closest(\'tr\').remove()" title="Remover">×</button></td>' +
+      '</tr>';
   }
 
   function adicionarLinhaDisc() {
-    const tbody = document.getElementById('linhasDisc');
+    var tbody = document.getElementById('linhasDisc');
     if (!tbody) return;
-    const idx = discIdx++;
-    const tr = document.createElement('tr');
-    tr.id = `disc-${idx}`;
-    const estadoOpts = ['concluida','em_curso','reprovada','pendente'];
-    const estadoLabel = { concluida:'Concluída', em_curso:'Em Curso', reprovada:'Reprovada', pendente:'Pendente' };
-    tr.innerHTML = `
-      <td><input class="disc-input" type="text" placeholder="Ex: Programação Web" value=""></td>
-      <td><input class="disc-input" type="number" placeholder="—" min="0" max="20" style="width:64px" value=""></td>
-      <td><select class="disc-select">${estadoOpts.map(e=>`<option value="${e}">${estadoLabel[e]}</option>`).join('')}</select></td>
-      <td><button class="btn-rem-disc" onclick="removerLinhaDisc('disc-${idx}')" title="Remover">✕</button></td>`;
-    tbody.appendChild(tr);
-    tr.querySelector('.disc-input').focus();
-  }
-
-  function removerLinhaDisc(id) {
-    document.getElementById(id)?.remove();
+    tbody.insertAdjacentHTML('beforeend', gerarLinhaDisc({}, null));
+    tbody.lastElementChild.querySelector('.disc-input').focus();
   }
 
   function recolherDisciplinas() {
-    const tbody = document.getElementById('linhasDisc');
+    var tbody = document.getElementById('linhasDisc');
     if (!tbody) return [];
-    return [...tbody.querySelectorAll('tr')].map(tr => {
-      const inputs = tr.querySelectorAll('input');
-      const sel    = tr.querySelector('select');
-      const notaV  = inputs[1]?.value;
-      return {
-        nome:   inputs[0]?.value.trim() || '',
-        nota:   notaV !== '' && notaV !== undefined ? Number(notaV) : null,
-        estado: sel?.value || 'pendente'
-      };
-    }).filter(d => d.nome);
+    return Array.from(tbody.querySelectorAll('tr')).map(function(tr) {
+      var ins = tr.querySelectorAll('input');
+      var sel = tr.querySelector('select');
+      var nv  = ins[1] ? ins[1].value : '';
+      return { nome: ins[0] ? ins[0].value.trim() : '', nota: nv !== '' ? Number(nv) : null, estado: sel ? sel.value : 'pendente' };
+    }).filter(function(d) { return d.nome; });
   }
 
-  // ── Gerar PDF do percurso ──
   function gerarPDFNotas() {
-    const disciplinas = recolherDisciplinas();
-    if (!disciplinas.length) {
-      mostrarAlerta('Adiciona pelo menos uma disciplina antes de gerar o PDF.');
-      return;
-    }
+    var discs = recolherDisciplinas();
+    if (!discs.length) { mostrarAlerta('Adiciona pelo menos uma disciplina antes de gerar o PDF.'); return; }
 
-    const uLocal  = JSON.parse(localStorage.getItem('esmad_user') || '{}');
-    const nome    = document.getElementById('f_nome')?.value || uLocal.nome || '—';
-    const cursoEl = document.querySelector('.disc-tabela')?.closest('.painel-secao')?.previousElementSibling;
-    const curso   = document.querySelector('input[readonly]')?.value || 'TeSP DTAM';
+    var uLocal = JSON.parse(localStorage.getItem('esmad_user') || '{}');
+    var nome  = (document.getElementById('f_nome') ? document.getElementById('f_nome').value : '') || uLocal.nome || '-';
+    var curso = (document.getElementById('f_curso') ? document.getElementById('f_curso').value : '') || 'TeSP DTAM';
+    var hoje  = new Date().toLocaleDateString('pt-PT');
+    var ano   = new Date().getFullYear();
+    var lbls  = {concluida:'Concluida',em_curso:'Em Curso',reprovada:'Reprovada',pendente:'Pendente'};
+    var cors  = {concluida:'#70AD47',em_curso:'#BF8F00',reprovada:'#C00000',pendente:'#888'};
+    var concl = discs.filter(function(d){return d.estado==='concluida';}).length;
+    var cN    = discs.filter(function(d){return d.nota!==null;});
+    var media = cN.length ? (cN.reduce(function(s,d){return s+d.nota;},0)/cN.length).toFixed(1) : '-';
 
-    const estadoLabel = { concluida:'Concluída', em_curso:'Em Curso', reprovada:'Reprovada', pendente:'Pendente' };
-    const estadoCor   = { concluida:'#70AD47', em_curso:'#BF8F00', reprovada:'#C00000', pendente:'#888888' };
+    // Gerar HTML como array de linhas (sem tags HTML literais no JS para evitar parser bugs)
+    var L = [];
+    var T = function(s){ L.push(s); };
+    var O = '\x3C'; // <
+    var C = '\x3E'; // >
+    var S = O + '/';  // </
 
-    const linhas = disciplinas.map(d => `
-      <tr>
-        <td style="padding:10px 14px;border-bottom:1px solid #eee;font-size:13px">${d.nome}</td>
-        <td style="padding:10px 14px;border-bottom:1px solid #eee;font-size:13px;font-weight:700;text-align:center">${d.nota ?? '—'}</td>
-        <td style="padding:10px 14px;border-bottom:1px solid #eee;font-size:13px">
-          <span style="display:inline-block;padding:2px 10px;border-radius:4px;font-weight:600;font-size:12px;background:${estadoCor[d.estado]}22;color:${estadoCor[d.estado]}">${estadoLabel[d.estado]||d.estado}</span>
-        </td>
-      </tr>`).join('');
+    T('<!DOCTYPE html>');
+    T(O+'html lang="pt"'+C+O+'head'+C+O+'meta charset="UTF-8"'+C);
+    T(O+'title'+C+'Percurso Academico'+S+'title'+C);
+    T(O+'link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"'+C);
+    T(O+'style'+C);
+    T('*{box-sizing:border-box;margin:0;padding:0}');
+    T('body{font-family:Inter,sans-serif;padding:48px 56px;color:#1a1a1a}');
+    T('.cab{display:flex;justify-content:space-between;padding-bottom:20px;border-bottom:3px solid #F15A24;margin-bottom:28px}');
+    T('.esc{font-size:22px;font-weight:800;color:#F15A24;letter-spacing:2px}');
+    T('.sub{font-size:11px;color:#888;margin-top:3px}');
+    T('.an{font-size:18px;font-weight:700;margin-bottom:4px}.am{font-size:12px;color:#888}');
+    T('.sec{font-size:11px;font-weight:700;text-transform:uppercase;color:#888;margin:24px 0 10px}');
+    T('table{width:100%;border-collapse:collapse}thead tr{background:#f8f8f8}');
+    T('th{padding:10px 14px;font-size:11px;color:#888;border-bottom:1px solid #eee;text-align:left}');
+    T('td{padding:10px 14px;border-bottom:1px solid #eee;font-size:13px}');
+    T('.res{background:#f8f8f8;border-radius:8px;padding:14px 18px;margin-top:20px;display:flex;gap:32px}');
+    T('.rl{font-size:10px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:3px}');
+    T('.rv{font-size:20px;font-weight:800}');
+    T('.rod{margin-top:36px;padding-top:14px;border-top:1px solid #eee;font-size:10px;color:#bbb;text-align:center}');
+    T('@media print{.btn-p{display:none}body{padding:28px 36px}}');
+    T(S+'style'+C+S+'head'+C+O+'body'+C);
 
-    const media = disciplinas.filter(d => d.nota !== null).length
-      ? (disciplinas.filter(d => d.nota !== null).reduce((s, d) => s + d.nota, 0) / disciplinas.filter(d => d.nota !== null).length).toFixed(1)
-      : '—';
+    T(O+'div class="cab"'+C);
+    T(O+'div'+C+O+'div class="esc"'+C+'ESMAD'+S+'div'+C);
+    T(O+'div class="sub"'+C+'Escola Superior de Media Artes e Design'+S+'div'+C+S+'div'+C);
+    T(O+'div style="text-align:right"'+C);
+    T(O+'div style="font-size:13px;font-weight:700"'+C+'Percurso Academico'+S+'div'+C);
+    T(O+'div class="sub"'+C+'Gerado em '+hoje+S+'div'+C+S+'div'+C+S+'div'+C);
+    T(O+'div class="an"'+C+nome+S+'div'+C);
+    T(O+'div class="am"'+C+curso+' &middot; '+ano+S+'div'+C);
+    T(O+'div class="sec"'+C+'Unidades Curriculares'+S+'div'+C);
+    T(O+'table'+C+O+'thead'+C+O+'tr'+C);
+    T(O+'th'+C+'Disciplina'+S+'th'+C+O+'th style="text-align:center"'+C+'Nota'+S+'th'+C+O+'th'+C+'Estado'+S+'th'+C);
+    T(S+'tr'+C+S+'thead'+C+O+'tbody'+C);
+    discs.forEach(function(d) {
+      var cor = cors[d.estado]||'#888'; var lbl = lbls[d.estado]||d.estado;
+      T(O+'tr'+C+O+'td'+C+d.nome+S+'td'+C);
+      T(O+'td style="font-weight:700;text-align:center"'+C+(d.nota!==null?d.nota:'-')+S+'td'+C);
+      T(O+'td'+C+O+'span style="padding:2px 10px;border-radius:4px;font-size:12px;font-weight:600;background:'+cor+'22;color:'+cor+'"'+C+lbl+S+'span'+C+S+'td'+C+S+'tr'+C);
+    });
+    T(S+'tbody'+C+S+'table'+C);
+    T(O+'div class="res"'+C);
+    T(O+'div'+C+O+'div class="rl"'+C+'Total'+S+'div'+C+O+'div class="rv"'+C+discs.length+S+'div'+C+S+'div'+C);
+    T(O+'div'+C+O+'div class="rl"'+C+'Concluidas'+S+'div'+C+O+'div class="rv"'+C+concl+S+'div'+C+S+'div'+C);
+    T(O+'div'+C+O+'div class="rl"'+C+'Media'+S+'div'+C+O+'div class="rv"'+C+media+S+'div'+C+S+'div'+C);
+    T(S+'div'+C);
+    T(O+'div class="rod"'+C+'Documento gerado pela plataforma ESMAD'+S+'div'+C);
+    T(O+'div style="margin-top:24px;text-align:center"'+C);
+    T(O+'button class="btn-p" onclick="window.print()" style="background:#F15A24;color:#fff;border:none;border-radius:8px;padding:12px 28px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer"'+C+'Guardar como PDF (Ctrl+P)'+S+'button'+C+S+'div'+C);
+    T(S+'body'+C+S+'html'+C);
 
-    const html = `<!DOCTYPE html>
-<html lang="pt">
-<head>
-<meta charset="UTF-8">
-<title>Percurso Académico — ${nome}</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: Inter, sans-serif; background: #fff; color: #1A1A1A; padding: 48px 56px; }
-  .cab { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 20px; border-bottom: 3px solid #F15A24; margin-bottom: 28px; }
-  .cab-escola { font-size: 22px; font-weight: 800; color: #F15A24; letter-spacing: 2px; }
-  .cab-doc    { font-size: 11px; color: #888; margin-top: 3px; }
-  .aluno-nome { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .aluno-meta { font-size: 12px; color: #888; }
-  .secao-titulo { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #888; margin-bottom: 10px; margin-top: 24px; }
-  table { width: 100%; border-collapse: collapse; }
-  thead tr { background: #F8F8F8; }
-  th { padding: 10px 14px; font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid #eee; text-align: left; }
-  .resumo { background: #F8F8F8; border-radius: 8px; padding: 14px 18px; margin-top: 20px; display: flex; gap: 32px; }
-  .resumo-item .label { font-size: 10px; color: #888; font-weight: 700; text-transform: uppercase; margin-bottom: 3px; }
-  .resumo-item .valor { font-size: 20px; font-weight: 800; color: #1A1A1A; }
-  .rodape { margin-top: 36px; padding-top: 14px; border-top: 1px solid #eee; font-size: 10px; color: #bbb; text-align: center; }
-  @media print { body { padding: 28px 36px; } button { display: none; } }
-</style>
-</head>
-<body>
-<div class="cab">
-  <div>
-    <div class="cab-escola">ESMAD</div>
-    <div class="cab-doc">Escola Superior de Media Artes e Design — P.Porto</div>
-  </div>
-  <div style="text-align:right">
-    <div style="font-size:13px;font-weight:700">Percurso Académico</div>
-    <div class="cab-doc">Gerado em ${new Date().toLocaleDateString('pt-PT')}</div>
-  </div>
-</div>
-
-<div class="aluno-nome">${nome}</div>
-<div class="aluno-meta">${curso} &nbsp;·&nbsp; ${new Date().getFullYear()}</div>
-
-<div class="secao-titulo">Unidades Curriculares</div>
-<table>
-  <thead><tr><th>Disciplina</th><th style="text-align:center">Nota</th><th>Estado</th></tr></thead>
-  <tbody>${linhas}</tbody>
-</table>
-
-<div class="resumo">
-  <div class="resumo-item"><div class="label">Total de Disciplinas</div><div class="valor">${disciplinas.length}</div></div>
-  <div class="resumo-item"><div class="label">Concluídas</div><div class="valor">${disciplinas.filter(d=>d.estado==='concluida').length}</div></div>
-  <div class="resumo-item"><div class="label">Média</div><div class="valor">${media}</div></div>
-</div>
-
-<div class="rodape">Documento gerado pela plataforma ESMAD · Para uso interno</div>
-
-<div style="margin-top:24px;text-align:center">
-  <button onclick="window.print()" style="background:#F15A24;color:#fff;border:none;border-radius:8px;padding:12px 28px;font-family:Inter,sans-serif;font-size:14px;font-weight:700;cursor:pointer">
-    🖨 Guardar como PDF (Ctrl+P)
-  </button>
-</div>
-</body>
-</html>`;
-
-    const blob = new Blob([html], { type: 'text/html' });
-    const url  = URL.createObjectURL(blob);
-    window.open(url, '_blank');
+    var janela = window.open('', '_blank');
+    if (!janela) { mostrarAlerta('Permite popups para gerar o PDF.'); return; }
+    janela.document.write(L.join('\n'));
+    janela.document.close();
   }
-
   carregar();
 </script>
 </body>

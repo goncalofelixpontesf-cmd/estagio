@@ -303,6 +303,7 @@
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo"><span>ESMAD</span></div>
   <nav class="sidebar-nav">
+    <a class="nav-item" href="dashboard-estudante.html">Início</a>
     <a class="nav-item" href="lista-propostas.html">Propostas</a>
     <a class="nav-item" href="dashboard-estudante.html">As Minhas Candidaturas</a>
     <a class="nav-item activo">O Meu Perfil</a>
@@ -598,7 +599,6 @@
   }
 
   async function extrairNotasDomus(file) {
-    // Ler PDF como base64
     const base64 = await new Promise((res, rej) => {
       const r = new FileReader();
       r.onload  = () => res(r.result.split(',')[1]);
@@ -606,27 +606,16 @@
       r.readAsDataURL(file);
     });
 
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    // Chamar backend (que tem a ANTHROPIC_API_KEY no .env)
+    const dados = await req('/utilizadores/extrair-notas', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
-            { type: 'text', text: 'Extrai todas as disciplinas/unidades curriculares e as respetivas notas deste documento académico do DOMUS (sistema de gestão académica português). Responde APENAS com um array JSON puro, sem markdown, sem texto adicional, no formato exato: [{"nome":"Nome da Disciplina","nota":15,"estado":"concluida"}]. Regras para estado: "concluida" se nota >= 10, "reprovada" se nota < 10, "em_curso" se a disciplina não tem nota final ainda. Se a nota não existir usa null. Inclui todas as disciplinas que encontrares.' }
-          ]
-        }]
-      })
+      body: JSON.stringify({ pdfBase64: base64 })
     });
 
-    const data = await resp.json();
-    const texto = data.content?.[0]?.text || '';
-    const limpo = texto.replace(/```json|```/g, '').trim();
-    return JSON.parse(limpo);
+    if (!dados.sucesso) throw new Error(dados.mensagem);
+    return dados.disciplinas;
   }
+
 
   function mostrarPreviewNotas(disciplinas, fileName) {
     const zona = document.getElementById('domusZona');
