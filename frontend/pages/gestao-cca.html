@@ -220,14 +220,14 @@
       .detalhe-meta { grid-template-columns: 1fr; }
     }
 
-    /* Alterações da proposta */
+    /* Alteracoes da proposta */
     .alteracoes-aviso { background: var(--amarelo-light); border: 1.5px solid var(--amarelo); border-radius: 10px; padding: 12px 16px; margin-bottom: 14px; font-size: 0.82rem; color: var(--amarelo); font-weight: 700; }
     .alteracoes-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
     .alt-campo { border-radius: 8px; overflow: hidden; border: 1px solid var(--cinza-linha); }
     .alt-campo-label { background: #F5F5F5; padding: 6px 12px; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--cinza-texto); }
     .alt-antes { padding: 7px 12px; font-size: 0.83rem; color: var(--cinza-texto); text-decoration: line-through; background: #FFF8F8; border-top: 1px solid var(--cinza-linha); }
     .alt-depois { padding: 7px 12px; font-size: 0.83rem; color: var(--preto); font-weight: 600; background: #F5FFF5; border-top: 1px solid var(--cinza-linha); }
-    .alt-depois::before { content: '→ '; color: var(--verde); font-weight: 800; }
+    .alt-depois::before { content: '\2192 '; color: var(--verde); font-weight: 800; }
   </style>
 </head>
 <body>
@@ -501,6 +501,7 @@
   if (!['comissao','admin'].includes(JSON.parse(user).perfil)) { window.location.href = 'login.html'; }
   const utilizador = JSON.parse(user);
   if (!['comissao','admin'].includes(utilizador.perfil)) { window.location.href = 'login.html'; }
+  if (!['comissao','admin'].includes(utilizador.perfil)) { window.location.href = 'login.html'; }
 
   document.getElementById('sidebarNome').textContent = utilizador.nome;
   document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
@@ -627,43 +628,25 @@
 
       const estadoLabel = { aprovada:'Aprovada', pendente:'Pendente', rejeitada:'Rejeitada', atribuida:'Atribuída' };
 
-      // ── Comparar com versão anterior (se existir) ──
+      // Compare with previous version if exists
       function diffCampo(label, antes, depois) {
         const a = Array.isArray(antes) ? antes.join(', ') : (antes || '');
         const d = Array.isArray(depois) ? depois.join(', ') : (depois || '');
-        if (a === d) return ''; // sem alteração
-        return `<div class="alt-campo">
-          <div class="alt-campo-label">${label}</div>
-          ${a ? `<div class="alt-antes">${a}</div>` : ''}
-          <div class="alt-depois">${d || '(removido)'}</div>
-        </div>`;
+        if (a === d) return '';
+        return `<div class="alt-campo"><div class="alt-campo-label">${label}</div>${a ? `<div class="alt-antes">${a}</div>` : ''}<div class="alt-depois">${d || '(removido)'}</div></div>`;
       }
-
       let htmlAlteracoes = '';
       if (p.versaoAnterior) {
         const v = p.versaoAnterior;
         const diffs = [
-          diffCampo('Título',               v.titulo,              p.titulo),
-          diffCampo('Tipo',                  v.tipo === 'estagio' ? 'Estágio' : 'Projecto', p.tipo === 'estagio' ? 'Estágio' : 'Projecto'),
-          diffCampo('Áreas',                 v.areas,               p.areas),
-          diffCampo('Entidade',              v.nomeEntidade,        p.nomeEntidade),
-          diffCampo('Email de Contacto',     v.emailContacto,       p.emailContacto),
-          diffCampo('Morada da Entidade',    v.moradaEntidade,      p.moradaEntidade),
-          diffCampo('Morada do Local',       v.moradaLocalEstagio,  p.moradaLocalEstagio),
-          diffCampo('Tutor',                 v.tutorNome,           p.tutorNome),
-          diffCampo('Email do Tutor',        v.tutorEmail,          p.tutorEmail),
-          diffCampo('Cargo do Tutor',        v.tutorCargo,          p.tutorCargo),
-          diffCampo('Objetivos',             v.objetivos || v.descricao, p.objetivos || p.descricao),
-          diffCampo('Resultados Esperados',  v.resultadosEsperados, p.resultadosEsperados),
-          diffCampo('Plano de Trabalho',     v.planoTrabalho,       p.planoTrabalho),
-          diffCampo('Perfil do Candidato',   v.perfilCandidato,     p.perfilCandidato),
+          diffCampo('Titulo', v.titulo, p.titulo),
+          diffCampo('Areas', v.areas, p.areas),
+          diffCampo('Entidade', v.nomeEntidade, p.nomeEntidade),
+          diffCampo('Tutor', v.tutorNome, p.tutorNome),
+          diffCampo('Objetivos', v.objetivos || v.descricao, p.objetivos || p.descricao),
+          diffCampo('Resultados', v.resultadosEsperados, p.resultadosEsperados),
         ].filter(Boolean).join('');
-
-        if (diffs) {
-          htmlAlteracoes = `
-            <div class="alteracoes-aviso">✏️ Proposta resubmetida — campos alterados:</div>
-            <div class="alteracoes-grid">${diffs}</div>`;
-        }
+        if (diffs) htmlAlteracoes = `<div class="alteracoes-aviso">\u2702\ufe0f Proposta resubmetida:</div><div class="alteracoes-grid">${diffs}</div>`;
       }
 
       document.getElementById('detalheBody').innerHTML = `
@@ -779,8 +762,8 @@
       <div class="painel">
         <div class="painel-header"><h2>Propostas Pendentes <span class="badge-count" id="badgePTab">0</span></h2></div>
         <table>
-          <thead><tr><th>Título</th><th>Tipo</th><th>Proponente</th><th>Submetida</th><th>Tutor</th><th>Ações</th></tr></thead>
-          <tbody id="tbPendentes"><tr><td colspan="6"><div class="vazio"><div class="emoji">⏳</div>A carregar…</div></td></tr></tbody>
+          <thead><tr><th>Título</th><th>Tipo</th><th>Proponente</th><th>Submetida</th><th>Ações</th></tr></thead>
+          <tbody id="tbPendentes"><tr><td colspan="5"><div class="vazio"><div class="emoji">⏳</div>A carregar…</div></td></tr></tbody>
         </table>
       </div>`;
 
@@ -794,7 +777,7 @@
       if (total > 0) { document.getElementById('alertaPTexto').textContent = `${total} proposta${total !== 1 ? 's' : ''} aguarda${total === 1 ? '' : 'm'} aprovação`; document.getElementById('alertaPBox').style.display = 'flex'; }
 
       const tbody = document.getElementById('tbPendentes');
-      if (!total) { tbody.innerHTML = `<tr><td colspan="6"><div class="vazio"><div class="emoji">✅</div>Não há propostas pendentes.</div></td></tr>`; return; }
+      if (!total) { tbody.innerHTML = `<tr><td colspan="5"><div class="vazio"><div class="emoji">✅</div>Não há propostas pendentes.</div></td></tr>`; return; }
 
       // Verificar votos do utilizador actual para cada proposta
       const votosMap = {};
@@ -854,7 +837,7 @@
         </div>
         <table>
           <thead><tr><th>Título</th><th>Tipo</th><th>Proponente</th><th>Data</th><th>Estado</th><th>Ações</th></tr></thead>
-          <tbody id="tbTodas"><tr><td colspan="6"><div class="vazio"><div class="emoji">⏳</div>A carregar…</div></td></tr></tbody>
+          <tbody id="tbTodas"><tr><td colspan="5"><div class="vazio"><div class="emoji">⏳</div>A carregar…</div></td></tr></tbody>
         </table>
       </div>`;
 
@@ -890,8 +873,13 @@
           botoesAcao = jaVotou
             ? `<span class="badge-votado">✔ ${meuVoto === 'aprovado' ? 'Aprovou' : 'Rejeitou'}</span>`
             : `<button class="btn-aprovar" onclick="aprovar('${p._id}','${p.titulo.replace(/'/g,"\\'")}','')">Aprovar</button><button class="btn-rejeitar" onclick="abrirRejeitar('${p._id}','${p.titulo.replace(/'/g,"\\'")}','')">Rejeitar</button>`;
-        }
+        } else if (p.estado === 'aprovada') {
+          botoesAcao = `<button class="btn-atribuir" onclick="abrirAtribuir('${p._id}','${p.titulo.replace(/'/g,"\\'")}')">Atribuir Tutor</button>`;
+        } else if (p.estado === 'atribuida') {
+          const nomeOrient = p.orientadorId?.nome || 'Tutor atribuido';
+          botoesAcao = `<span style="display:inline-flex;align-items:center;gap:6px;background:var(--azul-light);color:var(--azul);border-radius:6px;padding:5px 12px;font-size:0.76rem;font-weight:700">&#128104;&#8205;&#127979; ${nomeOrient}</span>`;
 
+        }
         return `<tr>
           <td>
             <span class="titulo-link" onclick="abrirDetalhe('${p._id}','${p.titulo.replace(/'/g,"\\'")}','${(p.nomeEntidade||p.proponenteId?.nome||'').replace(/'/g,"\\'")}')">${p.titulo}</span>
@@ -1115,7 +1103,7 @@
       } catch (err) { al.textContent = err.message; al.className = 'alerta-modal erro'; btn.disabled = false; btn.textContent = 'Adicionar à CCA'; }
     } else {
       const email = document.getElementById('emailConvite').value.trim();
-      if (!email || !emailValido(email)) { al.textContent = 'Introduz um email válido (ex: docente@esmad.ipp.pt).'; al.className = 'alerta-modal erro'; return; }
+      if (!email || !emailValido(email)) { al.textContent = 'Introduza um email válido (ex: docente@esmad.ipp.pt).'; al.className = 'alerta-modal erro'; return; }
       btn.disabled = true; btn.innerHTML = '<span class="spin"></span>A enviar convite…';
       try {
         const dados = await req('/cca/convite', { method: 'POST', body: JSON.stringify({ email, cursosCCA }) });

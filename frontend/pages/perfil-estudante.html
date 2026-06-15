@@ -293,6 +293,7 @@
       .content { padding: 20px 16px; }
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
 
@@ -303,7 +304,6 @@
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo"><span>ESMAD</span></div>
   <nav class="sidebar-nav">
-    <a class="nav-item" href="dashboard-estudante.html">Início</a>
     <a class="nav-item" href="lista-propostas.html">Propostas</a>
     <a class="nav-item" href="dashboard-estudante.html">As Minhas Candidaturas</a>
     <a class="nav-item activo">O Meu Perfil</a>
@@ -542,19 +542,19 @@
 
       <a href="editar-perfil.html" class="btn-editar">Editar Perfil</a>
 
-      <button class="btn-secundario" onclick="document.getElementById('inputDomus').click()">
-        Carregar notas (DOMUS PDF)
-      </button>
-      <div class="btn-secundario-nota" id="notaDomus">
-        ${domusNome ? `📄 ${domusNome}` : 'Ficheiro PDF exportado do DOMUS'}
+      <a href="editar-perfil.html" class="btn-editar" style="background:var(--verde);margin-top:4px">
+        ✏️ Introduzir Notas Manualmente
+      </a>
+      <div class="btn-secundario-nota" style="margin-top:2px">
+        Adiciona disciplinas e gera o PDF do percurso académico
       </div>
 
-      <div class="domus-zona ${domusNome ? 'tem-ficheiro' : ''}" id="domusZona" onclick="document.getElementById('inputDomus').click()">
-        <div class="icone">${domusNome ? '✅' : '📤'}</div>
+      <div class="domus-zona" id="domusZona" onclick="document.getElementById('inputDomus').click()"
+           style="margin-top:12px;opacity:0.7" title="Requer PDF com texto seleccionável">
+        <div class="icone">📤</div>
         <div class="texto">
-          ${domusNome
-            ? `<strong>${domusNome}</strong>Clica para substituir`
-            : `<strong>Clica para fazer upload</strong>PDF exportado do DOMUS (máx. 5MB)`}
+          <strong>Ou carrega PDF do DOMUS</strong>
+          <span style="font-size:0.72rem;color:var(--cinza-texto)">(só funciona se o PDF tiver texto — não imagem)</span>
         </div>
       </div>
 
@@ -590,32 +590,84 @@
       const disciplinas = await extrairNotasDomus(file);
       mostrarPreviewNotas(disciplinas, file.name);
     } catch (err) {
-      mostrarToast('Não foi possível extrair as notas automaticamente.', 'erro');
+      mostrarToast((err.message || 'Nao foi possivel extrair as notas.'), 'erro');
       if (zona) {
-        zona.className = 'domus-zona tem-ficheiro';
-        zona.innerHTML = `<div class="icone">✅</div><div class="texto"><strong>${file.name}</strong>Clica para substituir</div>`;
+        zona.className = 'domus-zona';
+        zona.innerHTML = '<div class="icone">⚠️</div><div class="texto"><strong>Extracao indisponivel</strong><br><a href="editar-perfil.html" style="color:var(--laranja);font-weight:600">→ Introduz as notas manualmente</a></div>';
       }
     }
   }
 
   async function extrairNotasDomus(file) {
-    const base64 = await new Promise((res, rej) => {
-      const r = new FileReader();
-      r.onload  = () => res(r.result.split(',')[1]);
-      r.onerror = () => rej(new Error('Erro ao ler ficheiro'));
-      r.readAsDataURL(file);
-    });
+    // Extrair texto do PDF usando PDF.js (sem API key necessaria)
+    const arrayBuffer = await file.arrayBuffer();
+    // PDF.js via CDN expoe-se como window.pdfjsLib
+    const pdfjsLib = window.pdfjsLib;
+    if (!pdfjsLib) throw new Error('PDF.js nao carregou. Verifica a ligacao a internet e recarrega a pagina.');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-    // Chamar backend (que tem a ANTHROPIC_API_KEY no .env)
-    const dados = await req('/utilizadores/extrair-notas', {
-      method: 'POST',
-      body: JSON.stringify({ pdfBase64: base64 })
-    });
+    let texto = '';
+    try {
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page    = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        texto += content.items.map(function(item){ return item.str; }).join(' ') + '\n';
+      }
+    } catch(pdfErr) {
+      throw new Error('Erro ao ler PDF: ' + pdfErr.message);
+    }
 
-    if (!dados.sucesso) throw new Error(dados.mensagem);
-    return dados.disciplinas;
+    if (!texto.trim()) throw new Error('O PDF nao tem texto extraivel (pode ser uma imagem). Usa Editar Perfil para introduzir as notas manualmente.');
+
+    const disciplinas = parsearTextoDomus(texto);
+    if (!disciplinas.length) throw new Error('Nenhuma disciplina encontrada. Usa Editar Perfil para introduzir manualmente.');
+    return disciplinas;
   }
 
+  function parsearTextoDomus(texto) {
+    const disciplinas = [];
+    const linhas = texto.split(/[\n\r]+/).map(l => l.trim()).filter(l => l.length > 2);
+
+    for (let i = 0; i < linhas.length; i++) {
+      const linha = linhas[i];
+      if (/^(\d{4}|ECTS|Cred|Hora|Total|Media|Aprov|Reprov|Inscr|Ano|Sem)/i.test(linha)) continue;
+      if (linha.length < 4 || /^\d+$/.test(linha)) continue;
+
+      // Padrao: "Nome da Disciplina  14" na mesma linha
+      const m = linha.match(/^(.+?)\s{2,}(\d{1,2}[,.]?\d?)\s*$/);
+      if (m) {
+        const nome = m[1].trim();
+        const nota = parseFloat(m[2].replace(',', '.'));
+        if (nome.length > 3 && nota >= 0 && nota <= 20) {
+          disciplinas.push({ nome, nota, estado: nota >= 10 ? 'concluida' : 'reprovada' });
+          continue;
+        }
+      }
+
+      // Padrao alternativo: nota na linha seguinte
+      if (/[A-Za-z\u00C0-\u024F]{4,}/.test(linha) && linha.length > 4) {
+        const prox = (linhas[i + 1] || '').trim();
+        const mProx = prox.match(/^(\d{1,2}[,.]?\d?)$/);
+        if (mProx) {
+          const nota = parseFloat(mProx[1].replace(',', '.'));
+          if (nota >= 0 && nota <= 20) {
+            disciplinas.push({ nome: linha, nota, estado: nota >= 10 ? 'concluida' : 'reprovada' });
+            i++;
+            continue;
+          }
+        }
+        if (/em curso|inscrit|frequen/i.test(prox)) {
+          disciplinas.push({ nome: linha, nota: null, estado: 'em_curso' });
+          i++;
+        }
+      }
+    }
+
+    // Remover duplicados
+    const vistos = new Set();
+    return disciplinas.filter(d => { if (vistos.has(d.nome)) return false; vistos.add(d.nome); return true; });
+  }
 
   function mostrarPreviewNotas(disciplinas, fileName) {
     const zona = document.getElementById('domusZona');

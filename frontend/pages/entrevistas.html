@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESMAD</title>
+  <title>ESMAD </title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="favicon.ico">
   <style>
@@ -55,17 +55,7 @@
 
     .content { padding: 24px 32px; flex: 1; }
 
-    /* ══ ALERTA ACEITE ══ */
-    .alerta-aceite {
-      background: var(--verde-light); border: 1.5px solid var(--verde);
-      border-radius: 12px; padding: 18px 22px; margin-bottom: 22px;
-      display: flex; align-items: flex-start; gap: 14px;
-    }
-    .alerta-aceite .icone { font-size: 1.6rem; flex-shrink: 0; }
-    .alerta-aceite .texto strong { display: block; font-size: 0.94rem; color: var(--verde); margin-bottom: 4px; }
-    .alerta-aceite .texto p { font-size: 0.82rem; color: #555; line-height: 1.5; }
-    .alerta-aceite .texto .detalhe { margin-top: 10px; background: var(--branco); border-radius: 8px; padding: 10px 14px; font-size: 0.84rem; }
-    .alerta-aceite .texto .detalhe span { font-weight: 700; color: var(--preto); }
+
 
     /* ══ STATS ══ */
     .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
@@ -239,18 +229,6 @@
 
   <div class="content">
 
-    <!-- Alerta aceite (oculto por defeito) -->
-    <div class="alerta-aceite" id="alertaAceite" style="display:none">
-      <div class="icone">🎉</div>
-      <div class="texto">
-        <strong>Foste aceite numa proposta!</strong>
-        <p>Parabéns! O proponente escolheu-te para esta proposta. Aguarda contacto para os próximos passos.</p>
-        <div class="detalhe" id="alertaAceiteDetalhe">
-          <span id="alertaAceiteTitulo">—</span>
-        </div>
-      </div>
-    </div>
-
     <!-- Stats -->
     <div class="stats-grid" id="statsGrid">
       <div class="stat-card laranja">
@@ -357,41 +335,34 @@
       if (!dados.sucesso) throw new Error(dados.mensagem);
 
       const candidaturas = dados.candidaturas || [];
-
-      const stats = dados.stats || {
-      totalCandidaturas: candidaturas.length,
-      entrevistasAgendadas: candidaturas.filter(c => c.estado === 'entrevista_agendada').length,
-      aceite: candidaturas.filter(c => c.estado === 'aceite').length
-      };
       todasCandidaturas = candidaturas;
+
+      // Calcular stats a partir das candidaturas
+      const totalCandidaturas   = candidaturas.length;
+      const entrevistasAgendadas = candidaturas.filter(c => c.estado === 'entrevista_agendada').length;
+      const emEspera            = candidaturas.filter(c => c.estado === 'pendente').length;
+      const aceite              = candidaturas.filter(c => c.estado === 'aceite').length;
 
       // Stats
       document.getElementById('statsGrid').innerHTML = `
         <div class="stat-card laranja">
-          <div class="num">${stats.totalCandidaturas}</div>
+          <div class="num">${totalCandidaturas}</div>
           <div class="label">Total de Candidaturas</div>
         </div>
         <div class="stat-card azul">
-          <div class="num">${stats.entrevistasAgendadas}</div>
+          <div class="num">${entrevistasAgendadas}</div>
           <div class="label">Entrevistas Agendadas</div>
         </div>
         <div class="stat-card amarelo">
-          <div class="num">${candidaturas.filter(c => c.estado === 'pendente').length}</div>
+          <div class="num">${emEspera}</div>
           <div class="label">Aguardam Resposta</div>
         </div>
         <div class="stat-card verde">
-          <div class="num">${stats.aceite}</div>
+          <div class="num">${aceite}</div>
           <div class="label">Aceite</div>
         </div>`;
 
-      // Alerta aceite
-      if (stats.aceite > 0) {
-        const aceite = candidaturas.find(c => c.estado === 'aceite');
-        if (aceite) {
-          document.getElementById('alertaAceiteTitulo').textContent = aceite.propostaId?.titulo || '—';
-          document.getElementById('alertaAceite').style.display = 'flex';
-        }
-      }
+
 
       renderLista(candidaturas);
 

@@ -28,7 +28,10 @@ router.get('/perfil',       ctrl.obterPerfil);
 router.put('/perfil',       ctrl.editarPerfil);
 router.post('/cv', uploadCV.single('cv'), ctrl.uploadCV);
 
-module.exports = router;
-
 // Extração de notas via IA (PDF DOMUS)
-router.post('/extrair-notas', proteger, ctrl.extrairNotasDomus);
+router.post('/extrair-notas', ctrl.extrairNotasDomus);
+
+// Tutorias do docente atribuído
+router.get('/tutorias', ctrl.minhasTutorias);
+
+module.exports = router;

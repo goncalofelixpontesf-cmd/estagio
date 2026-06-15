@@ -97,14 +97,15 @@ exports.extrairNotasDomus = async (req, res) => {
     if (!pdfBase64) return res.status(400).json({ sucesso: false, mensagem: 'PDF não fornecido.' });
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) return res.status(500).json({ sucesso: false, mensagem: 'ANTHROPIC_API_KEY não configurada no servidor.' });
+    if (!apiKey) return res.status(503).json({ sucesso: false, mensagem: 'A extração automática não está disponível (API key não configurada). Usa o Editar Perfil para introduzir as notas manualmente.' });
 
     const resposta = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
+        'anthropic-version': '2023-06-01',
+        'anthropic-beta': 'pdfs-2024-09-25'
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
@@ -137,5 +138,40 @@ exports.extrairNotasDomus = async (req, res) => {
     res.json({ sucesso: true, disciplinas });
   } catch (err) {
     res.status(500).json({ sucesso: false, mensagem: 'Nao foi possivel extrair as notas: ' + err.message });
+  }
+};
+
+
+// GET /api/utilizadores/tutorias
+// Propostas onde o docente autenticado é o orientador atribuído
+exports.minhasTutorias = async (req, res) => {
+  try {
+    const Proposta    = require('../models/Proposta');
+    const Candidatura = require('../models/Candidatura');
+    const Estudante   = require('../models/Estudante');
+
+    const propostas = await Proposta.find({ orientadorId: req.utilizador._id })
+      .populate('proponenteId', 'nome email')
+      .sort({ atualizadaEm: -1 });
+
+    const resultado = await Promise.all(propostas.map(async p => {
+      const cands = await Candidatura.find({ propostaId: p._id });
+      const candAceite = cands.find(function(cd) { return cd.estado === 'aceite'; });
+
+      let estudanteAceite = null;
+      if (candAceite) {
+        const est = await Estudante.findById(candAceite.estudanteId)
+          .populate('utilizadorId', 'nome email');
+        if (est && est.utilizadorId) {
+          estudanteAceite = { nome: est.utilizadorId.nome, email: est.utilizadorId.email };
+        }
+      }
+
+      return { ...p.toObject(), totalCandidatos: cands.length, estudanteAceite };
+    }));
+
+    res.json({ sucesso: true, total: resultado.length, propostas: resultado });
+  } catch (err) {
+    res.status(500).json({ sucesso: false, mensagem: err.message });
   }
 };

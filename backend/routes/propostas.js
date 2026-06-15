@@ -11,6 +11,9 @@ router.get('/', ctrl.listar);
 // Criar proposta (estudante ou entidade/docente)
 router.post('/', ctrl.criar);
 
+// Tutorias do docente autenticado
+router.get('/minhas-tutorias', restringir('docente'), ctrl.minhasTutorias);
+
 // Obter proposta individual
 router.get('/:id', ctrl.obterProposta);
 

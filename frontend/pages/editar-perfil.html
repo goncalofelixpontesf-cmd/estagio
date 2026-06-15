@@ -41,7 +41,7 @@
     .avatar { width: 38px; height: 38px; background: var(--laranja); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 0.95rem; cursor: pointer; flex-shrink: 0; }
     .topbar-left { width: 38px; }
 
-    .content { padding: 32px; flex: 1; max-width: 860px; }
+    .content { padding: 32px; flex: 1; max-width: 860px; margin: 0 auto; width: 100%; }
 
     /* ══ ALERTA ══ */
     .alerta { display: none; border-radius: 10px; padding: 13px 18px; font-size: 0.84rem; font-weight: 500; margin-bottom: 22px; border-left: 4px solid transparent; }
@@ -373,7 +373,7 @@
       <!-- Dados Pessoais -->
       <div class="form-card">
         <div class="form-card-header">
-          <div class="icone-secao">??</div>
+          <div class="icone-secao"></div>
           <div class="header-texto">
             <div class="titulo-secao">Dados Pessoais</div>
             <div class="subtitulo-secao">Nome e contacto direto</div>
@@ -400,7 +400,7 @@
       <!-- Presença Online -->
       <div class="form-card">
         <div class="form-card-header">
-          <div class="icone-secao">??</div>
+          <div class="icone-secao"></div>
           <div class="header-texto">
             <div class="titulo-secao">Presença Online</div>
             <div class="subtitulo-secao">Links visíveis pelas entidades</div>
@@ -423,17 +423,17 @@
       <!-- Dados Académicos -->
       <div class="form-card">
         <div class="form-card-header">
-          <div class="icone-secao">??</div>
+          <div class="icone-secao"></div>
           <div class="header-texto">
             <div class="titulo-secao">Dados Académicos</div>
-            <div class="subtitulo-secao">Geridos pela instituição — só leitura</div>
+            <div class="subtitulo-secao">Geridos pela instituição</div>
           </div>
         </div>
         <div class="form-card-body">
           <div class="form-grid">
             <div class="campo">
               <label>Curso</label>
-              <input type="text" value="${est?.curso||'TeSP DTAM'}" readonly>
+              <input type="text" id="f_curso" value="${est?.curso||'TeSP DTAM'}" readonly>
             </div>
             <div class="campo">
               <label>Ano</label>
@@ -446,7 +446,7 @@
       <!-- CV -->
       <div class="form-card">
         <div class="form-card-header">
-          <div class="icone-secao">??</div>
+          <div class="icone-secao"></div>
           <div class="header-texto">
             <div class="titulo-secao">Curriculum Vitae</div>
             <div class="subtitulo-secao">PDF enviado às entidades quando te candidatas</div>
@@ -457,7 +457,7 @@
             <div class="cv-area-icone">${cvNome ? '✅' : '??'}</div>
             <div class="cv-area-titulo">${cvNome ? 'CV carregado' : 'Carregar CV'}</div>
             <div class="cv-area-sub">${cvNome ? 'Clica para substituir' : 'PDF · máx. 5MB'}</div>
-            ${cvNome ? `<div class="cv-badge">?? ${cvNome}</div>` : ''}
+            ${cvNome ? `<div class="cv-badge"> ${cvNome}</div>` : ''}
           </div>
         </div>
       </div>
@@ -687,10 +687,21 @@
     T(O+'button class="btn-p" onclick="window.print()" style="background:#F15A24;color:#fff;border:none;border-radius:8px;padding:12px 28px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer"'+C+'Guardar como PDF (Ctrl+P)'+S+'button'+C+S+'div'+C);
     T(S+'body'+C+S+'html'+C);
 
-    var janela = window.open('', '_blank');
-    if (!janela) { mostrarAlerta('Permite popups para gerar o PDF.'); return; }
-    janela.document.write(L.join('\n'));
-    janela.document.close();
+    var htmlStr = L.join('\n');
+    try {
+      var blob = new Blob([htmlStr], {type: 'text/html; charset=utf-8'});
+      var url  = URL.createObjectURL(blob);
+      var a    = document.createElement('a');
+      a.href   = url;
+      a.target = '_blank';
+      a.rel    = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 10000);
+    } catch(e) {
+      mostrarAlerta('Erro ao gerar PDF: ' + e.message);
+    }
   }
   carregar();
 </script>

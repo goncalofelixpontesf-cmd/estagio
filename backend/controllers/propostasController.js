@@ -20,7 +20,13 @@ exports.listar = async (req, res) => {
 
     // Docentes e entidades vêem só as suas próprias propostas
     if (['docente','entidade'].includes(req.utilizador.perfil)) {
-      filtro.proponenteId = req.utilizador._id;
+      if (req.query.orientador === 'me') {
+        // Propostas onde é tutor atribuído
+        filtro.orientadorId = req.utilizador._id;
+        delete filtro.proponenteId;
+      } else {
+        filtro.proponenteId = req.utilizador._id;
+      }
     }
 
     if (tipo)    filtro.tipo  = tipo;
@@ -200,6 +206,32 @@ exports.obterProposta = async (req, res) => {
       .populate('proponenteId', 'nome email');
     if (!proposta) return res.status(404).json({ sucesso: false, mensagem: 'Proposta não encontrada.' });
     res.json({ sucesso: true, proposta });
+  } catch (err) {
+    res.status(500).json({ sucesso: false, mensagem: err.message });
+  }
+};
+
+// GET /api/propostas/minhas-tutorias
+// Propostas onde o docente autenticado é o orientador atribuído
+exports.minhasTutorias = async (req, res) => {
+  try {
+    const propostas = await Proposta.find({ orientadorId: req.utilizador._id })
+      .populate('proponenteId', 'nome email')
+      .sort({ atualizadaEm: -1 });
+
+    // Para cada proposta, buscar o estudante aceite (se existir)
+    const propostasComEstudante = await Promise.all(propostas.map(async p => {
+      const Candidatura = require('../models/Candidatura');
+      const candAceite = await Candidatura.findOne({ propostaId: p._id, estado: 'aceite' })
+        .populate('estudanteId', 'nome email');
+      return {
+        ...p.toObject(),
+        estudanteAceite: candAceite?.estudanteId || null,
+        totalCandidatos: await Candidatura.countDocuments({ propostaId: p._id })
+      };
+    }));
+
+    res.json({ sucesso: true, total: propostas.length, propostas: propostasComEstudante });
   } catch (err) {
     res.status(500).json({ sucesso: false, mensagem: err.message });
   }

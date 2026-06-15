@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESMAD — As Minhas Tutorias</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.ico">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --laranja: #F15A24; --laranja-hover: #d94d1c; --laranja-light: #FEE8DF;
+      --preto: #1A1A1A; --cinza-bg: #F4F4F4; --cinza-texto: #888;
+      --cinza-linha: #EEEEEE; --branco: #FFFFFF;
+      --azul: #2E75B6; --azul-light: #EBF3FB;
+      --verde: #70AD47; --verde-light: #E2EFDA;
+      --amarelo: #BF8F00; --amarelo-light: #FFF2CC;
+      --vermelho: #C00000; --vermelho-light: #FFDEDE;
+      --sidebar-w: 220px;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--cinza-bg); color: var(--preto); min-height: 100vh; display: flex; }
+
+    .sidebar { width: var(--sidebar-w); background: var(--laranja); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
+    .sidebar-logo { padding: 22px 0 18px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.18); }
+    .sidebar-logo span { color: #fff; font-size: 1.35rem; font-weight: 800; letter-spacing: 2px; }
+    .sidebar-nav { flex: 1; padding: 12px 0; }
+    .nav-item { display: block; padding: 13px 28px; color: rgba(255,255,255,0.82); font-size: 0.88rem; font-weight: 500; text-decoration: none; cursor: pointer; border: none; background: none; width: 100%; text-align: left; transition: background 0.15s, color 0.15s; }
+    .nav-item:hover  { background: rgba(0,0,0,0.12); color: #fff; }
+    .nav-item.activo { background: rgba(0,0,0,0.18); color: #fff; font-weight: 700; }
+    .sidebar-footer { padding: 18px 28px; border-top: 1px solid rgba(255,255,255,0.18); }
+    .sidebar-footer .nome   { color: #fff; font-size: 0.82rem; font-weight: 600; }
+    .sidebar-footer .perfil { color: rgba(255,255,255,0.65); font-size: 0.75rem; margin-top: 2px; }
+
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { background: var(--branco); padding: 18px 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--cinza-linha); position: sticky; top: 0; z-index: 50; }
+    .topbar-centro { text-align: center; flex: 1; }
+    .topbar-centro .titulo    { font-size: 1rem; font-weight: 700; }
+    .topbar-centro .subtitulo { font-size: 0.78rem; color: var(--cinza-texto); margin-top: 1px; }
+    .avatar { width: 38px; height: 38px; background: var(--laranja); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 0.95rem; cursor: pointer; flex-shrink: 0; }
+    .topbar-left { width: 38px; }
+    .content { padding: 28px 32px; flex: 1; }
+
+    /* Stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+    .stat-card { background: var(--branco); border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); padding: 18px 22px; text-align: center; }
+    .stat-card .num   { font-size: 2rem; font-weight: 800; line-height: 1; margin-bottom: 5px; }
+    .stat-card .label { font-size: 0.74rem; color: var(--cinza-texto); }
+    .stat-card.azul   { background: var(--azul-light); }
+    .stat-card.azul   .num { color: var(--azul); }
+    .stat-card.verde  { background: var(--verde-light); }
+    .stat-card.verde  .num { color: var(--verde); }
+    .stat-card.amarelo{ background: var(--amarelo-light); }
+    .stat-card.amarelo .num { color: var(--amarelo); }
+
+    /* Cards */
+    .tutorias-grid { display: flex; flex-direction: column; gap: 16px; }
+
+    .tutoria-card { background: var(--branco); border-radius: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); overflow: hidden; transition: box-shadow 0.18s; }
+    .tutoria-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.10); }
+
+    .tutoria-barra { height: 5px; }
+    .tutoria-barra.atribuida { background: var(--azul); }
+    .tutoria-barra.aprovada  { background: var(--verde); }
+
+    .tutoria-body { padding: 20px 24px; display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: start; }
+
+    .tutoria-titulo { font-size: 1rem; font-weight: 700; margin-bottom: 5px; }
+    .tutoria-meta   { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 0.78rem; color: var(--cinza-texto); margin-bottom: 14px; }
+
+    .tag-tipo { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 0.72rem; font-weight: 700; }
+    .tag-tipo.estagio  { background: var(--laranja-light); color: var(--laranja); }
+    .tag-tipo.projecto { background: var(--azul-light); color: var(--azul); }
+
+    .tutoria-secoes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .tutoria-secao { background: var(--cinza-bg); border-radius: 8px; padding: 10px 14px; }
+    .tutoria-secao .sec-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--cinza-texto); margin-bottom: 4px; }
+    .tutoria-secao .sec-valor { font-size: 0.84rem; font-weight: 600; color: var(--preto); }
+    .tutoria-secao .sec-valor.sem { color: var(--cinza-texto); font-weight: 400; font-style: italic; }
+    .tutoria-secao.destaque-verde { background: var(--verde-light); }
+    .tutoria-secao.destaque-verde .sec-label { color: var(--verde); }
+    .tutoria-secao.destaque-verde .sec-valor { color: #2d5a1b; }
+    .tutoria-secao.destaque-amarelo { background: var(--amarelo-light); }
+    .tutoria-secao.destaque-amarelo .sec-label { color: var(--amarelo); }
+    .tutoria-secao.destaque-amarelo .sec-valor { color: #5a4000; }
+
+    .tutoria-acoes { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+    .badge-estado { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 6px; font-size: 0.76rem; font-weight: 700; white-space: nowrap; }
+    .badge-estado::before { content: ''; width: 7px; height: 7px; border-radius: 50%; }
+    .badge-estado.atribuida { background: var(--azul-light); color: var(--azul); }
+    .badge-estado.atribuida::before { background: var(--azul); }
+    .badge-estado.aprovada  { background: var(--verde-light); color: var(--verde); }
+    .badge-estado.aprovada::before  { background: var(--verde); }
+
+    .btn-ver { background: var(--laranja-light); color: var(--laranja); border: none; border-radius: 7px; padding: 7px 14px; font-family: 'Inter', sans-serif; font-size: 0.78rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .btn-ver:hover { background: var(--laranja); color: #fff; }
+
+    .area-tag { background: var(--azul-light); color: var(--azul); border-radius: 4px; padding: 2px 8px; font-size: 0.7rem; font-weight: 600; margin-right: 4px; }
+
+    .vazio { padding: 60px 20px; text-align: center; color: var(--cinza-texto); }
+    .vazio .emoji { font-size: 2.5rem; margin-bottom: 14px; }
+    .vazio p { font-size: 0.88rem; }
+
+    .skeleton { background: linear-gradient(90deg,#ececec 25%,#f5f5f5 50%,#ececec 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 6px; }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 8px; font-size: 0.84rem; font-weight: 500; transform: translateY(80px); opacity: 0; transition: transform 0.3s, opacity 0.3s; z-index: 500; color: #fff; }
+    .toast.visivel { transform: translateY(0); opacity: 1; }
+    .toast.erro { background: var(--vermelho); }
+
+    .menu-toggle { display: none; position: fixed; top: 14px; left: 14px; z-index: 200; background: var(--laranja); border: none; border-radius: 8px; padding: 8px 10px; cursor: pointer; color: white; font-size: 1.1rem; }
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 90; }
+
+    @media (max-width: 900px) { .stats-grid { grid-template-columns: 1fr 1fr 1fr; } }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
+      .sidebar.aberta { transform: translateX(0); }
+      .sidebar-overlay.visivel { display: block; }
+      .main { margin-left: 0; }
+      .menu-toggle { display: block; }
+      .topbar { padding-left: 56px; }
+      .content { padding: 18px 14px; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .tutoria-body { grid-template-columns: 1fr; }
+      .tutoria-acoes { flex-direction: row; align-items: center; }
+      .tutoria-secoes { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="menu-toggle" id="menuToggle">☰</button>
+<div class="sidebar-overlay" id="overlay"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><span>ESMAD</span></div>
+  <nav class="sidebar-nav">
+    <a class="nav-item" href="dashboard-entidade.html">As Minhas Propostas</a>
+    <a class="nav-item" href="estudantes-interessados.html">Estudantes Interessados</a>
+    <a class="nav-item activo">As Minhas Tutorias</a>
+    <a class="nav-item" href="entrevistas.html">Entrevistas</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="nome" id="sidebarNome">—</div>
+    <div class="perfil">Docente</div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left"></div>
+    <div class="topbar-centro">
+      <div class="titulo">As Minhas Tutorias</div>
+      <div class="subtitulo">Propostas em que é tutor</div>
+    </div>
+    <div class="avatar" id="avatar">?</div>
+  </div>
+
+  <div class="content">
+
+    <!-- Stats skeleton -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card azul">
+        <div class="skeleton" style="height:32px;width:50px;margin:0 auto 8px"></div>
+        <div class="skeleton" style="height:11px;width:90px;margin:0 auto"></div>
+      </div>
+      <div class="stat-card verde">
+        <div class="skeleton" style="height:32px;width:50px;margin:0 auto 8px"></div>
+        <div class="skeleton" style="height:11px;width:90px;margin:0 auto"></div>
+      </div>
+      <div class="stat-card amarelo">
+        <div class="skeleton" style="height:32px;width:50px;margin:0 auto 8px"></div>
+        <div class="skeleton" style="height:11px;width:90px;margin:0 auto"></div>
+      </div>
+    </div>
+
+    <!-- Lista skeleton -->
+    <div id="listaTutorias">
+      <div class="tutoria-card">
+        <div style="height:5px;background:#eee"></div>
+        <div class="tutoria-body" style="display:block;padding:20px 24px">
+          <div class="skeleton" style="height:16px;width:55%;margin-bottom:10px"></div>
+          <div class="skeleton" style="height:11px;width:35%;margin-bottom:16px"></div>
+          <div class="skeleton" style="height:60px;border-radius:8px"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const API   = 'http://localhost:5000/api';
+  const token = localStorage.getItem('esmad_token');
+  const user  = localStorage.getItem('esmad_user');
+  if (!token || !user) { window.location.href = 'login.html'; }
+
+  const utilizador = JSON.parse(user);
+  if (utilizador.perfil !== 'docente') { window.location.href = 'login.html'; }
+
+  document.getElementById('sidebarNome').textContent = utilizador.nome;
+  document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
+  document.getElementById('avatar').addEventListener('click', () => {
+    if (confirm('Tens a certeza que queres fazer logout?')) { localStorage.clear(); window.location.href = 'login.html'; }
+  });
+
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  document.getElementById('menuToggle').addEventListener('click', () => { sidebar.classList.toggle('aberta'); overlay.classList.toggle('visivel'); });
+  overlay.addEventListener('click', () => { sidebar.classList.remove('aberta'); overlay.classList.remove('visivel'); });
+
+  function req(endpoint, opts = {}) {
+    return fetch(`${API}${endpoint}`, {
+      ...opts,
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...(opts.headers || {}) }
+    }).then(r => r.json());
+  }
+
+  function formatarData(str) {
+    if (!str) return '—';
+    return new Date(str).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: '2-digit' });
+  }
+
+  function mostrarToast(msg, tipo = 'erro') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = `toast ${tipo} visivel`;
+    setTimeout(() => { t.className = `toast ${tipo}`; }, 3000);
+  }
+
+  async function carregar() {
+    try {
+      const dados = await req('/utilizadores/tutorias');
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+
+      const propostas = dados.propostas || [];
+
+
+      // Enriquecer cada proposta com candidaturas
+      const propostasRich = await Promise.all(propostas.map(async p => {
+        try {
+          const cands = await req(`/candidaturas/proposta/${p._id}`);
+          const aceite = (cands.candidaturas || []).find(c => c.estado === 'aceite');
+          return {
+            ...p,
+            totalCandidatos: cands.total || 0,
+            estudanteAceite: aceite?.estudanteId || null
+          };
+        } catch { return { ...p, totalCandidatos: 0, estudanteAceite: null }; }
+      }));
+
+      const comEstudante = propostasRich.filter(p => p.estudanteAceite).length;
+      const semEstudante = propostasRich.filter(p => !p.estudanteAceite).length;
+
+      document.getElementById('statsGrid').innerHTML = `
+        <div class="stat-card azul">
+          <div class="num">${propostasRich.length}</div>
+          <div class="label">Total de Tutorias</div>
+        </div>
+        <div class="stat-card verde">
+          <div class="num">${comEstudante}</div>
+          <div class="label">Com Estudante Atribuído</div>
+        </div>
+        <div class="stat-card amarelo">
+          <div class="num">${semEstudante}</div>
+          <div class="label">A Aguardar Estudante</div>
+        </div>`;
+
+      const lista = document.getElementById('listaTutorias');
+
+      if (!propostasRich.length) {
+        lista.innerHTML = `
+          <div class="vazio">
+            <div class="emoji">👨‍🏫</div>
+            <p>Ainda não foi atribuído como tutor a nenhuma proposta.</p>
+            <p style="margin-top:8px;font-size:0.8rem">A CCA atribui tutores às propostas aprovadas.</p>
+          </div>`;
+        return;
+      }
+
+      lista.innerHTML = `<div class="tutorias-grid">${propostasRich.map(p => {
+        const tipo = p.tipo === 'estagio' ? 'Estágio' : 'Projeto';
+        const estado = p.estado;
+        const estadoLabel = { atribuida: 'Atribuída', aprovada: 'Aprovada' };
+        const areas = (p.areas || []).slice(0, 3).map(a => `<span class="area-tag">${a}</span>`).join('');
+        const est = p.estudanteAceite;
+
+        return `
+          <div class="tutoria-card">
+            <div class="tutoria-barra ${estado}"></div>
+            <div class="tutoria-body">
+              <div>
+                <div class="tutoria-titulo">${p.titulo}</div>
+                <div class="tutoria-meta">
+                  <span class="tag-tipo ${p.tipo}">${tipo}</span>
+                  <span>🏢 ${p.nomeEntidade || p.proponenteId?.nome || '—'}</span>
+                  <span>📚 ${p.curso}</span>
+                  <span>📅 Atribuído em ${formatarData(p.atualizadaEm)}</span>
+                </div>
+                ${areas ? `<div style="margin-bottom:14px">${areas}</div>` : ''}
+                <div class="tutoria-secoes">
+                  <div class="tutoria-secao">
+                    <div class="sec-label">Tutor na Entidade</div>
+                    <div class="sec-valor ${p.tutorNome ? '' : 'sem'}">${p.tutorNome ? `${p.tutorNome}${p.tutorCargo ? ' · ' + p.tutorCargo : ''}` : 'Não definido'}</div>
+                  </div>
+                  <div class="tutoria-secao">
+                    <div class="sec-label">Candidatos</div>
+                    <div class="sec-valor">${p.totalCandidatos || 0} candidato${p.totalCandidatos !== 1 ? 's' : ''}</div>
+                  </div>
+                  ${est
+                    ? `<div class="tutoria-secao destaque-verde" style="grid-column:1/-1">
+                        <div class="sec-label">✅ Estudante Atribuído</div>
+                        <div class="sec-valor">${est.nome} <span style="font-weight:400;color:#555">· ${est.email || '—'}</span></div>
+                      </div>`
+                    : `<div class="tutoria-secao destaque-amarelo" style="grid-column:1/-1">
+                        <div class="sec-label">⏳ Estudante</div>
+                        <div class="sec-valor">A aguardar candidaturas / seleção</div>
+                      </div>`
+                  }
+                  ${p.objetivos ? `
+                  <div class="tutoria-secao" style="grid-column:1/-1">
+                    <div class="sec-label">Objetivos</div>
+                    <div class="sec-valor" style="font-weight:400;font-size:0.8rem;line-height:1.5;color:#444">${p.objetivos.substring(0, 180)}${p.objetivos.length > 180 ? '…' : ''}</div>
+                  </div>` : ''}
+                </div>
+              </div>
+              <div class="tutoria-acoes">
+                <span class="badge-estado ${estado}">${estadoLabel[estado] || estado}</span>
+                <button class="btn-ver" onclick="window.location.href='estudantes-interessados.html?proposta=${p._id}'">
+                  Ver candidatos →
+                </button>
+              </div>
+            </div>
+          </div>`;
+      }).join('')}</div>`;
+
+    } catch (err) {
+      mostrarToast(err.message, 'erro');
+      document.getElementById('listaTutorias').innerHTML = `
+        <div class="vazio">
+          <div class="emoji">⚠️</div>
+          <p>${err.message}</p>
+        </div>`;
+    }
+  }
+
+  carregar();
+</script>
+</body>
+</html>
