@@ -139,7 +139,7 @@
 </div>
 
 <script>
-  const API_URL = 'http://localhost:5000/api';
+  const API_URL = 'http://192.168.1.66:5000/api';
 
   // Já autenticado → redirecionar
   (() => {
@@ -302,6 +302,26 @@
       btnRegisto.textContent = 'Criar conta';
     }
   });
+
+  // ── Pré-preencher a partir de um link de convite (ex: convite CCA) ──
+  (function preencherDeConvite() {
+    const params = new URLSearchParams(window.location.search);
+    const emailParam  = params.get('email');
+    const perfilParam = params.get('perfil');
+    if (!emailParam && !perfilParam) return;
+
+    if (perfilParam && emailConfig[perfilParam]) {
+      perfilSelect.value = perfilParam;
+      perfilSelect.dispatchEvent(new Event('change'));
+    }
+    if (emailParam) {
+      emailInput.value = emailParam;
+      // Bloquear o email para garantir que corresponde ao convite
+      emailInput.readOnly = true;
+      emailInput.style.background = '#F0F0F0';
+      notaEmail.textContent = 'Email pré-preenchido a partir do convite recebido.';
+    }
+  })();
 </script>
 </body>
 </html>

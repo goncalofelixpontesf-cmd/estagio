@@ -3,35 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESMAD </title>
+  <title>ESMAD — Entrevistas</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/png" href="favicon.ico">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --laranja:       #F15A24;
-      --laranja-hover: #d94d1c;
-      --laranja-light: #FEE8DF;
-      --preto:         #1A1A1A;
-      --cinza-bg:      #F4F4F4;
-      --cinza-texto:   #888888;
-      --cinza-linha:   #EEEEEE;
-      --branco:        #FFFFFF;
-      --azul:          #2E75B6;
-      --azul-light:    #EBF3FB;
-      --verde:         #70AD47;
-      --verde-light:   #E2EFDA;
-      --amarelo:       #BF8F00;
-      --amarelo-light: #FFF2CC;
-      --vermelho:      #C00000;
-      --vermelho-light:#FFDEDE;
-      --sidebar-w:     220px;
+      --laranja: #F15A24; --laranja-hover: #d94d1c; --laranja-light: #FEE8DF;
+      --preto: #1A1A1A; --cinza-bg: #F4F4F4; --cinza-texto: #888888;
+      --cinza-linha: #EEEEEE; --cinza-input: #F5F5F5; --branco: #FFFFFF;
+      --azul: #2E75B6; --azul-light: #EBF3FB;
+      --verde: #70AD47; --verde-light: #E2EFDA;
+      --amarelo: #BF8F00; --amarelo-light: #FFF2CC;
+      --vermelho: #C00000; --vermelho-light: #FFDEDE;
+      --sidebar-w: 220px;
     }
-
     body { font-family: 'Inter', sans-serif; background: var(--cinza-bg); color: var(--preto); min-height: 100vh; display: flex; }
 
-    /* ══ SIDEBAR ══ */
     .sidebar { width: var(--sidebar-w); background: var(--laranja); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
     .sidebar-logo { padding: 22px 0 18px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.18); }
     .sidebar-logo span { color: var(--branco); font-size: 1.35rem; font-weight: 800; letter-spacing: 2px; }
@@ -43,146 +30,104 @@
     .sidebar-footer .nome   { color: var(--branco); font-size: 0.82rem; font-weight: 600; }
     .sidebar-footer .perfil { color: rgba(255,255,255,0.65); font-size: 0.75rem; margin-top: 2px; }
 
-    /* ══ MAIN ══ */
     .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
-
     .topbar { background: var(--branco); padding: 18px 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--cinza-linha); position: sticky; top: 0; z-index: 50; }
     .topbar-centro { text-align: center; flex: 1; }
     .topbar-centro .titulo    { font-size: 1rem; font-weight: 700; }
     .topbar-centro .subtitulo { font-size: 0.78rem; color: var(--cinza-texto); margin-top: 1px; }
-    .avatar { width: 38px; height: 38px; background: var(--laranja); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--branco); font-weight: 700; font-size: 0.95rem; cursor: pointer; flex-shrink: 0; }
     .topbar-left { width: 38px; }
-
+    .avatar { width: 38px; height: 38px; background: var(--laranja); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--branco); font-weight: 700; font-size: 0.95rem; cursor: pointer; flex-shrink: 0; }
     .content { padding: 24px 32px; flex: 1; }
 
+    /* STATS */
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+    .stat-card { background: var(--branco); border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); padding: 18px 22px; display: flex; align-items: center; gap: 14px; }
+    .stat-icone { width: 46px; height: 46px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+    .stat-icone.amarelo { background: var(--amarelo-light); }
+    .stat-icone.azul    { background: var(--azul-light); }
+    .stat-icone.verde   { background: var(--verde-light); }
+    .stat-num   { font-size: 1.6rem; font-weight: 800; line-height: 1; }
+    .stat-label { font-size: 0.78rem; color: var(--cinza-texto); margin-top: 3px; }
 
+    /* TABS */
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+    .tab { padding: 9px 22px; border-radius: 8px; border: none; font-family: 'Inter', sans-serif; font-size: 0.83rem; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+    .tab.inactivo { background: var(--branco); color: var(--cinza-texto); box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .tab.inactivo:hover { background: #F0F0F0; }
+    .tab.activo   { background: var(--laranja); color: var(--branco); }
+    .badge-tab { background: var(--vermelho); color: var(--branco); border-radius: 10px; padding: 1px 7px; font-size: 0.7rem; font-weight: 700; margin-left: 6px; }
 
-    /* ══ STATS ══ */
-    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
-    .stat-card { background: var(--branco); border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); padding: 16px 20px; text-align: center; }
-    .stat-card .num   { font-size: 1.8rem; font-weight: 800; line-height: 1; margin-bottom: 5px; }
-    .stat-card .label { font-size: 0.74rem; color: var(--cinza-texto); }
-    .stat-card.laranja { background: var(--laranja-light); }
-    .stat-card.laranja .num { color: var(--laranja); }
-    .stat-card.azul    { background: var(--azul-light); }
-    .stat-card.azul    .num { color: var(--azul); }
-    .stat-card.amarelo { background: var(--amarelo-light); }
-    .stat-card.amarelo .num { color: var(--amarelo); }
-    .stat-card.verde   { background: var(--verde-light); }
-    .stat-card.verde   .num { color: var(--verde); }
+    /* PAINEL */
+    .painel { background: var(--branco); border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); overflow: hidden; }
 
-    /* Skeleton */
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #F8F8F8; }
+    th { padding: 11px 16px; text-align: left; font-size: 0.71rem; font-weight: 700; color: var(--cinza-texto); text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid var(--cinza-linha); white-space: nowrap; }
+    td { padding: 13px 16px; font-size: 0.83rem; border-bottom: 1px solid var(--cinza-linha); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #FAFAFA; }
+
+    .nome-link { font-weight: 600; cursor: pointer; color: var(--preto); }
+    .nome-link:hover { color: var(--laranja); text-decoration: underline; }
+
+    /* Badges */
+    .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border-radius: 5px; font-size: 0.73rem; font-weight: 700; }
+    .badge.pendente  { background: var(--amarelo-light); color: var(--amarelo); }
+    .badge.agendada  { background: var(--azul-light);    color: var(--azul); }
+    .badge.aceite    { background: var(--verde-light);   color: var(--verde); }
+    .badge.confirmado { background: var(--verde-light); color: var(--verde); }
+    .badge.aguarda    { background: var(--amarelo-light); color: var(--amarelo); }
+
+    /* Botões de ação */
+    .btn-agendar  { background: var(--laranja); color: var(--branco); border: none; border-radius: 6px; padding: 7px 14px; font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .btn-agendar:hover { background: var(--laranja-hover); }
+    .btn-reagendar { background: var(--azul-light); color: var(--azul); border: none; border-radius: 6px; padding: 7px 14px; font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .btn-reagendar:hover { opacity: 0.8; }
+    .btn-escolher { background: var(--verde-light); color: var(--verde); border: none; border-radius: 6px; padding: 7px 14px; font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .btn-escolher:hover { opacity: 0.8; }
+
+    .acoes { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+    .vazio { padding: 48px 20px; text-align: center; color: var(--cinza-texto); }
+    .vazio .emoji { font-size: 2.2rem; margin-bottom: 10px; }
+    .vazio p { font-size: 0.88rem; }
+
     .skeleton { background: linear-gradient(90deg,#ececec 25%,#f5f5f5 50%,#ececec 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 6px; }
     @keyframes shimmer { to { background-position: -200% 0; } }
 
-    /* ══ FILTROS ══ */
-    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
-    .section-title { font-size: 1rem; font-weight: 700; }
+    /* MODAIS */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.42); z-index: 400; align-items: center; justify-content: center; padding: 16px; }
+    .modal-overlay.aberto { display: flex; }
+    .modal { background: var(--branco); border-radius: 14px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,0.18); }
+    .modal-topo { height: 6px; background: var(--laranja); border-radius: 14px 14px 0 0; }
+    .modal-header { padding: 22px 26px 0; display: flex; align-items: flex-start; justify-content: space-between; }
+    .modal-header h2 { font-size: 1rem; font-weight: 700; }
+    .modal-header .sub { font-size: 0.78rem; color: var(--cinza-texto); margin-top: 3px; }
+    .btn-fechar { background: none; border: none; cursor: pointer; color: var(--cinza-texto); font-size: 1.2rem; padding: 2px 6px; flex-shrink: 0; }
+    .btn-fechar:hover { color: var(--preto); }
+    .modal-body { padding: 18px 26px; }
+    .modal-footer { padding: 0 26px 22px; display: flex; justify-content: flex-end; gap: 10px; }
+    .linha-modal { border: none; border-top: 1px solid var(--cinza-linha); margin: 10px 0 16px; }
+    .alerta-modal { display: none; border-radius: 8px; padding: 10px 13px; font-size: 0.8rem; font-weight: 500; margin-bottom: 12px; }
+    .alerta-modal.erro    { background: var(--vermelho-light); color: var(--vermelho); display: block; }
+    .alerta-modal.sucesso { background: var(--verde-light);    color: var(--verde);    display: block; }
+    .campo-label { display: block; font-size: 0.72rem; font-weight: 700; color: var(--preto); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .campo-input { width: 100%; background: var(--cinza-input); border: 1.5px solid transparent; border-radius: 8px; padding: 12px 14px; font-family: 'Inter', sans-serif; font-size: 0.86rem; color: var(--preto); outline: none; transition: border-color 0.18s, box-shadow 0.18s; margin-bottom: 14px; }
+    .campo-input::placeholder { color: #BBBBBB; }
+    .campo-input:focus { background: var(--branco); border-color: var(--laranja); box-shadow: 0 0 0 3px rgba(241,90,36,0.10); }
+    .btn-m-cancelar { background: #F0F0F0; color: #666; border: none; border-radius: 8px; padding: 10px 20px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 500; cursor: pointer; }
+    .btn-m-cancelar:hover { background: #E4E4E4; }
+    .btn-m-laranja  { background: var(--laranja); color: var(--branco); border: none; border-radius: 8px; padding: 10px 22px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; }
+    .btn-m-laranja:hover { background: var(--laranja-hover); }
+    .btn-m-laranja:disabled { opacity: 0.65; cursor: not-allowed; }
+    .btn-m-verde { background: var(--verde); color: var(--branco); border: none; border-radius: 8px; padding: 10px 22px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; }
 
-    .filtros { display: flex; gap: 8px; flex-wrap: wrap; }
-    .filtro-btn {
-      padding: 7px 16px; border-radius: 20px; border: 1.5px solid var(--cinza-linha);
-      background: var(--branco); font-family: 'Inter', sans-serif; font-size: 0.78rem;
-      font-weight: 600; color: var(--cinza-texto); cursor: pointer; transition: all 0.15s;
-    }
-    .filtro-btn:hover { border-color: var(--laranja); color: var(--laranja); }
-    .filtro-btn.activo { background: var(--laranja); border-color: var(--laranja); color: var(--branco); }
+    .spin { display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: girar 0.6s linear infinite; vertical-align: middle; margin-right: 6px; }
+    @keyframes girar { to { transform: rotate(360deg); } }
 
-    /* ══ CARDS DE CANDIDATURA ══ */
-    .candidaturas-lista { display: flex; flex-direction: column; gap: 14px; }
-
-    .cand-card {
-      background: var(--branco); border-radius: 12px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-      overflow: hidden; transition: box-shadow 0.18s;
-    }
-    .cand-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10); }
-
-    .cand-card-topo { height: 5px; }
-    .cand-card-topo.pendente           { background: var(--amarelo); }
-    .cand-card-topo.entrevista_agendada{ background: var(--azul); }
-    .cand-card-topo.aceite             { background: var(--verde); }
-    .cand-card-topo.rejeitada          { background: var(--vermelho); }
-
-    .cand-card-body { padding: 18px 22px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-
-    .cand-info { flex: 1; min-width: 200px; }
-    .cand-titulo { font-size: 0.96rem; font-weight: 700; color: var(--preto); margin-bottom: 4px; cursor: pointer; transition: color 0.15s; }
-    .cand-titulo:hover { color: var(--laranja); }
-    .cand-meta { font-size: 0.78rem; color: var(--cinza-texto); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
-    .cand-meta span { display: flex; align-items: center; gap: 4px; }
-
-    .tag-tipo { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 0.72rem; font-weight: 700; }
-    .tag-tipo.estagio  { background: var(--laranja-light); color: var(--laranja); }
-    .tag-tipo.projecto { background: var(--azul-light); color: var(--azul); }
-
-    .cand-areas { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
-    .area-tag { background: var(--azul-light); color: var(--azul); border-radius: 4px; padding: 2px 8px; font-size: 0.7rem; font-weight: 600; }
-
-    /* Status coluna direita */
-    .cand-status { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; }
-
-    .badge-estado { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; }
-    .badge-estado::before { content: ''; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-    .badge-estado.pendente            { background: var(--amarelo-light); color: var(--amarelo); }
-    .badge-estado.pendente::before    { background: var(--amarelo); }
-    .badge-estado.entrevista_agendada { background: var(--azul-light); color: var(--azul); }
-    .badge-estado.entrevista_agendada::before { background: var(--azul); }
-    .badge-estado.aceite              { background: var(--verde-light); color: var(--verde); }
-    .badge-estado.aceite::before      { background: var(--verde); }
-    .badge-estado.rejeitada           { background: var(--vermelho-light); color: var(--vermelho); }
-    .badge-estado.rejeitada::before   { background: var(--vermelho); }
-
-    .cand-data { font-size: 0.76rem; color: var(--cinza-texto); }
-
-    /* Info entrevista */
-    .entrevista-box {
-      margin: 0 22px 16px; background: var(--azul-light);
-      border-radius: 8px; padding: 12px 16px;
-      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-    }
-    .entrevista-box .ei-label { font-size: 0.72rem; color: var(--azul); font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 2px; }
-    .entrevista-box .ei-valor { font-size: 0.84rem; font-weight: 600; color: var(--preto); }
-    .entrevista-box .ei-link  { color: var(--azul); text-decoration: none; font-size: 0.84rem; font-weight: 600; }
-    .entrevista-box .ei-link:hover { text-decoration: underline; }
-    .entrevista-box .ei-sep { width: 1px; height: 32px; background: rgba(46,117,182,0.25); flex-shrink: 0; }
-
-    /* Info aceite */
-    .aceite-box {
-      margin: 0 22px 16px; background: var(--verde-light);
-      border-radius: 8px; padding: 12px 16px;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .aceite-box .icone { font-size: 1.2rem; }
-    .aceite-box p { font-size: 0.83rem; color: #375623; font-weight: 500; }
-
-    /* Botão ver proposta */
-    .btn-ver-proposta {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: none; border: 1.5px solid var(--cinza-linha); border-radius: 6px;
-      padding: 6px 14px; font-family: 'Inter', sans-serif; font-size: 0.76rem;
-      font-weight: 600; color: var(--cinza-texto); cursor: pointer;
-      transition: border-color 0.15s, color 0.15s;
-    }
-    .btn-ver-proposta:hover { border-color: var(--laranja); color: var(--laranja); }
-
-    /* Favorita */
-    .btn-fav { background: none; border: none; cursor: pointer; font-size: 1.1rem; padding: 4px; transition: transform 0.15s; color: var(--cinza-linha); }
-    .btn-fav:hover { transform: scale(1.2); }
-    .btn-fav.fav { color: var(--laranja); }
-
-    /* Vazio */
-    .vazio { padding: 60px 20px; text-align: center; color: var(--cinza-texto); }
-    .vazio .emoji { font-size: 2.5rem; margin-bottom: 12px; }
-    .vazio p { font-size: 0.88rem; margin-bottom: 16px; }
-    .btn-ir-propostas { display: inline-flex; align-items: center; gap: 6px; background: var(--laranja); color: var(--branco); border: none; border-radius: 8px; padding: 11px 22px; font-family: 'Inter', sans-serif; font-size: 0.86rem; font-weight: 700; cursor: pointer; text-decoration: none; transition: background 0.15s; }
-    .btn-ir-propostas:hover { background: var(--laranja-hover); }
-
-    /* Mobile */
     .menu-toggle { display: none; position: fixed; top: 14px; left: 14px; z-index: 200; background: var(--laranja); border: none; border-radius: 8px; padding: 8px 10px; cursor: pointer; color: white; font-size: 1.1rem; }
     .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 90; }
 
-    @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2,1fr); } }
     @media (max-width: 768px) {
       .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
       .sidebar.aberta { transform: translateX(0); }
@@ -191,9 +136,8 @@
       .menu-toggle { display: block; }
       .topbar { padding-left: 56px; }
       .content { padding: 18px 14px; }
-      .stats-grid { grid-template-columns: 1fr 1fr; }
-      .cand-card-body { flex-direction: column; }
-      .cand-status { align-items: flex-start; flex-direction: row; flex-wrap: wrap; }
+      .stats-row { grid-template-columns: 1fr; }
+      th:nth-child(4), td:nth-child(4) { display: none; }
     }
   </style>
 </head>
@@ -202,27 +146,25 @@
 <button class="menu-toggle" id="menuToggle">☰</button>
 <div class="sidebar-overlay" id="overlay"></div>
 
-<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo"><span>ESMAD</span></div>
   <nav class="sidebar-nav">
-    <a class="nav-item" href="lista-propostas.html">Propostas</a>
-    <a class="nav-item activo">As Minhas Candidaturas</a>
-    <a class="nav-item" href="perfil-estudante.html">O Meu Perfil</a>
+    <a class="nav-item" href="dashboard-docente.html">As Minhas Propostas</a>
+    <a class="nav-item" href="estudantes-interessados.html">Estudantes Interessados</a>
+    <a class="nav-item activo">Entrevistas</a>
   </nav>
   <div class="sidebar-footer">
     <div class="nome" id="sidebarNome">—</div>
-    <div class="perfil">Estudante</div>
+    <div class="perfil" id="sidebarPerfil">Entidade</div>
   </div>
 </aside>
 
-<!-- MAIN -->
 <main class="main">
   <div class="topbar">
     <div class="topbar-left"></div>
     <div class="topbar-centro">
-      <div class="titulo">As Minhas Candidaturas</div>
-      <div class="subtitulo">Acompanha o estado das tuas candidaturas</div>
+      <div class="titulo">Entrevistas</div>
+      <div class="subtitulo" id="topbarSub">Gestão de entrevistas das suas propostas</div>
     </div>
     <div class="avatar" id="avatar">?</div>
   </div>
@@ -230,62 +172,100 @@
   <div class="content">
 
     <!-- Stats -->
-    <div class="stats-grid" id="statsGrid">
-      <div class="stat-card laranja">
-        <div class="skeleton" style="height:28px;width:40px;margin:0 auto 6px"></div>
-        <div class="skeleton" style="height:11px;width:80px;margin:0 auto"></div>
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icone amarelo">📋</div>
+        <div><div class="stat-num" id="statPorAgendar">—</div><div class="stat-label">Por agendar</div></div>
       </div>
-      <div class="stat-card azul">
-        <div class="skeleton" style="height:28px;width:40px;margin:0 auto 6px"></div>
-        <div class="skeleton" style="height:11px;width:80px;margin:0 auto"></div>
+      <div class="stat-card">
+        <div class="stat-icone azul">📅</div>
+        <div><div class="stat-num" id="statAgendadas">—</div><div class="stat-label">Entrevistas agendadas</div></div>
       </div>
-      <div class="stat-card amarelo">
-        <div class="skeleton" style="height:28px;width:40px;margin:0 auto 6px"></div>
-        <div class="skeleton" style="height:11px;width:80px;margin:0 auto"></div>
-      </div>
-      <div class="stat-card verde">
-        <div class="skeleton" style="height:28px;width:40px;margin:0 auto 6px"></div>
-        <div class="skeleton" style="height:11px;width:80px;margin:0 auto"></div>
+      <div class="stat-card">
+        <div class="stat-icone verde">✅</div>
+        <div><div class="stat-num" id="statConfirmadas">—</div><div class="stat-label">Confirmadas pelo estudante</div></div>
       </div>
     </div>
 
-    <!-- Filtros -->
-    <div class="section-header">
-      <h2 class="section-title">Candidaturas</h2>
-      <div class="filtros" id="filtros">
-        <button class="filtro-btn activo" onclick="filtrar('todas',this)">Todas</button>
-        <button class="filtro-btn" onclick="filtrar('pendente',this)">Pendentes</button>
-        <button class="filtro-btn" onclick="filtrar('entrevista_agendada',this)">Entrevistas</button>
-        <button class="filtro-btn" onclick="filtrar('aceite',this)">Aceites</button>
-        <button class="filtro-btn" onclick="filtrar('rejeitada',this)">Rejeitadas</button>
-      </div>
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab activo" id="tabPorAgendar" onclick="mudarTab('por-agendar')">
+        Por Agendar <span class="badge-tab" id="badgePorAgendar" style="display:none">0</span>
+      </button>
+      <button class="tab inactivo" id="tabAgendadas" onclick="mudarTab('agendadas')">
+        Entrevistas Agendadas
+      </button>
     </div>
 
-    <!-- Lista -->
-    <div class="candidaturas-lista" id="lista">
-      <div style="background:var(--branco);border-radius:12px;padding:32px;box-shadow:0 1px 6px rgba(0,0,0,0.06)">
-        <div class="skeleton" style="height:16px;width:60%;margin-bottom:10px"></div>
-        <div class="skeleton" style="height:12px;width:40%;margin-bottom:20px"></div>
-        <div class="skeleton" style="height:12px;width:100%;margin-bottom:6px"></div>
-        <div class="skeleton" style="height:12px;width:80%"></div>
-      </div>
-    </div>
+    <div id="conteudo"></div>
 
   </div>
 </main>
 
+<!-- MODAL AGENDAR / REAGENDAR -->
+<div class="modal-overlay" id="modalAgendar">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-topo"></div>
+    <div class="modal-header">
+      <div>
+        <h2 id="modalAgendarTitulo">Agendar Entrevista</h2>
+        <div class="sub" id="modalAgendarSub">—</div>
+      </div>
+      <button class="btn-fechar" onclick="fecharModal('modalAgendar')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="alertaAgendar" class="alerta-modal"></div>
+      <div class="linha-modal"></div>
+      <label class="campo-label">Data e Hora <span style="color:var(--laranja)">*</span></label>
+      <input type="datetime-local" class="campo-input" id="agendarData">
+      <label class="campo-label">Local / Link da Entrevista <span style="color:var(--laranja)">*</span></label>
+      <input type="text" class="campo-input" id="agendarLocal" placeholder="Ex: Google Meet, Zoom ou morada física">
+    </div>
+    <div class="modal-footer">
+      <button class="btn-m-cancelar" onclick="fecharModal('modalAgendar')">Cancelar</button>
+      <button class="btn-m-laranja" id="btnConfirmarAgendar" onclick="confirmarAgendar()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ESCOLHER ESTUDANTE -->
+<div class="modal-overlay" id="modalEscolher">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-topo"></div>
+    <div class="modal-header">
+      <div>
+        <h2>Selecionar Estudante</h2>
+        <div class="sub" id="escolherSub">—</div>
+      </div>
+      <button class="btn-fechar" onclick="fecharModal('modalEscolher')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="alertaEscolher" class="alerta-modal"></div>
+      <div class="linha-modal"></div>
+      <p style="font-size:0.86rem;color:#444;line-height:1.7;margin-bottom:12px">
+        Ao confirmar, o estudante <strong id="escolherNome" style="color:var(--laranja)">—</strong> será aceite
+        e as restantes candidaturas rejeitadas automaticamente.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-m-cancelar" onclick="fecharModal('modalEscolher')">Cancelar</button>
+      <button class="btn-m-verde" id="btnConfirmarEscolher" onclick="confirmarEscolher()">✔ Confirmar Seleção</button>
+    </div>
+  </div>
+</div>
+
 <script>
-  const API = 'http://localhost:5000/api';
+  const API = 'http://192.168.1.66:5000/api';
   const token = localStorage.getItem('esmad_token');
   const user  = localStorage.getItem('esmad_user');
   if (!token || !user) { window.location.href = 'login.html'; }
 
   const utilizador = JSON.parse(user);
-  if (utilizador.perfil !== 'estudante') { window.location.href = 'login.html'; }
+  if (!['docente','entidade'].includes(utilizador.perfil)) { window.location.href = 'login.html'; }
 
-  const primeiroNome = utilizador.nome.split(' ')[0];
-  document.getElementById('sidebarNome').textContent = utilizador.nome;
-  document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
+  document.getElementById('sidebarNome').textContent   = utilizador.nome;
+  document.getElementById('sidebarPerfil').textContent = utilizador.perfil === 'docente' ? 'Docente' : 'Entidade';
+  document.getElementById('avatar').textContent        = utilizador.nome.charAt(0).toUpperCase();
 
   document.getElementById('avatar').addEventListener('click', () => {
     if (confirm('Tens a certeza que queres fazer logout?')) { localStorage.clear(); window.location.href = 'login.html'; }
@@ -307,215 +287,300 @@
     if (!str) return '—';
     return new Date(str).toLocaleDateString('pt-PT', { day:'2-digit', month:'2-digit', year:'2-digit' });
   }
+
   function formatarDataHora(str) {
     if (!str) return '—';
     return new Date(str).toLocaleString('pt-PT', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' });
   }
 
   function isLink(str) {
-    return str && (str.startsWith('http') || str.includes('meet.') || str.includes('zoom.') || str.includes('teams.'));
+    return str && (str.startsWith('http') || str.startsWith('www.') || str.includes('meet.') || str.includes('zoom.') || str.includes('teams.'));
   }
 
-  const estadoLabels = {
-    pendente: 'Pendente',
-    entrevista_agendada: 'Entrevista Agendada',
-    aceite: 'Aceite',
-    rejeitada: 'Rejeitada'
-  };
+  function fecharModal(id) {
+    document.getElementById(id).classList.remove('aberto');
+    document.body.style.overflow = '';
+    const al = document.getElementById(id).querySelector('.alerta-modal');
+    if (al) al.className = 'alerta-modal';
+  }
+  function abrirModal(id) { document.getElementById(id).classList.add('aberto'); document.body.style.overflow = 'hidden'; }
+  document.querySelectorAll('.modal-overlay').forEach(el => {
+    el.addEventListener('click', e => { if (e.target === el) fecharModal(el.id); });
+  });
 
-  // Propostas guardadas (favoritas)
-  const guardadas = JSON.parse(localStorage.getItem('esmad_guardadas') || '[]');
-
+  // ── Estado ──
+  let tabActiva = 'por-agendar';
   let todasCandidaturas = [];
-  let filtroActivo = 'todas';
+  let candidaturaAgendarId = null;
+  let candidaturaEscolherId = null;
 
+  // ── Carregar todas as candidaturas das minhas propostas ──
   async function carregar() {
     try {
-      const dados = await req('/candidaturas/minhas');
-      if (!dados.sucesso) throw new Error(dados.mensagem);
+      // Carregar propostas do utilizador
+      const dadosP = await req('/propostas');
+      if (!dadosP.sucesso) throw new Error(dadosP.mensagem);
 
-      const candidaturas = dados.candidaturas || [];
-      todasCandidaturas = candidaturas;
+      const minhas = dadosP.propostas.filter(p =>
+        (p.proponenteId?._id || p.proponenteId) === utilizador.id &&
+        (p.estado === 'aprovada' || p.estado === 'atribuida')
+      );
 
-      // Calcular stats a partir das candidaturas
-      const totalCandidaturas   = candidaturas.length;
-      const entrevistasAgendadas = candidaturas.filter(c => c.estado === 'entrevista_agendada').length;
-      const emEspera            = candidaturas.filter(c => c.estado === 'pendente').length;
-      const aceite              = candidaturas.filter(c => c.estado === 'aceite').length;
+      if (!minhas.length) {
+        todasCandidaturas = [];
+        atualizarStats();
+        renderTab();
+        return;
+      }
 
-      // Stats
-      document.getElementById('statsGrid').innerHTML = `
-        <div class="stat-card laranja">
-          <div class="num">${totalCandidaturas}</div>
-          <div class="label">Total de Candidaturas</div>
-        </div>
-        <div class="stat-card azul">
-          <div class="num">${entrevistasAgendadas}</div>
-          <div class="label">Entrevistas Agendadas</div>
-        </div>
-        <div class="stat-card amarelo">
-          <div class="num">${emEspera}</div>
-          <div class="label">Aguardam Resposta</div>
-        </div>
-        <div class="stat-card verde">
-          <div class="num">${aceite}</div>
-          <div class="label">Aceite</div>
-        </div>`;
+      // Carregar candidaturas de cada proposta
+      const resultados = await Promise.all(
+        minhas.map(p => req(`/candidaturas/proposta/${p._id}`).then(r => ({
+          proposta: p,
+          candidaturas: r.sucesso ? r.candidaturas : []
+        })))
+      );
 
+      todasCandidaturas = resultados.flatMap(r =>
+        r.candidaturas.map(c => ({ ...c, _proposta: r.proposta }))
+      );
 
-
-      renderLista(candidaturas);
-
+      atualizarStats();
+      renderTab();
     } catch (err) {
-      document.getElementById('lista').innerHTML = `
-        <div style="background:var(--branco);border-radius:12px;padding:40px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,0.06)">
-          <div style="font-size:2rem;margin-bottom:10px">⚠️</div>
-          <p style="color:var(--cinza-texto);font-size:0.88rem">${err.message}</p>
-        </div>`;
+      document.getElementById('conteudo').innerHTML = `<div class="painel"><div class="vazio"><div class="emoji">⚠️</div><p>${err.message}</p></div></div>`;
     }
   }
 
-  function renderLista(lista) {
-    const container = document.getElementById('lista');
+  function atualizarStats() {
+    const porAgendar  = todasCandidaturas.filter(c => c.estado === 'pendente').length;
+    const agendadas   = todasCandidaturas.filter(c => c.estado === 'entrevista_agendada').length;
+    const confirmadas = todasCandidaturas.filter(c => c.estado === 'entrevista_agendada' && c.conhecimentoEntrevista).length;
+
+    document.getElementById('statPorAgendar').textContent  = porAgendar;
+    document.getElementById('statAgendadas').textContent   = agendadas;
+    document.getElementById('statConfirmadas').textContent = confirmadas;
+
+    const badge = document.getElementById('badgePorAgendar');
+    badge.textContent = porAgendar;
+    badge.style.display = porAgendar > 0 ? '' : 'none';
+  }
+
+  function mudarTab(tab) {
+    tabActiva = tab;
+    document.getElementById('tabPorAgendar').className = tab === 'por-agendar' ? 'tab activo' : 'tab inactivo';
+    document.getElementById('tabAgendadas').className  = tab === 'agendadas'   ? 'tab activo' : 'tab inactivo';
+    renderTab();
+  }
+
+  function renderTab() {
+    if (tabActiva === 'por-agendar') renderPorAgendar();
+    else renderAgendadas();
+  }
+
+  // ── TAB: Por Agendar ──
+  function renderPorAgendar() {
+    const lista = todasCandidaturas.filter(c => c.estado === 'pendente');
+    const conteudo = document.getElementById('conteudo');
+
     if (!lista.length) {
-      container.innerHTML = `
-        <div class="vazio">
-          <div class="emoji">📭</div>
-          <p>${filtroActivo === 'todas'
-            ? 'Ainda não te candidataste a nenhuma proposta.'
-            : 'Não há candidaturas com este estado.'}</p>
-          ${filtroActivo === 'todas'
-            ? `<a href="lista-propostas.html" class="btn-ir-propostas">Ver Propostas Disponíveis →</a>`
-            : ''}
-        </div>`;
+      conteudo.innerHTML = `<div class="painel"><div class="vazio"><div class="emoji">✅</div><p>Não há candidatos por entrevistar de momento.</p></div></div>`;
       return;
     }
 
-    container.innerHTML = lista.map(cand => {
-      const p      = cand.propostaId;
-      const titulo = p?.titulo || '—';
-      const tipo   = p?.tipo   || 'estagio';
-      const entidade = p?.nomeEntidade || p?.proponenteId?.nome || '—';
-      const areas  = p?.areas || [];
-      const estado = cand.estado;
-      const fav    = guardadas.includes(p?._id);
-
-      // Bloco de entrevista (se agendada)
-      const jaConfirmou = cand.conhecimentoEntrevista;
-      const entrevistaHtml = estado === 'entrevista_agendada' && cand.dataEntrevista
-        ? `<div class="entrevista-box">
-            <div>
-              <div class="ei-label">Data</div>
-              <div class="ei-valor">📅 ${formatarDataHora(cand.dataEntrevista)}</div>
-            </div>
-            ${cand.localEntrevista ? `
-            <div class="ei-sep"></div>
-            <div>
-              <div class="ei-label">Local / Link</div>
-              ${isLink(cand.localEntrevista)
-                ? `<a class="ei-link" href="${cand.localEntrevista}" target="_blank">🔗 Entrar na reunião</a>`
-                : `<div class="ei-valor">📍 ${cand.localEntrevista}</div>`}
-            </div>` : ''}
-            <div class="ei-sep"></div>
-            <div>
-              ${jaConfirmou
-                ? `<div style="display:flex;align-items:center;gap:6px;background:var(--verde-light);color:var(--verde);border-radius:6px;padding:7px 14px;font-size:0.78rem;font-weight:700">
-                    ✔ Conhecimento confirmado
-                   </div>`
-                : `<button onclick="tomarConhecimento('${cand._id}',this)"
-                    style="background:var(--azul);color:#fff;border:none;border-radius:6px;padding:8px 14px;font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer">
-                    ✔ Tomar conhecimento
-                   </button>`}
-            </div>
-          </div>` : '';
-
-      // Bloco aceite
-      const aceiteHtml = estado === 'aceite'
-        ? `<div class="aceite-box">
-            <div class="icone">🎉</div>
-            <p>Foste aceite nesta proposta! Aguarda contacto do orientador para os próximos passos.</p>
-          </div>` : '';
-
-      return `
-        <div class="cand-card">
-          <div class="cand-card-topo ${estado}"></div>
-          <div class="cand-card-body">
-            <div class="cand-info">
-              <div class="cand-titulo" onclick="window.location.href='detalhe-proposta.html?id=${p?._id}'">${titulo}</div>
-              <div class="cand-meta">
-                <span>🏢 ${entidade}</span>
-                <span class="tag-tipo ${tipo}">${tipo === 'estagio' ? 'Estágio' : 'Projecto'}</span>
-                <span>📅 Candidatura em ${formatarData(cand.criadaEm)}</span>
-              </div>
-              ${areas.length ? `
-              <div class="cand-areas">
-                ${areas.slice(0,3).map(a => `<span class="area-tag">${a}</span>`).join('')}
-                ${areas.length > 3 ? `<span class="area-tag">+${areas.length - 3}</span>` : ''}
-              </div>` : ''}
-            </div>
-            <div class="cand-status">
-              <span class="badge-estado ${estado}">${estadoLabels[estado] || estado}</span>
-              <div class="cand-data">Candidatura: ${formatarData(cand.criadaEm)}</div>
-              <div style="display:flex;gap:6px;align-items:center">
-                <button class="btn-ver-proposta" onclick="window.location.href='detalhe-proposta.html?id=${p?._id}'">
-                  Ver proposta →
-                </button>
-                <button class="btn-fav ${fav ? 'fav' : ''}" onclick="toggleFav('${p?._id}',this)" title="${fav ? 'Remover dos favoritos' : 'Guardar proposta'}">
-                  ${fav ? '★' : '☆'}
-                </button>
-              </div>
-            </div>
-          </div>
-          ${entrevistaHtml}
-          ${aceiteHtml}
-        </div>`;
-    }).join('');
+    conteudo.innerHTML = `
+      <div class="painel">
+        <table>
+          <thead>
+            <tr>
+              <th>Estudante</th>
+              <th>Proposta</th>
+              <th>Candidatura</th>
+              <th>Curso</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${lista.map(c => {
+              const est  = c.estudanteId;
+              const u    = est?.utilizadorId;
+              const nome = u?.nome || '—';
+              const prop = c._proposta;
+              return `<tr>
+                <td><span class="nome-link">${nome}</span></td>
+                <td style="max-width:220px">
+                  <div style="font-weight:600;font-size:0.84rem">${prop?.titulo || '—'}</div>
+                  <div style="font-size:0.75rem;color:var(--cinza-texto)">${prop?.tipo === 'estagio' ? 'Estágio' : 'Projecto'}</div>
+                </td>
+                <td style="color:var(--cinza-texto)">${formatarData(c.criadaEm)}</td>
+                <td>${est?.curso || '—'}</td>
+                <td>
+                  <div class="acoes">
+                    <button class="btn-agendar" onclick="abrirAgendar('${c._id}','${nome.replace(/'/g,"\\'")}',false)">
+                      📅 Agendar Entrevista
+                    </button>
+                  </div>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>`;
   }
 
-  function filtrar(estado, btn) {
-    filtroActivo = estado;
-    document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('activo'));
-    if (btn) btn.classList.add('activo');
+  // ── TAB: Agendadas ──
+  function renderAgendadas() {
+    const lista = todasCandidaturas.filter(c => c.estado === 'entrevista_agendada' || c.estado === 'aceite');
+    const conteudo = document.getElementById('conteudo');
 
-    const filtradas = estado === 'todas'
-      ? todasCandidaturas
-      : todasCandidaturas.filter(c => c.estado === estado);
+    if (!lista.length) {
+      conteudo.innerHTML = `<div class="painel"><div class="vazio"><div class="emoji">📅</div><p>Não há entrevistas agendadas de momento.</p></div></div>`;
+      return;
+    }
 
-    renderLista(filtradas);
+    conteudo.innerHTML = `
+      <div class="painel">
+        <table>
+          <thead>
+            <tr>
+              <th>Estudante</th>
+              <th>Proposta</th>
+              <th>Data da Entrevista</th>
+              <th>Local / Link</th>
+              <th>Confirmação</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${lista.map(c => {
+              const est  = c.estudanteId;
+              const u    = est?.utilizadorId;
+              const nome = u?.nome || '—';
+              const prop = c._proposta;
+              const jaConfirmou = c.conhecimentoEntrevista;
+              const jaAceite   = c.estado === 'aceite';
+
+              const localHtml = c.localEntrevista
+                ? (isLink(c.localEntrevista)
+                    ? `<a href="${c.localEntrevista}" target="_blank" style="color:var(--azul);font-weight:600;font-size:0.82rem">🔗 Link</a>`
+                    : `<span style="font-size:0.82rem">📍 ${c.localEntrevista}</span>`)
+                : '<span style="color:var(--cinza-texto)">—</span>';
+
+              const confirmacaoHtml = jaAceite
+                ? `<span class="badge aceite">✔ Aceite</span>`
+                : jaConfirmou
+                  ? `<div>
+                      <span class="badge confirmado">✔ Confirmado</span>
+                      <div style="font-size:0.72rem;color:var(--cinza-texto);margin-top:3px">${formatarData(c.conhecimentoEm)}</div>
+                    </div>`
+                  : `<span class="badge aguarda">⏳ A aguardar</span>`;
+
+              return `<tr>
+                <td>
+                  <div style="font-weight:600">${nome}</div>
+                  <div style="font-size:0.75rem;color:var(--cinza-texto)">${est?.curso || '—'}</div>
+                </td>
+                <td style="max-width:200px">
+                  <div style="font-weight:600;font-size:0.84rem">${prop?.titulo || '—'}</div>
+                </td>
+                <td style="font-weight:600;white-space:nowrap">${formatarDataHora(c.dataEntrevista)}</td>
+                <td>${localHtml}</td>
+                <td>${confirmacaoHtml}</td>
+                <td>
+                  <div class="acoes">
+                    ${!jaAceite ? `
+                      <button class="btn-reagendar" onclick="abrirAgendar('${c._id}','${nome.replace(/'/g,"\\'")}',true)">
+                        🔄 Reagendar
+                      </button>
+                      ${jaConfirmou ? `<button class="btn-escolher" onclick="abrirEscolher('${c._id}','${nome.replace(/'/g,"\\'")}','${(prop?.titulo||'').replace(/'/g,"\\'")}')">✔ Selecionar</button>` : ''}
+                    ` : '<span style="font-size:0.76rem;color:var(--verde);font-weight:600">✔ Selecionado</span>'}
+                  </div>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>`;
   }
 
-  async function tomarConhecimento(candidaturaId, btn) {
-    btn.disabled = true;
-    btn.textContent = 'A confirmar…';
+  // ── Agendar / Reagendar ──
+  function abrirAgendar(candidaturaId, nomeEstudante, reagendar) {
+    candidaturaAgendarId = candidaturaId;
+    document.getElementById('modalAgendarTitulo').textContent = reagendar ? 'Reagendar Entrevista' : 'Agendar Entrevista';
+    document.getElementById('modalAgendarSub').textContent    = nomeEstudante;
+    document.getElementById('agendarData').value  = '';
+    document.getElementById('agendarLocal').value = '';
+    document.getElementById('alertaAgendar').className = 'alerta-modal';
+    abrirModal('modalAgendar');
+    setTimeout(() => document.getElementById('agendarData').focus(), 100);
+  }
+
+  async function confirmarAgendar() {
+    const dataVal  = document.getElementById('agendarData').value;
+    const localVal = document.getElementById('agendarLocal').value.trim();
+    const al  = document.getElementById('alertaAgendar');
+    if (!dataVal)  { al.textContent = 'Seleciona a data e hora.'; al.className = 'alerta-modal erro'; return; }
+    if (!localVal) { al.textContent = 'Indica o local ou link.';  al.className = 'alerta-modal erro'; return; }
+
+    const btn = document.getElementById('btnConfirmarAgendar');
+    btn.disabled = true; btn.innerHTML = '<span class="spin"></span>A agendar…';
+
     try {
-      const dados = await req(`/candidaturas/${candidaturaId}/conhecimento`, { method: 'PUT' });
+      const dados = await req(`/candidaturas/${candidaturaAgendarId}/entrevista`, {
+        method: 'PUT',
+        body: JSON.stringify({ dataEntrevista: dataVal, localEntrevista: localVal })
+      });
       if (!dados.sucesso) throw new Error(dados.mensagem);
-      // Substituir o botão pelo badge verde sem recarregar tudo
-      btn.outerHTML = `<div style="display:flex;align-items:center;gap:6px;background:var(--verde-light);color:var(--verde);border-radius:6px;padding:7px 14px;font-size:0.78rem;font-weight:700">✔ Conhecimento confirmado</div>`;
-      // Atualizar a lista para reflectir o estado
-      setTimeout(carregarCandidaturas, 400);
+
+      al.textContent = '✔ Entrevista agendada! O estudante foi notificado.';
+      al.className = 'alerta-modal sucesso';
+      btn.innerHTML = '✔ Agendado';
+
+      setTimeout(() => {
+        fecharModal('modalAgendar');
+        btn.disabled = false; btn.textContent = 'Confirmar';
+        carregar();
+      }, 1200);
     } catch (err) {
-      btn.disabled = false;
-      btn.textContent = '✔ Tomar conhecimento';
-      alert('Erro: ' + err.message);
+      al.textContent = err.message; al.className = 'alerta-modal erro';
+      btn.disabled = false; btn.textContent = 'Confirmar';
     }
   }
 
-  function toggleFav(propostaId, btn) {
-    if (!propostaId) return;
-    const idx = guardadas.indexOf(propostaId);
-    if (idx === -1) {
-      guardadas.push(propostaId);
-      btn.textContent = '★';
-      btn.classList.add('fav');
-    } else {
-      guardadas.splice(idx, 1);
-      btn.textContent = '☆';
-      btn.classList.remove('fav');
-    }
-    localStorage.setItem('esmad_guardadas', JSON.stringify(guardadas));
+  // ── Selecionar estudante ──
+  function abrirEscolher(candidaturaId, nomeEstudante, tituloProposta) {
+    candidaturaEscolherId = candidaturaId;
+    document.getElementById('escolherSub').textContent = tituloProposta;
+    document.getElementById('escolherNome').textContent = nomeEstudante;
+    document.getElementById('alertaEscolher').className = 'alerta-modal';
+    abrirModal('modalEscolher');
   }
 
+  async function confirmarEscolher() {
+    const al  = document.getElementById('alertaEscolher');
+    const btn = document.getElementById('btnConfirmarEscolher');
+    btn.disabled = true; btn.innerHTML = '<span class="spin"></span>A confirmar…';
+
+    try {
+      const dados = await req(`/candidaturas/${candidaturaEscolherId}/aceitar`, { method: 'PUT' });
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+
+      al.textContent = '✔ Estudante selecionado com sucesso!';
+      al.className = 'alerta-modal sucesso';
+      btn.innerHTML = '✔ Confirmado';
+
+      setTimeout(() => {
+        fecharModal('modalEscolher');
+        btn.disabled = false; btn.textContent = '✔ Confirmar Seleção';
+        carregar();
+      }, 1200);
+    } catch (err) {
+      al.textContent = err.message; al.className = 'alerta-modal erro';
+      btn.disabled = false; btn.textContent = '✔ Confirmar Seleção';
+    }
+  }
+
+  // ── Iniciar ──
   carregar();
 </script>
 </body>

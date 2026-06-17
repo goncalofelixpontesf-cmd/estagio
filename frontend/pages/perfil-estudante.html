@@ -225,6 +225,10 @@
     .badge.entrevista_agendada::before { background: var(--azul); border-radius: 50%; }
     .badge.aceite    { background: var(--verde-light); color: var(--verde); }
     .badge.aceite::before    { background: var(--verde); border-radius: 50%; }
+    .badge.confirmada { background: var(--verde-light); color: var(--verde); }
+    .badge.confirmada::before { background: var(--verde); border-radius: 50%; }
+    .badge.recusada  { background: #F0F0F0; color: var(--cinza-texto); }
+    .badge.recusada::before  { background: var(--cinza-texto); border-radius: 50%; }
     .badge.rejeitada { background: #FFDEDE; color: var(--vermelho); }
     .badge.rejeitada::before { background: var(--vermelho); border-radius: 50%; }
 
@@ -305,7 +309,7 @@
   <div class="sidebar-logo"><span>ESMAD</span></div>
   <nav class="sidebar-nav">
     <a class="nav-item" href="lista-propostas.html">Propostas</a>
-    <a class="nav-item" href="dashboard-estudante.html">As Minhas Candidaturas</a>
+    <a class="nav-item" href="candidaturas.html">As Minhas Candidaturas</a>
     <a class="nav-item activo">O Meu Perfil</a>
   </nav>
   <div class="sidebar-footer">
@@ -384,7 +388,7 @@
 <input type="file" id="inputDomus" accept=".pdf">
 
 <script>
-  const API = 'http://localhost:5000/api';
+  const API = 'http://192.168.1.66:5000/api';
   const token = localStorage.getItem('esmad_token');
   const user  = localStorage.getItem('esmad_user');
   if (!token || !user) { window.location.href = 'login.html'; }
@@ -442,6 +446,8 @@
     pendente:            'Pendente',
     entrevista_agendada: 'Entrevista Agendada',
     aceite:              'Aceite',
+    confirmada:          'Confirmada',
+    recusada:            'Recusada',
     rejeitada:           'Rejeitada',
   };
 

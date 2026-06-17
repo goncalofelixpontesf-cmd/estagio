@@ -6,7 +6,8 @@ const notificacaoSchema = new mongoose.Schema({
     type: String,
     enum: ['nova_proposta','proposta_aprovada','proposta_rejeitada','novo_interesse',
            'entrevista_agendada','candidatura_aceite','candidatura_rejeitada',
-           'orientador_atribuido','documento_disponivel'],
+           'orientador_atribuido','documento_disponivel',
+           'estagio_confirmado','candidatura_recusada_estudante'],
     required: true
   },
   mensagem:     { type: String, required: true },

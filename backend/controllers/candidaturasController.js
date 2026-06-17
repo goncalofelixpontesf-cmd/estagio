@@ -162,6 +162,56 @@ exports.aceitar = async (req, res) => {
   }
 };
 
+// PUT /api/candidaturas/:id/confirmar — estudante escolhe esta proposta entre as que foi aceite
+exports.confirmar = async (req, res) => {
+  try {
+    const estudante = await Estudante.findOne({ utilizadorId: req.utilizador._id });
+    if (!estudante) return res.status(404).json({ sucesso: false, mensagem: 'Perfil de estudante não encontrado.' });
+
+    const candidatura = await Candidatura.findOne({ _id: req.params.id, estudanteId: estudante._id })
+      .populate('propostaId', 'titulo proponenteId');
+
+    if (!candidatura) return res.status(404).json({ sucesso: false, mensagem: 'Candidatura não encontrada.' });
+    if (candidatura.estado !== 'aceite') {
+      return res.status(400).json({ sucesso: false, mensagem: 'Só podes confirmar candidaturas em que foste aceite.' });
+    }
+
+    candidatura.estado = 'confirmada';
+    await candidatura.save();
+
+    await Notificacao.create({
+      destinatarioId: candidatura.propostaId?.proponenteId,
+      tipo: 'estagio_confirmado',
+      mensagem: `O estudante confirmou que vai realizar o estágio na proposta "${candidatura.propostaId?.titulo}".`,
+      referenciaId: candidatura.propostaId?._id
+    });
+
+    // Recusar automaticamente TODAS as outras candidaturas ainda activas do estudante
+    // (pendentes, com entrevista agendada, ou outras em que também tinha sido aceite) —
+    // uma vez confirmado o estágio, deixa de fazer sentido continuar nos outros processos.
+    const outrasActivas = await Candidatura.find({
+      estudanteId: estudante._id,
+      _id: { $ne: candidatura._id },
+      estado: { $in: ['pendente', 'entrevista_agendada', 'aceite'] }
+    }).populate('propostaId', 'titulo proponenteId');
+
+    for (const outra of outrasActivas) {
+      outra.estado = 'recusada';
+      await outra.save();
+      await Notificacao.create({
+        destinatarioId: outra.propostaId?.proponenteId,
+        tipo: 'candidatura_recusada_estudante',
+        mensagem: `O estudante já confirmou estágio noutra proposta — a candidatura para "${outra.propostaId?.titulo}" foi automaticamente cancelada.`,
+        referenciaId: outra.propostaId?._id
+      });
+    }
+
+    res.json({ sucesso: true, candidatura, recusadas: outrasActivas.length });
+  } catch (err) {
+    res.status(500).json({ sucesso: false, mensagem: err.message });
+  }
+};
+
 // PUT /api/candidaturas/:id/rejeitar
 exports.rejeitar = async (req, res) => {
   try {

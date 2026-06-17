@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const Utilizador = require('../models/Utilizador');
 const Estudante  = require('../models/Estudante');
 const Entidade   = require('../models/Entidade');
+const Convite    = require('../models/Convite');
 
 const gerarToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
@@ -15,7 +16,7 @@ function validarEmail(email, perfil) {
     // Ex: 40240310@esmad.ipp.pt
     const regex = /^\d+@esmad\.ipp\.pt$/;
     if (!regex.test(emailLower)) {
-      return 'O email de estudante deve ter o formato:(ex: 00000000@esmad.ipp.pt)';
+      return 'O email de estudante deve ter o formato: número@esmad.ipp.pt (ex: 40240310@esmad.ipp.pt)';
     }
   }
 
@@ -24,7 +25,7 @@ function validarEmail(email, perfil) {
     // Ex: linooliveira@esmad.ipp.pt ou lino.oliveira@esmad.ipp.pt
     const regex = /^[a-zA-Z][a-zA-Z0-9.]+@esmad\.ipp\.pt$/;
     if (!regex.test(emailLower)) {
-      return 'O email de docente deve ter o formato:(ex: nome@esmad.ipp.pt)';
+      return 'O email de docente deve ter o formato: nome@esmad.ipp.pt (ex: linooliveira@esmad.ipp.pt)';
     }
   }
 
@@ -57,6 +58,17 @@ exports.registo = async (req, res) => {
     }
 
     const utilizador = await Utilizador.create({ nome, email, password, perfil });
+
+    // Se for docente e tiver um convite pendente da CCA, promover automaticamente
+    if (perfil === 'docente') {
+      const convite = await Convite.findOne({ email: email.toLowerCase() });
+      if (convite) {
+        utilizador.perfil    = 'comissao';
+        utilizador.cursosCCA = convite.cursosCCA;
+        await utilizador.save();
+        await Convite.deleteOne({ _id: convite._id });
+      }
+    }
 
     if (perfil === 'estudante') {
       await Estudante.create({

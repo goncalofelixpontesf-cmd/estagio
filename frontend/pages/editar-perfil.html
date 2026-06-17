@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESMAD</title>
+  <title>ESMAD — Editar Perfil</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="favicon.ico">
   <style>
@@ -304,7 +304,7 @@
 <input type="file" id="inputCV" accept=".pdf">
 
 <script>
-  const API = 'http://localhost:5000/api';
+  const API = 'http://192.168.1.66:5000/api';
   const token = localStorage.getItem('esmad_token');
   const user  = localStorage.getItem('esmad_user');
   if (!token || !user) { window.location.href = 'login.html'; }
@@ -373,7 +373,7 @@
       <!-- Dados Pessoais -->
       <div class="form-card">
         <div class="form-card-header">
-          <div class="icone-secao"></div>
+          <div class="icone-secao">??</div>
           <div class="header-texto">
             <div class="titulo-secao">Dados Pessoais</div>
             <div class="subtitulo-secao">Nome e contacto direto</div>
@@ -400,7 +400,7 @@
       <!-- Presença Online -->
       <div class="form-card">
         <div class="form-card-header">
-          <div class="icone-secao"></div>
+          <div class="icone-secao">??</div>
           <div class="header-texto">
             <div class="titulo-secao">Presença Online</div>
             <div class="subtitulo-secao">Links visíveis pelas entidades</div>
@@ -423,10 +423,10 @@
       <!-- Dados Académicos -->
       <div class="form-card">
         <div class="form-card-header">
-          <div class="icone-secao"></div>
+          <div class="icone-secao">??</div>
           <div class="header-texto">
             <div class="titulo-secao">Dados Académicos</div>
-            <div class="subtitulo-secao">Geridos pela instituição</div>
+            <div class="subtitulo-secao">Geridos pela instituição — só leitura</div>
           </div>
         </div>
         <div class="form-card-body">
@@ -446,7 +446,7 @@
       <!-- CV -->
       <div class="form-card">
         <div class="form-card-header">
-          <div class="icone-secao"></div>
+          <div class="icone-secao">??</div>
           <div class="header-texto">
             <div class="titulo-secao">Curriculum Vitae</div>
             <div class="subtitulo-secao">PDF enviado às entidades quando te candidatas</div>
@@ -457,7 +457,7 @@
             <div class="cv-area-icone">${cvNome ? '✅' : '??'}</div>
             <div class="cv-area-titulo">${cvNome ? 'CV carregado' : 'Carregar CV'}</div>
             <div class="cv-area-sub">${cvNome ? 'Clica para substituir' : 'PDF · máx. 5MB'}</div>
-            ${cvNome ? `<div class="cv-badge"> ${cvNome}</div>` : ''}
+            ${cvNome ? `<div class="cv-badge">?? ${cvNome}</div>` : ''}
           </div>
         </div>
       </div>

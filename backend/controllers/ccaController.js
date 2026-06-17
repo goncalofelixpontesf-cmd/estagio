@@ -2,6 +2,8 @@ const Proposta     = require('../models/Proposta');
 const AprovacaoCCA = require('../models/AprovacaoCCA');
 const Utilizador   = require('../models/Utilizador');
 const Notificacao  = require('../models/Notificacao');
+const Convite      = require('../models/Convite');
+const { enviarEmail, templateConviteCCA } = require('../utils/email');
 
 // ── Helper: filtro de curso para o membro autenticado ──
 function _filtroCurso(membro) {
@@ -57,6 +59,7 @@ exports.listarTodas = async (req, res) => {
     if (estado) filtro.estado = estado;
     const propostas = await Proposta.find(filtro)
       .populate('proponenteId', 'nome email perfil')
+      .populate('orientadorId', 'nome email')
       .sort({ criadaEm: -1 });
     res.json({ sucesso: true, total: propostas.length, propostas });
   } catch (err) {
@@ -156,17 +159,17 @@ exports.aprovacoes = async (req, res) => {
 
     const resultado = membros.map(m => {
       const voto = votos.find(v => v.membroId?._id?.toString() === m._id.toString());
-      // Ignorar votos antigos de rondas anteriores (anteriores à última resubmissão)
-      const votoValido = voto && proposta.atualizadaEm
-        ? voto.decididoEm >= proposta.atualizadaEm
-        : !!voto;
+      // Nota: não é preciso filtrar votos "antigos" aqui — ao resubmeter uma
+      // proposta rejeitada, os votos anteriores são apagados (ver editar() em
+      // propostasController.js), por isso qualquer voto existente é sempre da
+      // ronda actual.
       return {
         membroId:   m._id,
         nome:       m.nome,
         email:      m.email,
         cursosCCA:  m.cursosCCA || [],
-        decisao:    votoValido ? voto.decisao : 'pendente',
-        decididoEm: votoValido ? voto.decididoEm : null
+        decisao:    voto ? voto.decisao : 'pendente',
+        decididoEm: voto ? voto.decididoEm : null
       };
     });
 
@@ -307,8 +310,10 @@ exports.enviarConvite = async (req, res) => {
     if (!email) return res.status(400).json({ sucesso: false, mensagem: 'Email obrigatório.' });
     if (!cursosCCA || cursosCCA.length === 0) return res.status(400).json({ sucesso: false, mensagem: 'Selecciona pelo menos um curso.' });
 
+    const emailLower = email.toLowerCase();
+
     // Se já tem conta, promover directamente
-    const existe = await Utilizador.findOne({ email: email.toLowerCase() });
+    const existe = await Utilizador.findOne({ email: emailLower });
     if (existe) {
       if (existe.perfil === 'comissao') return res.status(400).json({ sucesso: false, mensagem: 'Já é membro da CCA.' });
       existe.perfil    = 'comissao';
@@ -317,9 +322,33 @@ exports.enviarConvite = async (req, res) => {
       return res.json({ sucesso: true, mensagem: `${existe.nome} já tinha conta e foi adicionado à CCA.`, utilizador: existe });
     }
 
-    // Sem conta — simular envio de email (integrar Nodemailer quando configurado)
-    console.log(`[CONVITE CCA] Para: ${email} | Cursos: ${cursosCCA.join(', ')}`);
-    res.json({ sucesso: true, mensagem: `Convite enviado para ${email}. O docente receberá um email com instruções para criar conta.` });
+    // Sem conta — guardar convite pendente (promoção automática quando se registar)
+    await Convite.findOneAndUpdate(
+      { email: emailLower },
+      { email: emailLower, cursosCCA, convidadoPor: req.utilizador._id },
+      { upsert: true, new: true }
+    );
+
+    // Enviar email real com link para a página de registo
+    // FRONTEND_URL deve apontar para a pasta "pages" (ex: http://127.0.0.1:5500/pages)
+    const baseUrl = (process.env.FRONTEND_URL || 'http://127.0.0.1:5500/pages').replace(/\/$/, '');
+    const linkRegisto = `${baseUrl}/registo.html?email=${encodeURIComponent(emailLower)}&perfil=docente`;
+
+    try {
+      await enviarEmail({
+        to: emailLower,
+        subject: 'Convite para a Comissão de Acompanhamento — ESMAD',
+        html: templateConviteCCA({ cursosCCA, linkRegisto })
+      });
+    } catch (emailErr) {
+      // O convite ficou guardado mesmo que o email falhe — o docente é promovido ao registar-se
+      return res.json({
+        sucesso: true,
+        mensagem: `Convite guardado para ${email}, mas o email não pôde ser enviado (${emailErr.message}). Quando o docente se registar com este email, será automaticamente adicionado à CCA.`
+      });
+    }
+
+    res.json({ sucesso: true, mensagem: `Email de convite enviado para ${email}. Quando o docente criar conta, será automaticamente adicionado à CCA.` });
   } catch (err) {
     res.status(500).json({ sucesso: false, mensagem: err.message });
   }

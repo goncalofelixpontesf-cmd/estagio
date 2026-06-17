@@ -318,7 +318,7 @@
 </div>
 
 <script>
-  const API   = 'http://localhost:5000/api';
+  const API   = 'http://192.168.1.66:5000/api';
   const token = localStorage.getItem('esmad_token');
   const user  = localStorage.getItem('esmad_user');
   if (!token || !user) { window.location.href = 'login.html'; }
@@ -456,7 +456,7 @@
     if (!lista.length) { g.innerHTML = '<div class="vazio"><div class="emoji">📭</div><p>Não há propostas disponíveis.</p></div>'; return; }
     const estadoLabels = { aprovada:'Aprovada', pendente:'Pendente', rejeitada:'Rejeitada', entrevista_agendada:'Entrevista', aceite:'Aceite' };
     g.innerHTML = lista.map(p => {
-      const tipo = p.tipo === 'estagio' ? 'Estágio' : 'Projeto';
+      const tipo = p.tipo === 'estagio' ? 'Estágio' : 'Projecto';
       return `<div class="proposta-card" onclick="window.location.href='detalhe-proposta.html?id=${p._id}'">
         <div class="card-topo"><span class="card-tipo${p.tipo==='projecto'?' projecto':''}">${tipo}</span></div>
         <div class="card-body">

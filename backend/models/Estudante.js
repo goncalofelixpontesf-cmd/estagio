@@ -27,16 +27,21 @@ const estudanteSchema = new mongoose.Schema({
   portfolio: { type: String, default: '' },
   linkedin:  { type: String, default: '' },
 
-  // Ficheiro PDF do CV — guarda apenas o nome do ficheiro (ex: cv-<id>-<timestamp>.pdf)
-  // O ficheiro fica em /uploads/ no servidor
-  cv: { type: String, default: null },
-
-  // Percurso académico extraído do DOMUS
+  // Percurso académico — disciplinas extraídas do DOMUS ou inseridas manualmente.
+  // A mediaFinal acima é recalculada a partir destas sempre que são actualizadas.
   disciplinas: [{
     nome:   { type: String, required: true },
     nota:   { type: Number, default: null },
-    estado: { type: String, enum: ['concluida','em_curso','reprovada','pendente'], default: 'pendente' }
+    estado: { type: String, enum: ['concluida', 'em_curso', 'reprovada'], default: 'em_curso' }
   }],
+
+  // Ficheiro PDF do CV — guarda apenas o nome do ficheiro (ex: cv-<id>-<timestamp>.pdf)
+  // O ficheiro fica em /CV no servidor (pasta dedicada, servida em /cv/<ficheiro>)
+  cv: { type: String, default: null },
+
+  // Cópia de segurança do CV no Cloudinary (URL completo) — só preenchido se o
+  // backup tiver sucesso; serve como redundância caso o disco do servidor falhe
+  cvCloudinaryUrl: { type: String, default: null },
 
   propostaEscolhidaId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -47,4 +52,4 @@ const estudanteSchema = new mongoose.Schema({
   timestamps: { createdAt: 'criadoEm', updatedAt: 'atualizadoEm' }
 });
 
-module.exports = mongoose.model('Estudante', estudanteSchema);
+module.exports = mongoose.model('Estudante', estudanteSchema);  

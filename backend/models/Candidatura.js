@@ -13,7 +13,7 @@ const candidaturaSchema = new mongoose.Schema({
   },
   estado: {
     type: String,
-    enum: ['pendente', 'entrevista_agendada', 'aceite', 'rejeitada'],
+    enum: ['pendente', 'entrevista_agendada', 'aceite', 'confirmada', 'recusada', 'rejeitada'],
     default: 'pendente'
   },
 

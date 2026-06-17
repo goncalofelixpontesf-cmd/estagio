@@ -12,10 +12,18 @@ connectDB();
 const uploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
 
+// Garantir que a pasta CV existe (guarda os CVs dos estudantes)
+const cvDir = path.join(__dirname, 'CV');
+if (!fs.existsSync(cvDir)) fs.mkdirSync(cvDir);
+
 const app = express();
 
 app.use(cors({
-  origin: [process.env.FRONTEND_URL, 'http://localhost:5500', 'http://127.0.0.1:5500'],
+  origin: [
+    process.env.FRONTEND_URL,
+    'http://localhost:5500', 'http://127.0.0.1:5500',
+    'http://192.168.1.66:5500'
+  ],
   credentials: true
 }));
 app.use(express.json());
@@ -23,6 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Servir ficheiros estáticos — CVs e outros uploads
 app.use('/uploads', express.static(uploadsDir));
+app.use('/cv',      express.static(cvDir));
 
 // Rotas
 app.use('/api/auth',          require('./routes/auth'));

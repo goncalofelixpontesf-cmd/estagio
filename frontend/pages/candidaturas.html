@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESMAD — As Minhas Candidaturas</title>
+  <title>ESMAD</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.ico">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -54,17 +55,7 @@
 
     .content { padding: 24px 32px; flex: 1; }
 
-    /* ══ ALERTA ACEITE ══ */
-    .alerta-aceite {
-      background: var(--verde-light); border: 1.5px solid var(--verde);
-      border-radius: 12px; padding: 18px 22px; margin-bottom: 22px;
-      display: flex; align-items: flex-start; gap: 14px;
-    }
-    .alerta-aceite .icone { font-size: 1.6rem; flex-shrink: 0; }
-    .alerta-aceite .texto strong { display: block; font-size: 0.94rem; color: var(--verde); margin-bottom: 4px; }
-    .alerta-aceite .texto p { font-size: 0.82rem; color: #555; line-height: 1.5; }
-    .alerta-aceite .texto .detalhe { margin-top: 10px; background: var(--branco); border-radius: 8px; padding: 10px 14px; font-size: 0.84rem; }
-    .alerta-aceite .texto .detalhe span { font-weight: 700; color: var(--preto); }
+
 
     /* ══ STATS ══ */
     .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
@@ -111,6 +102,8 @@
     .cand-card-topo.pendente           { background: var(--amarelo); }
     .cand-card-topo.entrevista_agendada{ background: var(--azul); }
     .cand-card-topo.aceite             { background: var(--verde); }
+    .cand-card-topo.confirmada         { background: var(--verde); }
+    .cand-card-topo.recusada           { background: var(--cinza-texto); }
     .cand-card-topo.rejeitada          { background: var(--vermelho); }
 
     .cand-card-body { padding: 18px 22px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
@@ -139,6 +132,10 @@
     .badge-estado.entrevista_agendada::before { background: var(--azul); }
     .badge-estado.aceite              { background: var(--verde-light); color: var(--verde); }
     .badge-estado.aceite::before      { background: var(--verde); }
+    .badge-estado.confirmada          { background: var(--verde-light); color: var(--verde); }
+    .badge-estado.confirmada::before  { background: var(--verde); }
+    .badge-estado.recusada            { background: #EFEFEF; color: var(--cinza-texto); }
+    .badge-estado.recusada::before    { background: var(--cinza-texto); }
     .badge-estado.rejeitada           { background: var(--vermelho-light); color: var(--vermelho); }
     .badge-estado.rejeitada::before   { background: var(--vermelho); }
 
@@ -164,6 +161,41 @@
     }
     .aceite-box .icone { font-size: 1.2rem; }
     .aceite-box p { font-size: 0.83rem; color: #375623; font-weight: 500; }
+
+    /* ══ PAINEL DE ESCOLHA DE ESTÁGIO ══ */
+    .escolha-painel {
+      background: var(--branco); border-radius: 14px;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.08);
+      padding: 28px 26px; margin-bottom: 24px;
+      border: 2px solid var(--verde);
+    }
+    .escolha-header { text-align: center; margin-bottom: 22px; }
+    .escolha-header .emoji { font-size: 2.2rem; margin-bottom: 6px; }
+    .escolha-header h2 { font-size: 1.15rem; font-weight: 800; margin-bottom: 6px; }
+    .escolha-header p { font-size: 0.86rem; color: var(--cinza-texto); max-width: 480px; margin: 0 auto; }
+
+    .escolha-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .escolha-card {
+      border: 1.5px solid var(--cinza-linha); border-radius: 12px;
+      padding: 18px; display: flex; flex-direction: column; gap: 8px;
+      transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    .escolha-card:hover { border-color: var(--verde); box-shadow: 0 2px 10px rgba(0,0,0,0.07); }
+    .ec-titulo { font-size: 0.94rem; font-weight: 700; }
+    .ec-meta { font-size: 0.78rem; color: var(--cinza-texto); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .ec-tutor { font-size: 0.78rem; color: var(--cinza-texto); }
+    .ec-acoes { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .btn-escolher {
+      flex: 1; background: var(--verde); color: var(--branco); border: none;
+      border-radius: 6px; padding: 9px 14px; font-family: 'Inter', sans-serif;
+      font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: background 0.15s;
+    }
+    .btn-escolher:hover { background: #5d9039; }
+    .btn-escolher:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .escolha-rodape { text-align: center; margin-top: 18px; }
+    .escolha-rodape a { font-size: 0.8rem; color: var(--cinza-texto); text-decoration: none; }
+    .escolha-rodape a:hover { color: var(--laranja); text-decoration: underline; }
 
     /* Botão ver proposta */
     .btn-ver-proposta {
@@ -238,17 +270,10 @@
 
   <div class="content">
 
-    <!-- Alerta aceite (oculto por defeito) -->
-    <div class="alerta-aceite" id="alertaAceite" style="display:none">
-      <div class="icone">🎉</div>
-      <div class="texto">
-        <strong>Foste aceite numa proposta!</strong>
-        <p>Parabéns! O proponente escolheu-te para esta proposta. Aguarda contacto para os próximos passos.</p>
-        <div class="detalhe" id="alertaAceiteDetalhe">
-          <span id="alertaAceiteTitulo">—</span>
-        </div>
-      </div>
-    </div>
+    <!-- Painel de escolha de estágio (quando há aceites por decidir) -->
+    <div id="escolhaContainer"></div>
+
+    <div id="corpoNormal">
 
     <!-- Stats -->
     <div class="stats-grid" id="statsGrid">
@@ -278,6 +303,7 @@
         <button class="filtro-btn" onclick="filtrar('pendente',this)">Pendentes</button>
         <button class="filtro-btn" onclick="filtrar('entrevista_agendada',this)">Entrevistas</button>
         <button class="filtro-btn" onclick="filtrar('aceite',this)">Aceites</button>
+        <button class="filtro-btn" onclick="filtrar('confirmada',this)">Confirmada</button>
         <button class="filtro-btn" onclick="filtrar('rejeitada',this)">Rejeitadas</button>
       </div>
     </div>
@@ -292,11 +318,13 @@
       </div>
     </div>
 
+    </div><!-- /corpoNormal -->
+
   </div>
 </main>
 
 <script>
-  const API = 'http://localhost:5000/api';
+  const API = 'http://192.168.1.66:5000/api';
   const token = localStorage.getItem('esmad_token');
   const user  = localStorage.getItem('esmad_user');
   if (!token || !user) { window.location.href = 'login.html'; }
@@ -341,6 +369,8 @@
     pendente: 'Pendente',
     entrevista_agendada: 'Entrevista Agendada',
     aceite: 'Aceite',
+    confirmada: 'Confirmada',
+    recusada: 'Recusada',
     rejeitada: 'Rejeitada'
   };
 
@@ -358,11 +388,15 @@
       const candidaturas = dados.candidaturas || [];
       todasCandidaturas = candidaturas;
 
+      // Candidaturas em que o estudante foi aceite mas ainda não escolheu/confirmou,
+      // e a candidatura final já confirmada (se existir)
+      renderPainelTopo(candidaturas);
+
       // Calcular stats a partir das candidaturas
       const totalCandidaturas   = candidaturas.length;
       const entrevistasAgendadas = candidaturas.filter(c => c.estado === 'entrevista_agendada').length;
       const emEspera            = candidaturas.filter(c => c.estado === 'pendente').length;
-      const aceite              = candidaturas.filter(c => c.estado === 'aceite').length;
+      const aceite              = candidaturas.filter(c => c.estado === 'aceite' || c.estado === 'confirmada').length;
 
       // Stats
       document.getElementById('statsGrid').innerHTML = `
@@ -383,14 +417,7 @@
           <div class="label">Aceite</div>
         </div>`;
 
-      // Alerta aceite
-      if (aceite > 0) {
-        const c = candidaturas.find(c => c.estado === 'aceite');
-        if (c) {
-          document.getElementById('alertaAceiteTitulo').textContent = c.propostaId?.titulo || '—';
-          document.getElementById('alertaAceite').style.display = 'flex';
-        }
-      }
+
 
       renderLista(candidaturas);
 
@@ -457,12 +484,23 @@
             </div>
           </div>` : '';
 
-      // Bloco aceite
-      const aceiteHtml = estado === 'aceite'
+      // Bloco de decisão (aceite a decidir / confirmada / recusada pelo estudante)
+      const decisaoHtml = estado === 'aceite'
         ? `<div class="aceite-box">
             <div class="icone">🎉</div>
-            <p>Foste aceite nesta proposta! Aguarda contacto do orientador para os próximos passos.</p>
-          </div>` : '';
+            <p>Foste aceite nesta proposta! Decide no painel do topo da página qual estágio vais escolher.</p>
+          </div>`
+        : estado === 'confirmada'
+        ? `<div class="aceite-box">
+            <div class="icone">✅</div>
+            <p>Confirmaste este estágio! Aguarda contacto do orientador para os próximos passos.</p>
+          </div>`
+        : estado === 'recusada'
+        ? `<div class="aceite-box" style="background:#F0F0F0">
+            <div class="icone">↩️</div>
+            <p style="color:var(--cinza-texto)">Optaste por outra proposta — esta candidatura foi automaticamente recusada.</p>
+          </div>`
+        : '';
 
       return `
         <div class="cand-card">
@@ -472,7 +510,7 @@
               <div class="cand-titulo" onclick="window.location.href='detalhe-proposta.html?id=${p?._id}'">${titulo}</div>
               <div class="cand-meta">
                 <span>🏢 ${entidade}</span>
-                <span class="tag-tipo ${tipo}">${tipo === 'estagio' ? 'Estágio' : 'Projeto'}</span>
+                <span class="tag-tipo ${tipo}">${tipo === 'estagio' ? 'Estágio' : 'Projecto'}</span>
                 <span>📅 Candidatura em ${formatarData(cand.criadaEm)}</span>
               </div>
               ${areas.length ? `
@@ -495,9 +533,114 @@
             </div>
           </div>
           ${entrevistaHtml}
-          ${aceiteHtml}
+          ${decisaoHtml}
         </div>`;
     }).join('');
+  }
+
+  function renderPainelTopo(candidaturas) {
+    const cont = document.getElementById('escolhaContainer');
+    const corpoNormal = document.getElementById('corpoNormal');
+
+    const pendentes  = candidaturas.filter(c => c.estado === 'aceite');
+    const confirmada = candidaturas.find(c => c.estado === 'confirmada');
+
+    // Caso 1: há aceites por decidir → painel de escolha
+    if (pendentes.length) {
+      corpoNormal.style.display = 'none';
+      const plural = pendentes.length > 1;
+
+      cont.innerHTML = `
+        <div class="escolha-painel">
+          <div class="escolha-header">
+            <div class="emoji">🎉</div>
+            <h2>${plural ? 'Foste aceite em mais do que uma proposta!' : 'Foste aceite nesta proposta!'}</h2>
+            <p>${plural
+              ? 'Escolhe em qual delas vais realizar o teu estágio. As restantes serão automaticamente recusadas.'
+              : 'Confirma que vais realizar o teu estágio nesta proposta para avançar para os próximos passos.'}</p>
+          </div>
+          <div class="escolha-cards">
+            ${pendentes.map(c => {
+              const p = c.propostaId;
+              const tituloEsc = (p?.titulo || '').replace(/'/g, "\\'");
+              return `
+                <div class="escolha-card">
+                  <div class="ec-titulo">${p?.titulo || '—'}</div>
+                  <div class="ec-meta">
+                    <span>🏢 ${p?.nomeEntidade || '—'}</span>
+                    <span class="tag-tipo ${p?.tipo || 'estagio'}">${p?.tipo === 'projecto' ? 'Projeto' : 'Estágio'}</span>
+                  </div>
+                  ${p?.tutorNome ? `<div class="ec-tutor">Tutor na entidade: ${p.tutorNome}</div>` : ''}
+                  <div class="ec-acoes">
+                    <button class="btn-ver-proposta" onclick="window.location.href='detalhe-proposta.html?id=${p?._id}'">Ver detalhes</button>
+                    <button class="btn-escolher" onclick="escolherProposta('${c._id}','${tituloEsc}',this)">Escolher esta →</button>
+                  </div>
+                </div>`;
+            }).join('')}
+          </div>
+          <div class="escolha-rodape"><a href="#" onclick="alternarVistaCompleta(event)">Ver as restantes candidaturas</a></div>
+        </div>`;
+      return;
+    }
+
+    // Caso 2: já há uma escolha confirmada → mostrar só essa, esconder tudo o resto
+    if (confirmada) {
+      corpoNormal.style.display = 'none';
+      const p = confirmada.propostaId;
+
+      cont.innerHTML = `
+        <div class="escolha-painel">
+          <div class="escolha-header">
+            <div class="emoji">✅</div>
+            <h2>Vais realizar o teu estágio aqui!</h2>
+            <p>Confirmaste esta proposta. Aguarda contacto do orientador para os próximos passos.</p>
+          </div>
+          <div class="escolha-cards" style="max-width:420px;margin:0 auto">
+            <div class="escolha-card">
+              <div class="ec-titulo">${p?.titulo || '—'}</div>
+              <div class="ec-meta">
+                <span>🏢 ${p?.nomeEntidade || '—'}</span>
+                <span class="tag-tipo ${p?.tipo || 'estagio'}">${p?.tipo === 'projecto' ? 'Projeto' : 'Estágio'}</span>
+              </div>
+              ${p?.tutorNome ? `<div class="ec-tutor">Tutor na entidade: ${p.tutorNome}</div>` : ''}
+              <div class="ec-acoes">
+                <button class="btn-ver-proposta" style="flex:1" onclick="window.location.href='detalhe-proposta.html?id=${p?._id}'">Ver detalhes da proposta →</button>
+              </div>
+            </div>
+          </div>
+          <div class="escolha-rodape"><a href="#" onclick="alternarVistaCompleta(event)">Ver o histórico de todas as candidaturas</a></div>
+        </div>`;
+      return;
+    }
+
+    // Caso 3: nada por decidir e nada confirmado ainda → vista normal
+    cont.innerHTML = '';
+    corpoNormal.style.display = '';
+  }
+
+  function alternarVistaCompleta(e) {
+    e.preventDefault();
+    const corpoNormal = document.getElementById('corpoNormal');
+    corpoNormal.style.display = corpoNormal.style.display === 'none' ? '' : 'none';
+  }
+
+  async function escolherProposta(candidaturaId, titulo, btn) {
+    const confirmar = confirm(
+      `Confirmas que vais realizar o estágio em "${titulo}"?\n\nEsta escolha não pode ser desfeita e as outras propostas em que foste aceite serão automaticamente recusadas.`
+    );
+    if (!confirmar) return;
+
+    btn.disabled = true;
+    btn.textContent = 'A confirmar…';
+    try {
+      const dados = await req(`/candidaturas/${candidaturaId}/confirmar`, { method: 'PUT' });
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+      await carregar();
+    } catch (err) {
+      alert('Erro: ' + err.message);
+      btn.disabled = false;
+      btn.textContent = 'Escolher esta →';
+    }
   }
 
   function filtrar(estado, btn) {

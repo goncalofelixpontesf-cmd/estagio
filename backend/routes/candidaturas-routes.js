@@ -14,6 +14,9 @@ router.post('/:propostaId', restringir('estudante'), ctrl.manifestarInteresse);
 // Estudante — tomar conhecimento da entrevista
 router.put('/:id/conhecimento', restringir('estudante'), ctrl.tomarConhecimento);
 
+// Estudante — confirmar/escolher esta proposta entre as que foi aceite
+router.put('/:id/confirmar', restringir('estudante'), ctrl.confirmar);
+
 // Entidade / Docente — ver candidatos de uma proposta
 router.get('/proposta/:propostaId', restringir('docente', 'entidade', 'comissao', 'admin'), ctrl.candidatosDeProposta);
 

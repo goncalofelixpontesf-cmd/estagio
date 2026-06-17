@@ -3,6 +3,7 @@ const Estudante  = require('../models/Estudante');
 const Entidade   = require('../models/Entidade');
 const path       = require('path');
 const fs         = require('fs');
+const { enviarBackupCV } = require('../utils/cloudinary');
 
 // GET /api/utilizadores/perfil
 exports.obterPerfil = async (req, res) => {
@@ -35,8 +36,15 @@ exports.editarPerfil = async (req, res) => {
       if (telefone  !== undefined) updateEstudante.telefone  = telefone;
       if (linkedin  !== undefined) updateEstudante.linkedin  = linkedin;
       if (portfolio !== undefined) updateEstudante.portfolio = portfolio;
-      // Disciplinas extraídas do DOMUS
-      if (req.body.disciplinas !== undefined) updateEstudante.disciplinas = req.body.disciplinas;
+      // Disciplinas extraídas do DOMUS ou inseridas manualmente
+      if (req.body.disciplinas !== undefined) {
+        updateEstudante.disciplinas = req.body.disciplinas;
+        // Recalcular a média a partir das disciplinas com nota atribuída
+        const comNota = req.body.disciplinas.filter(d => d.nota !== null && d.nota !== undefined && d.nota !== '');
+        updateEstudante.mediaFinal = comNota.length
+          ? comNota.reduce((soma, d) => soma + Number(d.nota), 0) / comNota.length
+          : null;
+      }
 
       if (Object.keys(updateEstudante).length) {
         await Estudante.findOneAndUpdate(
@@ -71,18 +79,26 @@ exports.uploadCV = async (req, res) => {
 
     // Apagar CV anterior se existir
     if (estudante.cv) {
-      const caminhoAntigo = path.join(__dirname, '..', 'uploads', estudante.cv);
+      const caminhoAntigo = path.join(__dirname, '..', 'CV', estudante.cv);
       if (fs.existsSync(caminhoAntigo)) fs.unlinkSync(caminhoAntigo);
     }
 
     estudante.cv = req.file.filename;
+
+    // Backup no Cloudinary (não bloqueia o resto se falhar — é só redundância)
+    const publicId = path.parse(req.file.filename).name;
+    estudante.cvCloudinaryUrl = await enviarBackupCV(req.file.path, publicId);
+
     await estudante.save();
 
     res.json({
       sucesso: true,
       cv: req.file.filename,
-      cvUrl: `/uploads/${req.file.filename}`,
-      mensagem: 'CV guardado com sucesso.'
+      cvUrl: `/cv/${req.file.filename}`,
+      cvBackup: estudante.cvCloudinaryUrl,
+      mensagem: estudante.cvCloudinaryUrl
+        ? 'CV guardado com sucesso (com backup no Cloudinary).'
+        : 'CV guardado com sucesso no servidor (o backup no Cloudinary não foi possível).'
     });
   } catch (err) {
     res.status(500).json({ sucesso: false, mensagem: err.message });

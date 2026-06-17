@@ -114,6 +114,8 @@
     .badge-estado.pendente            { background: var(--amarelo-light); color: var(--amarelo); }
     .badge-estado.entrevista_agendada { background: var(--azul-light);    color: var(--azul); }
     .badge-estado.aceite              { background: var(--verde-light);   color: var(--verde); }
+    .badge-estado.confirmada          { background: var(--verde-light);   color: var(--verde); }
+    .badge-estado.recusada            { background: #EFEFEF; color: var(--cinza-texto); }
     .badge-estado.rejeitada           { background: var(--vermelho-light); color: var(--vermelho); }
 
     .acoes-linha { display: flex; gap: 6px; align-items: center; }
@@ -227,7 +229,6 @@
   <nav class="sidebar-nav">
     <a class="nav-item" href="dashboard-entidade.html">As Minhas Propostas</a>
     <a class="nav-item activo">Estudantes Interessados</a>
-    <a class="nav-item" href="minhas-tutorias.html">As Minhas Tutorias</a>
     <a class="nav-item" href="entrevistas-entidade.html">Entrevistas</a>
   </nav>
   <div class="sidebar-footer">
@@ -362,7 +363,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  const API = 'http://localhost:5000/api';
+  const API = 'http://192.168.1.66:5000/api';
   const token = localStorage.getItem('esmad_token');
   const user  = localStorage.getItem('esmad_user');
   if (!token || !user) { window.location.href = 'login.html'; }
@@ -480,7 +481,7 @@
         return;
       }
 
-      const estadoLabels = { pendente:'Pendente', entrevista_agendada:'Entrevista Agendada', aceite:'Aceite', rejeitada:'Rejeitada' };
+      const estadoLabels = { pendente:'Pendente', entrevista_agendada:'Entrevista Agendada', aceite:'Aceite', confirmada:'Confirmada', recusada:'Recusada', rejeitada:'Rejeitada' };
 
       tbody.innerHTML = dados.candidaturas.map(cand => {
         const est  = cand.estudanteId;
@@ -543,7 +544,7 @@
       <div class="perfil-linha"><span class="pl-label">Média</span><span class="pl-valor">${media ? parseFloat(media).toFixed(1) : '—'}</span></div>
       ${portfolio ? `<div class="perfil-linha"><span class="pl-label">Portefólio</span><span class="pl-valor"><a href="${portfolio.startsWith('http') ? portfolio : 'https://'+portfolio}" target="_blank" style="color:var(--azul)">🔗 ver portefólio</a></span></div>` : ''}
       ${linkedin  ? `<div class="perfil-linha"><span class="pl-label">LinkedIn</span><span class="pl-valor"><a href="${linkedin.startsWith('http') ? linkedin : 'https://'+linkedin}" target="_blank" style="color:var(--azul)">🔗 ver LinkedIn</a></span></div>` : ''}
-      ${cv ? `<div class="perfil-linha"><span class="pl-label">Curriculum Vitae</span><span class="pl-valor"><a href="${cv.startsWith('http') ? cv : 'http://localhost:5000/uploads/'+cv}" target="_blank" style="color:var(--azul)">📄 descarregar CV</a></span></div>` : '<div class="perfil-linha"><span class="pl-label">Curriculum Vitae</span><span class="pl-valor" style="color:var(--cinza-texto)">Não disponível</span></div>'}
+      ${cv ? `<div class="perfil-linha"><span class="pl-label">Curriculum Vitae</span><span class="pl-valor"><a href="${cv.startsWith('http') ? cv : 'http://192.168.1.66:5000/cv/'+cv}" target="_blank" style="color:var(--azul)">📄 descarregar CV</a></span></div>` : '<div class="perfil-linha"><span class="pl-label">Curriculum Vitae</span><span class="pl-valor" style="color:var(--cinza-texto)">Não disponível</span></div>'}
     `;
   }
 

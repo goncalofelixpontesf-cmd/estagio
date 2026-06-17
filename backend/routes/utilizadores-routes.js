@@ -5,9 +5,9 @@ const path    = require('path');
 const ctrl    = require('../controllers/utilizadoresController');
 const { proteger } = require('../middleware/auth');
 
-// Configuração do multer para CV
+// Configuração do multer para CV — guarda na pasta dedicada /CV
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
+  destination: (req, file, cb) => cb(null, path.join(__dirname, '..', 'CV')),
   filename:    (req, file, cb) => {
     const ext = path.extname(file.originalname);
     cb(null, `cv-${req.utilizador._id}-${Date.now()}${ext}`);

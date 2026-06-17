@@ -152,7 +152,6 @@
   <nav class="sidebar-nav">
     <a class="nav-item" href="dashboard-entidade.html">As Minhas Propostas</a>
     <a class="nav-item" href="estudantes-interessados.html">Estudantes Interessados</a>
-    <a class="nav-item" href="minhas-tutorias.html">As Minhas Tutorias</a>
     <a class="nav-item activo">Entrevistas</a>
   </nav>
   <div class="sidebar-footer">
@@ -257,7 +256,7 @@
 </div>
 
 <script>
-  const API = 'http://localhost:5000/api';
+  const API = 'http://192.168.1.66:5000/api';
   const token = localStorage.getItem('esmad_token');
   const user  = localStorage.getItem('esmad_user');
   if (!token || !user) { window.location.href = 'login.html'; }

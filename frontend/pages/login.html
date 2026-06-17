@@ -68,7 +68,7 @@
     }
     .alerta.erro    { background: #FFDEDE; color: var(--vermelho); }
     .alerta.sucesso { background: #DFF0D8; color: var(--verde-texto); }
-    .alerta.visivel { display: block; }
+    .alerta.erro, .alerta.sucesso { display: block; }
 
     .campo { margin-bottom: 28px; }
     .campo label {
@@ -178,28 +178,24 @@
 
       <div id="alerta" class="alerta" role="alert"></div>
 
-      <form id="formLogin" novalidate>
+      <div class="campo">
+        <label for="email">Email</label>
+        <input type="email" id="email"
+          placeholder="exemplo@esmad.ipp.pt"
+          autocomplete="email" inputmode="email">
+      </div>
 
-        <div class="campo">
-          <label for="email">Email</label>
-          <input type="email" id="email"
-            placeholder="exemplo@esmad.ipp.pt"
-            autocomplete="email" inputmode="email">
+      <div class="campo">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <input type="password" id="password"
+            placeholder="••••••••"
+            autocomplete="current-password">
+          <button type="button" class="btn-olho" id="btnOlho" tabindex="-1">ver</button>
         </div>
+      </div>
 
-        <div class="campo">
-          <label for="password">Password</label>
-          <div class="input-wrap">
-            <input type="password" id="password"
-              placeholder="••••••••"
-              autocomplete="current-password">
-            <button type="button" class="btn-olho" id="btnOlho" tabindex="-1">ver</button>
-          </div>
-        </div>
-
-        <button type="submit" class="btn-principal" id="btnEntrar">ENTRAR</button>
-
-      </form>
+      <button type="button" class="btn-principal" id="btnEntrar" onclick="entrar()">ENTRAR</button>
 
       <p class="link-redirecao">
         Não tens conta? <a href="registo.html">Regista-te aqui</a>
@@ -209,46 +205,29 @@
   </div>
 
   <script>
-    const API_URL = 'http://localhost:5000/api';
+    const API = 'http://192.168.1.66:5000/api';
 
-    /* 🔧 CORREÇÃO AQUI */
-    (() => {
+    // Se já tem sessão activa, redirecionar para a página correcta
+    (function verificarSessao() {
       const token = localStorage.getItem('esmad_token');
-      const u = localStorage.getItem('esmad_user');
-
-      // só tenta redirecionar se estiver na página de login
-      if (!window.location.pathname.includes('login')) return;
-
-      if (!token || !u) return;
-
+      const user  = localStorage.getItem('esmad_user');
+      if (!token || !user) return; // sem sessão, mostrar login normalmente
       try {
-        const user = JSON.parse(u);
-        if (user?.perfil) {
-          redirecionar(user.perfil);
-        }
-      } catch (e) {
-        console.error('Erro ao ler user:', e);
-        localStorage.clear();
-      }
+        const u = JSON.parse(user);
+        redireccionarPorPerfil(u.perfil);
+      } catch { localStorage.clear(); }
     })();
 
-    function redirecionar(perfil) {
-      const destinos = {
-        estudante: 'lista-propostas.html',
-        docente:   'dashboard-entidade.html',
-        entidade:  'dashboard-entidade.html',
-        comissao:  'gestao-cca.html',
-        admin:     'gestao-cca.html',
-      };
-
-      const destino = destinos[perfil];
-
-      if (!destino) {
-        console.error('Perfil inválido:', perfil);
-        return;
+    // Redirecionar cada perfil para a página correta
+    function redireccionarPorPerfil(perfil) {
+      if (perfil === 'estudante') {
+        window.location.replace('lista-propostas.html');
+      } else if (perfil === 'docente' || perfil === 'entidade') {
+        window.location.replace('dashboard-entidade.html');
+      } else if (perfil === 'comissao' || perfil === 'admin') {
+        window.location.replace('gestao-cca.html');
       }
-
-      window.location.href = destino;
+      // Se o perfil for desconhecido, não redirecionar — mostrar login
     }
 
     const inputPass = document.getElementById('password');
@@ -258,45 +237,50 @@
       this.textContent = ver ? 'ocultar' : 'ver';
     });
 
+    document.getElementById('email').addEventListener('keydown',    e => { if (e.key === 'Enter') entrar(); });
+    document.getElementById('password').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
+
     const alertaEl = document.getElementById('alerta');
     function mostrarAlerta(msg, tipo = 'erro') {
       alertaEl.textContent = msg;
-      alertaEl.className = `alerta ${tipo} visivel`;
+      alertaEl.className = `alerta ${tipo}`;
     }
 
     const btnEntrar = document.getElementById('btnEntrar');
-    document.getElementById('formLogin').addEventListener('submit', async e => {
-      e.preventDefault();
+
+    async function entrar() {
       alertaEl.className = 'alerta';
 
       const email    = document.getElementById('email').value.trim();
       const password = inputPass.value;
-      if (!email || !password) { mostrarAlerta('Preenche o email e a password.'); return; }
+      if (!email)    { mostrarAlerta('Introduz o teu email.');    return; }
+      if (!password) { mostrarAlerta('Introduz a tua password.'); return; }
 
       btnEntrar.disabled = true;
       btnEntrar.innerHTML = '<span class="spin"></span>A entrar…';
 
       try {
-        const res   = await fetch(`${API_URL}/auth/login`, {
+        const resp  = await fetch(`${API}/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password }),
         });
-        const dados = await res.json();
-        if (!res.ok) throw new Error(dados.mensagem || 'Credenciais inválidas.');
+        const dados = await resp.json();
+
+        if (!dados.sucesso) throw new Error(dados.mensagem || 'Credenciais inválidas.');
 
         localStorage.setItem('esmad_token', dados.token);
         localStorage.setItem('esmad_user',  JSON.stringify(dados.utilizador));
 
         mostrarAlerta('Login com sucesso! A redirecionar…', 'sucesso');
-        setTimeout(() => redirecionar(dados.utilizador.perfil), 900);
+        setTimeout(() => redireccionarPorPerfil(dados.utilizador.perfil), 900);
 
       } catch (err) {
-        mostrarAlerta(err.message);
+        mostrarAlerta(err.message || 'Erro ao entrar. Tenta novamente.');
         btnEntrar.disabled = false;
         btnEntrar.textContent = 'ENTRAR';
       }
-    });
+    }
   </script>
 </body>
 </html>
