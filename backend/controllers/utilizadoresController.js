@@ -38,9 +38,11 @@ exports.editarPerfil = async (req, res) => {
       if (portfolio !== undefined) updateEstudante.portfolio = portfolio;
       // Disciplinas extraídas do DOMUS ou inseridas manualmente
       if (req.body.disciplinas !== undefined) {
-        updateEstudante.disciplinas = req.body.disciplinas;
+        // Ignorar linhas em branco (sem nome) que tenham ficado no formulário
+        const discsValidas = req.body.disciplinas.filter(d => d.nome && d.nome.trim() !== '');
+        updateEstudante.disciplinas = discsValidas;
         // Recalcular a média a partir das disciplinas com nota atribuída
-        const comNota = req.body.disciplinas.filter(d => d.nota !== null && d.nota !== undefined && d.nota !== '');
+        const comNota = discsValidas.filter(d => d.nota !== null && d.nota !== undefined && d.nota !== '');
         updateEstudante.mediaFinal = comNota.length
           ? comNota.reduce((soma, d) => soma + Number(d.nota), 0) / comNota.length
           : null;
@@ -50,7 +52,7 @@ exports.editarPerfil = async (req, res) => {
         await Estudante.findOneAndUpdate(
           { utilizadorId: req.utilizador._id },
           updateEstudante,
-          { new: true }
+          { new: true, runValidators: true }
         );
       }
     }
@@ -61,6 +63,7 @@ exports.editarPerfil = async (req, res) => {
 
     res.json({ sucesso: true, utilizador, dadosExtra });
   } catch (err) {
+    console.error('[editarPerfil] Erro:', err);
     res.status(500).json({ sucesso: false, mensagem: err.message });
   }
 };
@@ -77,33 +80,87 @@ exports.uploadCV = async (req, res) => {
       return res.status(404).json({ sucesso: false, mensagem: 'Perfil de estudante não encontrado.' });
     }
 
-    // Apagar CV anterior se existir
+    // Apagar CV anterior se existir — nunca deixar isto bloquear o upload do
+    // novo ficheiro (ex: se o OneDrive/antivírus estiver a "agarrar" o
+    // ficheiro antigo por um instante, isto não pode impedir o resto).
     if (estudante.cv) {
       const caminhoAntigo = path.join(__dirname, '..', 'CV', estudante.cv);
-      if (fs.existsSync(caminhoAntigo)) fs.unlinkSync(caminhoAntigo);
+      try {
+        if (fs.existsSync(caminhoAntigo)) fs.unlinkSync(caminhoAntigo);
+      } catch (errApagar) {
+        console.warn('[uploadCV] Não foi possível apagar o CV antigo (ficheiro talvez bloqueado):', errApagar.message);
+      }
     }
 
-    estudante.cv = req.file.filename;
-
-    // Backup no Cloudinary (não bloqueia o resto se falhar — é só redundância)
-    const publicId = path.parse(req.file.filename).name;
-    estudante.cvCloudinaryUrl = await enviarBackupCV(req.file.path, publicId);
-
-    await estudante.save();
+    // Gravar já o CV (sem esperar pelo Cloudinary) — isto é o que importa
+    // mesmo, e tem de responder ao browser sem demora.
+    await Estudante.findOneAndUpdate(
+      { utilizadorId: req.utilizador._id },
+      { cv: req.file.filename }
+    );
 
     res.json({
       sucesso: true,
       cv: req.file.filename,
       cvUrl: `/cv/${req.file.filename}`,
-      cvBackup: estudante.cvCloudinaryUrl,
-      mensagem: estudante.cvCloudinaryUrl
-        ? 'CV guardado com sucesso (com backup no Cloudinary).'
-        : 'CV guardado com sucesso no servidor (o backup no Cloudinary não foi possível).'
+      mensagem: 'CV guardado com sucesso.'
     });
+
+    // Backup no Cloudinary — corre DEPOIS de já ter respondido ao browser,
+    // em segundo plano. Mesmo que demore muito ou falhe, nunca bloqueia o
+    // upload nem o utilizador fica à espera. "void" porque deliberadamente
+    // não esperamos por esta promise.
+    const publicId = path.parse(req.file.filename).name;
+    enviarBackupCV(req.file.path, publicId)
+      .then(cvCloudinaryUrl => {
+        if (cvCloudinaryUrl) {
+          return Estudante.findOneAndUpdate(
+            { utilizadorId: req.utilizador._id },
+            { cvCloudinaryUrl }
+          );
+        }
+      })
+      .catch(err => console.error('[uploadCV] Backup Cloudinary falhou em segundo plano:', err.message));
+
   } catch (err) {
+    console.error('[uploadCV] Erro:', err);
     res.status(500).json({ sucesso: false, mensagem: err.message });
   }
 };  
+
+// DELETE /api/utilizadores/cv
+exports.removerCV = async (req, res) => {
+  try {
+    const estudante = await Estudante.findOne({ utilizadorId: req.utilizador._id });
+    if (!estudante) {
+      return res.status(404).json({ sucesso: false, mensagem: 'Perfil de estudante não encontrado.' });
+    }
+    if (!estudante.cv) {
+      return res.status(400).json({ sucesso: false, mensagem: 'Não tens nenhum CV carregado.' });
+    }
+
+    // Apagar o ficheiro em disco, se existir — sem deixar bloquear o pedido
+    // se o ficheiro estiver temporariamente bloqueado (ex: OneDrive)
+    const caminho = path.join(__dirname, '..', 'CV', estudante.cv);
+    try {
+      if (fs.existsSync(caminho)) fs.unlinkSync(caminho);
+    } catch (errApagar) {
+      console.warn('[removerCV] Não foi possível apagar o ficheiro (talvez bloqueado):', errApagar.message);
+    }
+
+    // Mesma razão que no uploadCV: findOneAndUpdate em vez de .save() do
+    // documento inteiro, para não depender da validade de outros campos.
+    await Estudante.findOneAndUpdate(
+      { utilizadorId: req.utilizador._id },
+      { cv: null, cvCloudinaryUrl: null }
+    );
+
+    res.json({ sucesso: true, mensagem: 'CV removido com sucesso.' });
+  } catch (err) {
+    console.error('[removerCV] Erro:', err);
+    res.status(500).json({ sucesso: false, mensagem: err.message });
+  }
+};
 
 // POST /api/utilizadores/extrair-notas
 // Recebe um PDF em base64, chama a API Anthropic e devolve as disciplinas extraídas

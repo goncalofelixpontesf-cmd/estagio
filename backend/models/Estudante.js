@@ -32,7 +32,7 @@ const estudanteSchema = new mongoose.Schema({
   disciplinas: [{
     nome:   { type: String, required: true },
     nota:   { type: Number, default: null },
-    estado: { type: String, enum: ['concluida', 'em_curso', 'reprovada'], default: 'em_curso' }
+    estado: { type: String, enum: ['concluida', 'em_curso', 'reprovada', 'pendente'], default: 'pendente' }
   }],
 
   // Ficheiro PDF do CV — guarda apenas o nome do ficheiro (ex: cv-<id>-<timestamp>.pdf)
@@ -52,4 +52,4 @@ const estudanteSchema = new mongoose.Schema({
   timestamps: { createdAt: 'criadoEm', updatedAt: 'atualizadoEm' }
 });
 
-module.exports = mongoose.model('Estudante', estudanteSchema);  
+module.exports = mongoose.model('Estudante', estudanteSchema);

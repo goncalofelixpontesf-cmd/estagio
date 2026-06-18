@@ -308,8 +308,9 @@
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo"><span>ESMAD</span></div>
   <nav class="sidebar-nav">
+    <a class="nav-item" href="dashboard-estudante.html">Início</a>
     <a class="nav-item" href="lista-propostas.html">Propostas</a>
-    <a class="nav-item" href="candidaturas.html">As Minhas Candidaturas</a>
+    <a class="nav-item" href="dashboard-estudante.html">As Minhas Candidaturas</a>
     <a class="nav-item activo">O Meu Perfil</a>
   </nav>
   <div class="sidebar-footer">
@@ -431,6 +432,7 @@
   function req(endpoint, opts = {}) {
     return fetch(`${API}${endpoint}`, {
       ...opts,
+      cache: 'no-store',
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...(opts.headers || {}) }
     }).then(r => r.json());
   }
@@ -544,6 +546,12 @@
           <span class="label">LinkedIn:</span>
           <span class="valor"><a href="${est.linkedin.startsWith('http') ? est.linkedin : 'https://'+est.linkedin}" target="_blank">${est.linkedin}</a></span>
         </div>` : ''}
+        <div class="contacto-linha">
+          <span class="label">CV:</span>
+          <span class="valor">${est?.cv
+            ? `<a href="${API.replace('/api','')}/cv/${est.cv}" target="_blank" style="color:var(--verde);font-weight:600">✅ Ver / descarregar CV</a>`
+            : `<span style="color:var(--cinza-texto)">Ainda não carregaste o CV — </span><a href="editar-perfil.html">carrega aqui</a>`}</span>
+        </div>
       </div>
 
       <a href="editar-perfil.html" class="btn-editar">Editar Perfil</a>

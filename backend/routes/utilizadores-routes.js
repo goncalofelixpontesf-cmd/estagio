@@ -27,6 +27,7 @@ router.use(proteger);
 router.get('/perfil',       ctrl.obterPerfil);
 router.put('/perfil',       ctrl.editarPerfil);
 router.post('/cv', uploadCV.single('cv'), ctrl.uploadCV);
+router.delete('/cv', ctrl.removerCV);
 
 // Extração de notas via IA (PDF DOMUS)
 router.post('/extrair-notas', ctrl.extrairNotasDomus);

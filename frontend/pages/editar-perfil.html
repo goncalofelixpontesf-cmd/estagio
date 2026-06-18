@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESMAD — Editar Perfil</title>
+  <title>ESMAD</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="favicon.ico">
   <style>
@@ -163,6 +163,41 @@
     }
     #inputCV { display: none; }
 
+    .btn-remover-cv {
+      display: block; width: 100%; margin-top: 10px;
+      background: var(--branco); color: var(--vermelho);
+      border: 1.5px solid #FFDEDE; border-radius: 8px; padding: 9px;
+      font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .btn-remover-cv:hover { background: #FFF5F5; }
+
+    /* ══ MODAL DE CONFIRMAÇÃO ══ */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45); z-index: 1000;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.visivel { display: flex; }
+    .modal-confirm {
+      background: var(--branco); border-radius: 14px;
+      padding: 28px 26px; max-width: 380px; width: 90%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+    .modal-confirm .icone { font-size: 2.2rem; margin-bottom: 10px; }
+    .modal-confirm h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .modal-confirm p { font-size: 0.84rem; color: var(--cinza-texto); margin-bottom: 22px; line-height: 1.5; }
+    .modal-confirm-acoes { display: flex; gap: 10px; }
+    .modal-confirm-acoes button {
+      flex: 1; border: none; border-radius: 8px; padding: 11px;
+      font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 700;
+      cursor: pointer; transition: opacity 0.15s;
+    }
+    .modal-confirm-acoes button:hover { opacity: 0.88; }
+    .btn-modal-cancelar { background: var(--cinza-input); color: var(--preto); }
+    .btn-modal-confirmar { background: var(--vermelho); color: var(--branco); }
+
     /* ══ FOOTER ══ */
     .form-footer {
       background: var(--branco);
@@ -303,6 +338,19 @@
 
 <input type="file" id="inputCV" accept=".pdf">
 
+<!-- Modal de confirmação para remover CV -->
+<div class="modal-overlay" id="modalRemoverCV" onclick="if(event.target===this) fecharModalRemoverCV()">
+  <div class="modal-confirm">
+    <div class="icone">🗑️</div>
+    <h3>Remover CV?</h3>
+    <p>Tens a certeza que queres remover o teu CV? Esta ação não pode ser desfeita.</p>
+    <div class="modal-confirm-acoes">
+      <button class="btn-modal-cancelar" onclick="fecharModalRemoverCV()">Cancelar</button>
+      <button class="btn-modal-confirmar" id="btnConfirmarRemoverCV" onclick="confirmarRemoverCV()">Remover</button>
+    </div>
+  </div>
+</div>
+
 <script>
   const API = 'http://192.168.1.66:5000/api';
   const token = localStorage.getItem('esmad_token');
@@ -311,6 +359,13 @@
 
   const utilizador = JSON.parse(user);
   if (utilizador.perfil !== 'estudante') { window.location.href = 'login.html'; }
+
+  // Se a página for restaurada do cache do browser (ex: botão "Voltar"),
+  // forçar uma recarga real para ir buscar dados frescos ao servidor em
+  // vez de mostrar o estado antigo que estava guardado nesse cache.
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) location.reload();
+  });
 
   document.getElementById('sidebarNome').textContent = utilizador.nome;
   document.getElementById('avatar').textContent      = utilizador.nome.charAt(0).toUpperCase();
@@ -327,6 +382,7 @@
   function req(endpoint, opts = {}) {
     return fetch(`${API}${endpoint}`, {
       ...opts,
+      cache: 'no-store',
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...(opts.headers||{}) }
     }).then(r => r.json());
   }
@@ -446,19 +502,20 @@
       <!-- CV -->
       <div class="form-card">
         <div class="form-card-header">
-          <div class="icone-secao">??</div>
+          <div class="icone-secao">📄</div>
           <div class="header-texto">
             <div class="titulo-secao">Curriculum Vitae</div>
             <div class="subtitulo-secao">PDF enviado às entidades quando te candidatas</div>
           </div>
         </div>
         <div class="form-card-body">
-          <div class="cv-area ${cvNome?'tem':''}" id="zonaCV" onclick="document.getElementById('inputCV').click()">
-            <div class="cv-area-icone">${cvNome ? '✅' : '??'}</div>
+          <div class="cv-area ${cvNome?'tem':''}" id="zonaCV" onclick="document.getElementById('inputCV').value=''; document.getElementById('inputCV').click()">
+            <div class="cv-area-icone">${cvNome ? '✅' : '📄'}</div>
             <div class="cv-area-titulo">${cvNome ? 'CV carregado' : 'Carregar CV'}</div>
             <div class="cv-area-sub">${cvNome ? 'Clica para substituir' : 'PDF · máx. 5MB'}</div>
-            ${cvNome ? `<div class="cv-badge">?? ${cvNome}</div>` : ''}
+            ${cvNome ? `<div class="cv-badge">📎 ${cvNome}</div>` : ''}
           </div>
+          ${cvNome ? `<button type="button" class="btn-remover-cv" id="btnRemoverCV" onclick="removerCV()">🗑️ Remover CV</button>` : ''}
         </div>
       </div>
 
@@ -523,7 +580,48 @@
       <div class="cv-area-icone">✅</div>
       <div class="cv-area-titulo">CV carregado</div>
       <div class="cv-area-sub">Clica para substituir</div>
-      <div class="cv-badge">?? ${file.name}</div>`;
+      <div class="cv-badge">📎 ${file.name}</div>`;
+  }
+
+  function removerCV() {
+    document.getElementById('modalRemoverCV').classList.add('visivel');
+  }
+
+  function fecharModalRemoverCV() {
+    document.getElementById('modalRemoverCV').classList.remove('visivel');
+  }
+
+  async function confirmarRemoverCV() {
+    const btnRemover  = document.getElementById('btnRemoverCV');
+    const btnConfirmar = document.getElementById('btnConfirmarRemoverCV');
+    btnConfirmar.disabled = true;
+    btnConfirmar.textContent = 'A remover…';
+
+    try {
+      const dados = await req('/utilizadores/cv', { method: 'DELETE' });
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+
+      cvNome = null;
+      cvFile = null;
+
+      const zona = document.getElementById('zonaCV');
+      zona.className = 'cv-area';
+      zona.innerHTML = `
+        <div class="cv-area-icone">📄</div>
+        <div class="cv-area-titulo">Carregar CV</div>
+        <div class="cv-area-sub">PDF · máx. 5MB</div>`;
+
+      if (btnRemover) btnRemover.remove();
+
+      fecharModalRemoverCV();
+      mostrarAlerta('CV removido com sucesso.', 'sucesso');
+    } catch (err) {
+      fecharModalRemoverCV();
+      mostrarAlerta('Erro ao remover CV: ' + err.message);
+    } finally {
+      btnConfirmar.disabled = false;
+      btnConfirmar.textContent = 'Remover';
+    }
   }
 
   async function guardar() {
@@ -541,8 +639,11 @@
     btn.innerHTML = '<span class="spin"></span><span>A guardar…</span>';
 
     try {
+      console.log('[guardar] A iniciar. cvFile =', cvFile ? cvFile.name : null);
+
       if (cvFile) {
         btn.innerHTML = '<span class="spin"></span><span>A enviar CV…</span>';
+        console.log('[guardar] A enviar CV...');
         const fd = new FormData();
         fd.append('cv', cvFile);
         const resCV = await fetch(`${API}/utilizadores/cv`, {
@@ -550,25 +651,32 @@
           headers: { 'Authorization': `Bearer ${token}` },
           body: fd
         });
+        console.log('[guardar] Resposta do upload de CV recebida. Status:', resCV.status);
         const dadosCV = await resCV.json();
+        console.log('[guardar] JSON do CV:', dadosCV);
         if (!dadosCV.sucesso) throw new Error('Erro ao enviar CV: ' + dadosCV.mensagem);
+        cvFile = null; // já foi enviado, não enviar outra vez se guardar() for chamado de novo
       }
 
       btn.innerHTML = '<span class="spin"></span><span>A guardar perfil…</span>';
+      console.log('[guardar] A guardar perfil...');
       const dados = await req('/utilizadores/perfil', {
         method: 'PUT',
         body: JSON.stringify({ nome, telefone, portfolio, linkedin, disciplinas: recolherDisciplinas() })
       });
+      console.log('[guardar] Resposta do perfil recebida:', dados);
       if (!dados.sucesso) throw new Error(dados.mensagem);
 
       const uLocal = JSON.parse(localStorage.getItem('esmad_user') || '{}');
       uLocal.nome = nome;
       localStorage.setItem('esmad_user', JSON.stringify(uLocal));
 
+      console.log('[guardar] Tudo OK, a redirecionar...');
       mostrarAlerta('✔ Perfil atualizado com sucesso!', 'sucesso');
       setTimeout(() => { window.location.href = 'perfil-estudante.html'; }, 1200);
 
     } catch (err) {
+      console.error('[guardar] ERRO CAPTURADO:', err);
       mostrarAlerta(err.message);
       btn.disabled = false;
       btn.innerHTML = '<span>Guardar Alterações</span>';

@@ -27,12 +27,19 @@ async function enviarBackupCV(caminhoLocal, publicId) {
     return null;
   }
   try {
-    const resultado = await cloudinary.uploader.upload(caminhoLocal, {
+    const tarefaUpload = cloudinary.uploader.upload(caminhoLocal, {
       resource_type: 'raw',        // PDFs não são imagens, têm de ir como "raw"
       folder: 'esmad/cv-backups',
       public_id: publicId,
-      overwrite: true
+      overwrite: true,
+      timeout: 8000                // tempo limite do próprio SDK do Cloudinary
     });
+    // Segunda camada de segurança: garante que nunca esperamos mais do que isto,
+    // mesmo que o SDK do Cloudinary não respeite o seu próprio "timeout" (ex: DNS preso).
+    const tempoLimite = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Tempo limite excedido a contactar o Cloudinary.')), 10000)
+    );
+    const resultado = await Promise.race([tarefaUpload, tempoLimite]);
     return resultado.secure_url;
   } catch (err) {
     console.error('[Cloudinary] Falha ao enviar backup do CV:', err.message);
