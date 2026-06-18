@@ -182,8 +182,64 @@
     .card-header {
       padding: 18px 22px 14px;
       border-bottom: 1px solid var(--cinza-linha);
+      display: flex; align-items: center; justify-content: space-between;
     }
     .card-header h2 { font-size: 0.92rem; font-weight: 700; }
+
+    /* ══ PERCURSO ACADÉMICO — ACORDEÃO POR ANO ══ */
+    .ano-bloco { border-bottom: 1px solid var(--cinza-linha); }
+    .ano-bloco:last-child { border-bottom: none; }
+
+    .ano-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 13px 22px; cursor: pointer;
+      background: #FAFAFA; transition: background 0.15s;
+      user-select: none;
+    }
+    .ano-header:hover { background: var(--laranja-light); }
+    .ano-titulo {
+      font-size: 0.82rem; font-weight: 700; color: var(--preto);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .ano-badge {
+      font-size: 0.7rem; font-weight: 600; padding: 2px 8px;
+      border-radius: 10px; background: var(--laranja-light); color: var(--laranja);
+    }
+    .ano-media {
+      font-size: 0.75rem; color: var(--cinza-texto); font-weight: 500;
+    }
+    .ano-chevron {
+      font-size: 0.7rem; color: var(--cinza-texto);
+      transition: transform 0.2s;
+    }
+    .ano-bloco.aberto .ano-chevron { transform: rotate(180deg); }
+
+    .ano-corpo { display: none; }
+    .ano-bloco.aberto .ano-corpo { display: block; }
+
+    .disc-linha {
+      display: flex; align-items: center;
+      padding: 10px 22px; border-top: 1px solid var(--cinza-linha);
+      gap: 12px;
+    }
+    .disc-linha:hover { background: #FAFAFA; }
+    .disc-nome { flex: 1; font-size: 0.83rem; font-weight: 500; }
+    .disc-nota {
+      font-size: 0.88rem; font-weight: 800; width: 28px; text-align: center;
+      flex-shrink: 0;
+    }
+    .disc-nota.alta   { color: var(--verde); }
+    .disc-nota.media  { color: var(--amarelo); }
+    .disc-nota.baixa  { color: var(--vermelho); }
+    .disc-nota.vazia  { color: var(--cinza-texto); }
+    .disc-badge {
+      font-size: 0.68rem; font-weight: 600; padding: 2px 8px;
+      border-radius: 4px; flex-shrink: 0;
+    }
+    .disc-badge.concluida { background: var(--verde-light);   color: var(--verde); }
+    .disc-badge.reprovada { background: #FFDEDE;              color: var(--vermelho); }
+    .disc-badge.em_curso  { background: var(--amarelo-light); color: var(--amarelo); }
+    .disc-badge.pendente  { background: #F0F0F0; color: var(--cinza-texto); }
 
     /* Tabelas */
     table { width: 100%; border-collapse: collapse; }
@@ -353,15 +409,13 @@
 
         <!-- Percurso Académico -->
         <div class="card">
-          <div class="card-header"><h2>Percurso Académico</h2></div>
-          <table>
-            <thead>
-              <tr><th>Disciplina</th><th>Nota</th><th>Estado</th></tr>
-            </thead>
-            <tbody id="tabelaDisciplinas">
-              <tr><td colspan="3"><div class="vazio"><div class="emoji">⏳</div>A carregar…</div></td></tr>
-            </tbody>
-          </table>
+          <div class="card-header">
+            <h2>Percurso Académico</h2>
+            <span id="percursoMedia" style="font-size:0.78rem;color:var(--cinza-texto);font-weight:500"></span>
+          </div>
+          <div id="percursoContainer">
+            <div class="vazio"><div class="emoji">⏳</div>A carregar…</div>
+          </div>
         </div>
 
         <!-- As Minhas Candidaturas -->
@@ -474,18 +528,7 @@
 
       // Disciplinas
       const disciplinas = est?.disciplinas || [];
-      const tbDisc = document.getElementById('tabelaDisciplinas');
-      if (!disciplinas.length) {
-        tbDisc.innerHTML = `<tr><td colspan="3"><div class="vazio"><div class="emoji">📚</div>Ainda não tens disciplinas registadas.</div></td></tr>`;
-      } else {
-        tbDisc.innerHTML = disciplinas.map(d => `
-          <tr>
-            <td><span class="nome-disciplina">${d.nome}</span></td>
-            <td><span class="nota">${d.nota ?? '—'}</span></td>
-            <td><span class="badge ${d.estado}">${estadoBadge[d.estado] || d.estado}</span></td>
-          </tr>
-        `).join('');
-      }
+      renderPercurso(disciplinas);
 
       // Candidaturas
       const dados2 = await req('/candidaturas/minhas');
@@ -556,19 +599,12 @@
 
       <a href="editar-perfil.html" class="btn-editar">Editar Perfil</a>
 
-      <a href="editar-perfil.html" class="btn-editar" style="background:var(--verde);margin-top:4px">
-        ✏️ Introduzir Notas Manualmente
-      </a>
-      <div class="btn-secundario-nota" style="margin-top:2px">
-        Adiciona disciplinas e gera o PDF do percurso académico
-      </div>
-
       <div class="domus-zona" id="domusZona" onclick="document.getElementById('inputDomus').click()"
-           style="margin-top:12px;opacity:0.7" title="Requer PDF com texto seleccionável">
+           style="margin-top:12px" title="Requer PDF com texto seleccionável">
         <div class="icone">📤</div>
         <div class="texto">
-          <strong>Ou carrega PDF do DOMUS</strong>
-          <span style="font-size:0.72rem;color:var(--cinza-texto)">(só funciona se o PDF tiver texto — não imagem)</span>
+          <strong>Carregar PDF do DOMUS</strong>
+          <span style="font-size:0.72rem;color:var(--cinza-texto)">Para importar as notas automaticamente</span>
         </div>
       </div>
 
@@ -607,7 +643,7 @@
       mostrarToast((err.message || 'Nao foi possivel extrair as notas.'), 'erro');
       if (zona) {
         zona.className = 'domus-zona';
-        zona.innerHTML = '<div class="icone">⚠️</div><div class="texto"><strong>Extracao indisponivel</strong><br><a href="editar-perfil.html" style="color:var(--laranja);font-weight:600">→ Introduz as notas manualmente</a></div>';
+        zona.innerHTML = '<div class="icone">⚠️</div><div class="texto"><strong>Não foi possível extrair as notas</strong><span>Tenta outro ficheiro PDF do DOMUS</span></div>';
       }
     }
   }
@@ -632,62 +668,50 @@
       throw new Error('Erro ao ler PDF: ' + pdfErr.message);
     }
 
-    if (!texto.trim()) throw new Error('O PDF nao tem texto extraivel (pode ser uma imagem). Usa Editar Perfil para introduzir as notas manualmente.');
+    console.log('[DOMUS] Texto extraido (primeiros 2000 chars):', texto.substring(0,2000));
+    if (!texto.trim()) throw new Error('O PDF não tem texto extraível. Certifica-te de que exportaste as notas do DOMUS como PDF de texto e não como imagem.');
 
     const disciplinas = parsearTextoDomus(texto);
-    if (!disciplinas.length) throw new Error('Nenhuma disciplina encontrada. Usa Editar Perfil para introduzir manualmente.');
+    if (!disciplinas.length) throw new Error('Nenhuma disciplina encontrada no PDF. Certifica-te de que o ficheiro é o exportado do DOMUS com as notas.');
     return disciplinas;
   }
 
   function parsearTextoDomus(texto) {
     const disciplinas = [];
-    const linhas = texto.split(/[\n\r]+/).map(l => l.trim()).filter(l => l.length > 2);
+    const inicio = texto.search(/1[oº°]\s*Ano/i);
+    const textoNotas = inicio >= 0 ? texto.slice(inicio) : texto;
 
-    for (let i = 0; i < linhas.length; i++) {
-      const linha = linhas[i];
-      if (/^(\d{4}|ECTS|Cred|Hora|Total|Media|Aprov|Reprov|Inscr|Ano|Sem)/i.test(linha)) continue;
-      if (linha.length < 4 || /^\d+$/.test(linha)) continue;
+    const tokens = textoNotas.split(/\s{2,}/).map(t => t.trim()).filter(t => t.length > 0);
+    const ignorar = new Set(['ECTS', 'Nota', 'Data', 'TN', 'EE', 'Unidade Curricular']);
 
-      // Padrao: "Nome da Disciplina  14" na mesma linha
-      const m = linha.match(/^(.+?)\s{2,}(\d{1,2}[,.]?\d?)\s*$/);
-      if (m) {
-        const nome = m[1].trim();
-        const nota = parseFloat(m[2].replace(',', '.'));
-        if (nome.length > 3 && nota >= 0 && nota <= 20) {
-          disciplinas.push({ nome, nota, estado: nota >= 10 ? 'concluida' : 'reprovada' });
-          continue;
-        }
-      }
+    let anoAtual = 1;
+    let i = 0;
+    while (i < tokens.length) {
+      const t = tokens[i];
+      if (/^(M[eé]dia atual|Nota:|informa[cç][aã]o|Ficha Estudante|Notas Parciais|Planos|Curso T[eé]|SC -|https?:|\/\/)/i.test(t)) break;
 
-      // Padrao alternativo: nota na linha seguinte
-      if (/[A-Za-z\u00C0-\u024F]{4,}/.test(linha) && linha.length > 4) {
-        const prox = (linhas[i + 1] || '').trim();
-        const mProx = prox.match(/^(\d{1,2}[,.]?\d?)$/);
-        if (mProx) {
-          const nota = parseFloat(mProx[1].replace(',', '.'));
-          if (nota >= 0 && nota <= 20) {
-            disciplinas.push({ nome: linha, nota, estado: nota >= 10 ? 'concluida' : 'reprovada' });
-            i++;
-            continue;
-          }
-        }
-        if (/em curso|inscrit|frequen/i.test(prox)) {
-          disciplinas.push({ nome: linha, nota: null, estado: 'em_curso' });
-          i++;
-        }
-      }
+      // Detectar mudança de ano a partir dos títulos de secção
+      const mAno = t.match(/^([12])[oº°]\s*Ano/i);
+      if (mAno) { anoAtual = parseInt(mAno[1], 10); i++; continue; }
+
+      if (ignorar.has(t) || /Semestre/i.test(t) || /^20\d{2}/.test(t)) { i++; continue; }
+
+      const nome  = t;
+      const ects  = tokens[i + 1] || '';
+      const notaS = tokens[i + 2] || '';
+      const data  = tokens[i + 3] || '';
+      const nota  = parseInt(notaS, 10);
+      const ectsN = parseInt(ects, 10);
+
+      if (!isNaN(ectsN) && !isNaN(nota) && nota >= 0 && nota <= 20 && /^20\d{2}/.test(data) && nome.length >= 3) {
+        disciplinas.push({ nome, nota, estado: nota >= 10 ? 'concluida' : 'reprovada', ano: anoAtual });
+        i += 4;
+      } else { i++; }
     }
-
-    // Remover duplicados
-    const vistos = new Set();
-    return disciplinas.filter(d => { if (vistos.has(d.nome)) return false; vistos.add(d.nome); return true; });
+    return disciplinas;
   }
-
   function mostrarPreviewNotas(disciplinas, fileName) {
     const zona = document.getElementById('domusZona');
-    const estadoLabel = { concluida:'Concluída', em_curso:'Em Curso', reprovada:'Reprovada', pendente:'Pendente' };
-    const estadoCor   = { concluida:'var(--verde)', em_curso:'var(--amarelo)', reprovada:'var(--vermelho)', pendente:'var(--cinza-texto)' };
-
     if (!disciplinas || !disciplinas.length) {
       mostrarToast('Não foram encontradas disciplinas no documento.', 'erro');
       if (zona) zona.innerHTML = `<div class="icone">✅</div><div class="texto"><strong>${fileName}</strong>Clica para substituir</div>`;
@@ -696,41 +720,75 @@
 
     if (zona) {
       zona.className = 'domus-zona tem-ficheiro';
-      zona.innerHTML = `
-        <div class="icone">✅</div>
-        <div class="texto"><strong>${fileName}</strong>${disciplinas.length} disciplinas extraídas</div>`;
+      zona.innerHTML = `<div class="icone">✅</div><div class="texto"><strong>${fileName}</strong>${disciplinas.length} disciplinas extraídas</div>`;
     }
-
-    // Mostrar toast
     mostrarToast(`✔ ${disciplinas.length} disciplinas extraídas!`, 'sucesso');
 
-    // Construir preview
-    const tbDisc = document.getElementById('tabelaDisciplinas');
-    if (!tbDisc) return;
+    // Mostrar pré-visualização com botão de guardar
+    const container = document.getElementById('percursoContainer');
+    const mediaEl   = document.getElementById('percursoMedia');
+    if (!container) return;
 
-    tbDisc.innerHTML = `
-      <tr><td colspan="3" style="padding:12px 18px;background:var(--verde-light)">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
-          <span style="font-size:0.84rem;font-weight:600;color:var(--verde)">✔ ${disciplinas.length} disciplinas extraídas do DOMUS</span>
-          <button onclick="guardarNotas()" style="background:var(--verde);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-family:Inter,sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer">
-            Guardar Notas
-          </button>
-        </div>
-      </td></tr>
-      ${disciplinas.map(d => `
-        <tr>
-          <td><span style="font-weight:500">${d.nome}</span></td>
-          <td><span style="font-weight:700">${d.nota ?? '—'}</span></td>
-          <td><span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:4px;font-size:0.72rem;font-weight:600;background:${estadoCor[d.estado]}22;color:${estadoCor[d.estado]}">${estadoLabel[d.estado] || d.estado}</span></td>
-        </tr>`).join('')}`;
+    const comNota = disciplinas.filter(d => d.nota !== null && d.nota !== undefined);
+    if (comNota.length && mediaEl) {
+      const media = comNota.reduce((s,d) => s + d.nota, 0) / comNota.length;
+      mediaEl.textContent = `Média: ${media.toFixed(1)} · ${comNota.length} disciplinas`;
+    }
 
-    // Guardar em memória para poder salvar
+    const notaCor = n => n >= 16 ? 'alta' : n >= 13 ? 'media' : n >= 10 ? 'media' : 'baixa';
+    const estadoLabel = { concluida:'Concluída', em_curso:'Em Curso', reprovada:'Reprovada', pendente:'Pendente' };
+    const porAno = {};
+    for (const d of disciplinas) {
+      const a = d.ano || 1;
+      if (!porAno[a]) porAno[a] = [];
+      porAno[a].push(d);
+    }
+
+    container.innerHTML = `
+      <div style="padding:12px 22px;background:var(--verde-light);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--cinza-linha)">
+        <span style="font-size:0.84rem;font-weight:600;color:var(--verde)">✔ ${disciplinas.length} disciplinas extraídas do DOMUS</span>
+        <button onclick="guardarNotas()" style="background:var(--verde);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-family:Inter,sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer">Guardar Notas</button>
+      </div>
+      ${Object.keys(porAno).sort().map((ano, idx) => {
+        const discs = porAno[ano];
+        const comN  = discs.filter(d => d.nota !== null);
+        const mediaAno = comN.length ? (comN.reduce((s,d) => s + d.nota, 0) / comN.length).toFixed(1) : null;
+        return `
+          <div class="ano-bloco """ id="ano-bloco-prev-${ano}">
+            <div class="ano-header" onclick="toggleAnoPrev(${ano})">
+              <div class="ano-titulo">
+                <span>${ano}º Ano</span>
+                <span class="ano-badge">${discs.length} disciplina${discs.length !== 1 ? 's' : ''}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px">
+                ${mediaAno ? `<span class="ano-media">Média ${mediaAno}</span>` : ''}
+                <span class="ano-chevron">▼</span>
+              </div>
+            </div>
+            <div class="ano-corpo">
+              ${discs.map(d => `
+                <div class="disc-linha">
+                  <span class="disc-nome">${d.nome}</span>
+                  <span class="disc-nota ${d.nota !== null ? notaCor(d.nota) : 'vazia'}">${d.nota ?? '—'}</span>
+                  <span class="disc-badge ${d.estado}">${estadoLabel[d.estado] || d.estado}</span>
+                </div>`).join('')}
+            </div>
+          </div>`;
+      }).join('')}`;
+
     window._disciplinasExtraidas = disciplinas;
   }
 
+  function toggleAnoPrev(ano) {
+    const bloco = document.getElementById(`ano-bloco-prev-${ano}`);
+    if (bloco) bloco.classList.toggle('aberto');
+  }
+  
   async function guardarNotas() {
     const disciplinas = window._disciplinasExtraidas;
     if (!disciplinas) return;
+    // Garantir que o campo 'ano' vai incluído — o backend usa só nome/nota/estado
+    // mas o frontend precisa dele para o acordeão; guardá-lo não faz mal nenhum.
     try {
       const dados = await req('/utilizadores/perfil', {
         method: 'PUT',
@@ -738,14 +796,96 @@
       });
       if (!dados.sucesso) throw new Error(dados.mensagem);
       mostrarToast('Notas guardadas no perfil!', 'sucesso');
-      // Recarregar para mostrar o estado atualizado
       setTimeout(() => carregar(), 800);
     } catch (err) {
       mostrarToast('Erro ao guardar: ' + err.message, 'erro');
     }
   }
 
-  // ── Iniciar ──
+  // ── Percurso Académico — acordeão por ano ──
+  function renderPercurso(disciplinas) {
+    const container = document.getElementById('percursoContainer');
+    const mediaEl   = document.getElementById('percursoMedia');
+    if (!container) return;
+
+    if (!disciplinas.length) {
+      container.innerHTML = '<div class="vazio"><div class="emoji">📚</div>Ainda não tens disciplinas registadas.<br><small>Carrega o PDF do DOMUS ou vai a <a href="editar-perfil.html">Editar Perfil</a>.</small></div>';
+      return;
+    }
+
+    // Média geral
+    const comNota = disciplinas.filter(d => d.nota !== null && d.nota !== undefined);
+    if (comNota.length && mediaEl) {
+      const media = comNota.reduce((s, d) => s + d.nota, 0) / comNota.length;
+      mediaEl.textContent = `Média: ${media.toFixed(1)} · ${comNota.length} disciplinas`;
+    }
+
+    const notaCor = n => n >= 16 ? 'alta' : n >= 13 ? 'media' : n >= 10 ? 'media' : 'baixa';
+    const estadoLabel = { concluida:'Concluída', em_curso:'Em Curso', reprovada:'Reprovada', pendente:'Pendente' };
+
+    // Verificar se as disciplinas têm informação de ano válida (> 1 ano distinto,
+    // ou pelo menos alguma com ano = 2). Se todas tiverem ano = 1 ou undefined,
+    // provavelmente foram guardadas antes do campo "ano" existir — pedir re-upload.
+    const anosDistintos = new Set(disciplinas.map(d => d.ano || 1));
+    const semInfoAno = anosDistintos.size === 1 && disciplinas.some(d => !d.ano || d.ano === 1)
+                       && disciplinas.length > 6; // mais de 6 disciplinas todas no "1º ano" é suspeito
+
+    if (semInfoAno) {
+      container.innerHTML = `
+        <div style="padding:14px 22px;background:var(--amarelo-light);border-bottom:1px solid var(--cinza-linha);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="font-size:0.82rem;font-weight:600;color:var(--amarelo)">⚠️ Para ver as disciplinas separadas por ano, volta a carregar o PDF do DOMUS.</span>
+          <span style="font-size:0.78rem;color:var(--cinza-texto)">(Os dados foram guardados antes desta funcionalidade existir)</span>
+        </div>
+        ${disciplinas.map(d => `
+          <div class="disc-linha">
+            <span class="disc-nome">${d.nome}</span>
+            <span class="disc-nota ${d.nota !== null && d.nota !== undefined ? notaCor(d.nota) : 'vazia'}">${d.nota ?? '—'}</span>
+            <span class="disc-badge ${d.estado}">${estadoLabel[d.estado] || d.estado}</span>
+          </div>`).join('')}`;
+      return;
+    }
+
+    // Agrupar por ano
+    const porAno = {};
+    for (const d of disciplinas) {
+      const a = d.ano || 1;
+      if (!porAno[a]) porAno[a] = [];
+      porAno[a].push(d);
+    }
+
+    container.innerHTML = Object.keys(porAno).sort().map(ano => {
+      const discs = porAno[ano];
+      const comN  = discs.filter(d => d.nota !== null && d.nota !== undefined);
+      const mediaAno = comN.length ? (comN.reduce((s,d) => s + d.nota, 0) / comN.length).toFixed(1) : null;
+      return `
+        <div class="ano-bloco" id="ano-bloco-${ano}">
+          <div class="ano-header" onclick="toggleAno(${ano})">
+            <div class="ano-titulo">
+              <span>${ano}º Ano</span>
+              <span class="ano-badge">${discs.length} disciplina${discs.length !== 1 ? 's' : ''}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+              ${mediaAno ? `<span class="ano-media">Média ${mediaAno}</span>` : ''}
+              <span class="ano-chevron">▼</span>
+            </div>
+          </div>
+          <div class="ano-corpo">
+            ${discs.map(d => `
+              <div class="disc-linha">
+                <span class="disc-nome">${d.nome}</span>
+                <span class="disc-nota ${d.nota !== null && d.nota !== undefined ? notaCor(d.nota) : 'vazia'}">${d.nota ?? '—'}</span>
+                <span class="disc-badge ${d.estado}">${estadoLabel[d.estado] || d.estado}</span>
+              </div>`).join('')}
+          </div>
+        </div>`;
+    }).join('');
+  }
+  function toggleAno(ano) {
+    const bloco = document.getElementById(`ano-bloco-${ano}`);
+    if (bloco) bloco.classList.toggle('aberto');
+  }
+
+    // ── Iniciar ──
   carregar();
 </script>
 </body>

@@ -240,6 +240,7 @@
   <nav class="sidebar-nav">
     <a class="nav-item" onclick="mudarTab('todas')">Todas as Propostas</a>
     <a class="nav-item activo" id="navGestao" onclick="mudarTab('docentes')">Gestão</a>
+    <a class="nav-item" href="minhas-tutorias.html">As Minhas Orientações</a>
   </nav>
   <div class="sidebar-footer">
     <div class="nome" id="sidebarNome">—</div>
@@ -363,7 +364,7 @@
   <div class="modal" style="max-width:420px">
     <div class="modal-topo"></div>
     <div class="modal-header">
-      <div><h2>Tutor Atribuído</h2><div class="sub" id="tutorSub">—</div></div>
+      <div><h2>Orientador Atribuído</h2><div class="sub" id="tutorSub">—</div></div>
       <button class="btn-fechar" onclick="fecharModal('modalTutor')">✕</button>
     </div>
     <div class="modal-body">
@@ -386,18 +387,18 @@
   <div class="modal" style="max-width:460px">
     <div class="modal-topo"></div>
     <div class="modal-header">
-      <div><h2>Atribuir Tutor CCA</h2><div class="sub" id="atribuirSub">—</div></div>
+      <div><h2>Atribuir Orientador</h2><div class="sub" id="atribuirSub">—</div></div>
       <button class="btn-fechar" onclick="fecharModal('modalAtribuir')">✕</button>
     </div>
     <div class="modal-body">
       <div id="alertaAtribuir" class="alerta-modal"></div>
       <div class="linha-modal"></div>
-      <label class="campo-label">Seleccionar docente</label>
+      <label class="campo-label">Selecionar orientador</label>
       <select class="campo-select" id="selectOrientador"><option value="">Selecionar…</option></select>
     </div>
     <div class="modal-footer">
       <button class="btn-m-cancelar" onclick="fecharModal('modalAtribuir')">Cancelar</button>
-      <button class="btn-m-azul" id="btnConfirmarAtribuir" onclick="confirmarAtribuir()">Atribuir Tutor</button>
+      <button class="btn-m-azul" id="btnConfirmarAtribuir" onclick="confirmarAtribuir()">Atribuir Orientador</button>
     </div>
   </div>
 </div>
@@ -897,9 +898,9 @@
             ? `<span class="badge-votado">✔ ${meuVoto === 'aprovado' ? 'Aprovou' : 'Rejeitou'}</span>`
             : `<button class="btn-aprovar" onclick="aprovar('${p._id}','${p.titulo.replace(/'/g,"\\'")}','')">Aprovar</button><button class="btn-rejeitar" onclick="abrirRejeitar('${p._id}','${p.titulo.replace(/'/g,"\\'")}','')">Rejeitar</button>`;
         } else if (p.estado === 'aprovada') {
-          botoesAcao = `<button class="btn-atribuir" onclick="abrirAtribuir('${p._id}','${p.titulo.replace(/'/g,"\\'")}')">Atribuir Tutor</button>`;
+          botoesAcao = `<button class="btn-atribuir" onclick="abrirAtribuir('${p._id}','${p.titulo.replace(/'/g,"\\'")}')">Atribuir Orientador</button>`;
         } else if (p.estado === 'atribuida') {
-          const nomeOrient = p.orientadorId?.nome || 'Tutor atribuído';
+          const nomeOrient = p.orientadorId?.nome || 'Orientador atribuído';
           const emailOrient = (p.orientadorId?.email || '').replace(/'/g,"\\'");
           botoesAcao = `<span style="display:inline-flex;align-items:center;gap:6px;background:var(--azul-light);color:var(--azul);border-radius:6px;padding:5px 12px;font-size:0.76rem;font-weight:700;cursor:pointer" onclick="abrirTutor('${nomeOrient.replace(/'/g,"\\'")}','${emailOrient}')">&#128104;&#8205;&#127979; ${nomeOrient}</span>`;
 
@@ -1032,8 +1033,8 @@
     try {
       const dados = await req('/cca/docentes');
       if (!dados.sucesso) throw new Error(dados.mensagem);
-      document.getElementById('selectOrientador').innerHTML = '<option value="">Selecionar docente…</option>' +
-        dados.docentes.map(d => `<option value="${d._id}">${d.nome} — ${d.email}</option>`).join('');
+      document.getElementById('selectOrientador').innerHTML = '<option value="">Selecionar orientador…</option>' +
+        dados.docentes.map(d => `<option value="${d._id}">[${d.tipo}] ${d.nome} — ${d.email}</option>`).join('');
     } catch (err) { document.getElementById('selectOrientador').innerHTML = `<option value="">Erro: ${err.message}</option>`; }
   }
 
@@ -1048,8 +1049,8 @@
       if (!dados.sucesso) throw new Error(dados.mensagem);
       al.textContent = 'Orientador atribuído!'; al.className = 'alerta-modal sucesso';
       btn.innerHTML = '✔ Atribuído';
-      setTimeout(() => { fecharModal('modalAtribuir'); btn.disabled = false; btn.textContent = 'Atribuir Tutor'; mudarTab(tabActiva); }, 1200);
-    } catch (err) { al.textContent = err.message; al.className = 'alerta-modal erro'; btn.disabled = false; btn.textContent = 'Atribuir Tutor'; }
+      setTimeout(() => { fecharModal('modalAtribuir'); btn.disabled = false; btn.textContent = 'Atribuir Orientador'; mudarTab(tabActiva); }, 1200);
+    } catch (err) { al.textContent = err.message; al.className = 'alerta-modal erro'; btn.disabled = false; btn.textContent = 'Atribuir Orientador'; }
   }
 
   // ══ DOCENTES ══
@@ -1059,7 +1060,7 @@
       const sel = document.getElementById('selectDocente');
       if (sel && dads.sucesso) {
         sel.innerHTML = dads.docentes.length
-          ? '<option value="">Selecionar docente…</option>' + dads.docentes.map(d => `<option value="${d._id}">${d.nome} — ${d.email}</option>`).join('')
+          ? '<option value="">Selecionar orientador…</option>' + dads.docentes.map(d => `<option value="${d._id}">${d.nome} — ${d.email}</option>`).join('')
           : '<option value="">Sem docentes disponíveis</option>';
       }
     } catch {}

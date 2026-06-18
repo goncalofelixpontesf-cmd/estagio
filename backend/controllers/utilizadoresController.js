@@ -13,6 +13,40 @@ exports.obterPerfil = async (req, res) => {
     if (utilizador.perfil === 'estudante') {
       dadosExtra = await Estudante.findOne({ utilizadorId: utilizador._id })
         .populate('propostaEscolhidaId', 'titulo');
+
+      // Atualização automática de ano para estudantes de Licenciatura:
+      // DTAM → sempre 2º ano (fixo, nunca muda)
+      // Lic. TSI Web → começa no 2º, passa para o 3º ao fim de 6 meses
+      if (dadosExtra) {
+        let novoAno = dadosExtra.ano;
+
+        if (dadosExtra.curso === 'TeSP DTAM') {
+          novoAno = 2; // fixo — DTAM é sempre 2º ano
+        } else if (dadosExtra.curso === 'Lic. TSI Web') {
+          if (dadosExtra.dataInicioLicenciatura) {
+            const mesesDecorridos = (Date.now() - new Date(dadosExtra.dataInicioLicenciatura).getTime())
+              / (1000 * 60 * 60 * 24 * 30.44);
+            novoAno = mesesDecorridos >= 6 ? 3 : 2;
+          } else {
+            // Conta criada antes de existir o campo dataInicioLicenciatura —
+            // garantir pelo menos o 2º ano e guardar a data de hoje para
+            // que a transição para o 3º ano passe a funcionar daqui em diante.
+            novoAno = 2;
+            await Estudante.findOneAndUpdate(
+              { utilizadorId: utilizador._id },
+              { dataInicioLicenciatura: new Date() }
+            );
+          }
+        }
+
+        if (novoAno !== dadosExtra.ano) {
+          await Estudante.findOneAndUpdate(
+            { utilizadorId: utilizador._id },
+            { ano: novoAno }
+          );
+          dadosExtra.ano = novoAno; // actualizar o objecto local para a resposta
+        }
+      }
     } else if (utilizador.perfil === 'entidade') {
       dadosExtra = await Entidade.findOne({ utilizadorId: utilizador._id });
     }
@@ -58,8 +92,31 @@ exports.editarPerfil = async (req, res) => {
     }
 
     const utilizador = await Utilizador.findById(req.utilizador._id);
-    const dadosExtra = await Estudante.findOne({ utilizadorId: utilizador._id })
+    let dadosExtra = await Estudante.findOne({ utilizadorId: utilizador._id })
       .populate('propostaEscolhidaId', 'titulo');
+
+    // Aplicar a mesma lógica de ano correto do GET /perfil
+    if (dadosExtra) {
+      let novoAno = dadosExtra.ano;
+      if (dadosExtra.curso === 'TeSP DTAM') {
+        novoAno = 2;
+      } else if (dadosExtra.curso === 'Lic. TSI Web') {
+        if (dadosExtra.dataInicioLicenciatura) {
+          const meses = (Date.now() - new Date(dadosExtra.dataInicioLicenciatura).getTime()) / (1000 * 60 * 60 * 24 * 30.44);
+          novoAno = meses >= 6 ? 3 : 2;
+        } else {
+          novoAno = 2;
+          await Estudante.findOneAndUpdate(
+            { utilizadorId: utilizador._id },
+            { dataInicioLicenciatura: new Date() }
+          );
+        }
+      }
+      if (novoAno !== dadosExtra.ano) {
+        await Estudante.findOneAndUpdate({ utilizadorId: utilizador._id }, { ano: novoAno });
+        dadosExtra.ano = novoAno;
+      }
+    }
 
     res.json({ sucesso: true, utilizador, dadosExtra });
   } catch (err) {
@@ -80,20 +137,8 @@ exports.uploadCV = async (req, res) => {
       return res.status(404).json({ sucesso: false, mensagem: 'Perfil de estudante não encontrado.' });
     }
 
-    // Apagar CV anterior se existir — nunca deixar isto bloquear o upload do
-    // novo ficheiro (ex: se o OneDrive/antivírus estiver a "agarrar" o
-    // ficheiro antigo por um instante, isto não pode impedir o resto).
-    if (estudante.cv) {
-      const caminhoAntigo = path.join(__dirname, '..', 'CV', estudante.cv);
-      try {
-        if (fs.existsSync(caminhoAntigo)) fs.unlinkSync(caminhoAntigo);
-      } catch (errApagar) {
-        console.warn('[uploadCV] Não foi possível apagar o CV antigo (ficheiro talvez bloqueado):', errApagar.message);
-      }
-    }
-
-    // Gravar já o CV (sem esperar pelo Cloudinary) — isto é o que importa
-    // mesmo, e tem de responder ao browser sem demora.
+    // O ficheiro é sempre guardado com o mesmo nome (cv-<id>.pdf), por isso
+    // sobrescreve automaticamente o anterior em disco — sem apagar, sem conflitos.
     await Estudante.findOneAndUpdate(
       { utilizadorId: req.utilizador._id },
       { cv: req.file.filename }
@@ -106,10 +151,7 @@ exports.uploadCV = async (req, res) => {
       mensagem: 'CV guardado com sucesso.'
     });
 
-    // Backup no Cloudinary — corre DEPOIS de já ter respondido ao browser,
-    // em segundo plano. Mesmo que demore muito ou falhe, nunca bloqueia o
-    // upload nem o utilizador fica à espera. "void" porque deliberadamente
-    // não esperamos por esta promise.
+    // Backup no Cloudinary em segundo plano — não bloqueia a resposta
     const publicId = path.parse(req.file.filename).name;
     enviarBackupCV(req.file.path, publicId)
       .then(cvCloudinaryUrl => {
@@ -120,7 +162,7 @@ exports.uploadCV = async (req, res) => {
           );
         }
       })
-      .catch(err => console.error('[uploadCV] Backup Cloudinary falhou em segundo plano:', err.message));
+      .catch(err => console.error('[uploadCV] Backup Cloudinary falhou:', err.message));
 
   } catch (err) {
     console.error('[uploadCV] Erro:', err);

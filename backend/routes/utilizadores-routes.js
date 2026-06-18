@@ -9,8 +9,14 @@ const { proteger } = require('../middleware/auth');
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, path.join(__dirname, '..', 'CV')),
   filename:    (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `cv-${req.utilizador._id}-${Date.now()}${ext}`);
+    // Usar o nome original do ficheiro, mas sanitizado para remover caracteres
+    // problemáticos e garantir que não há conflitos entre utilizadores diferentes.
+    const nomeOriginal = path.basename(file.originalname, path.extname(file.originalname))
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remover acentos
+      .replace(/[^a-zA-Z0-9\s-_]/g, '')                // só letras, números, espaços, - e _
+      .trim().replace(/\s+/g, '_')                       // espaços → underscores
+      .substring(0, 60);                                 // máx. 60 caracteres
+    cb(null, `${nomeOriginal}.pdf`);
   }
 });
 const uploadCV = multer({

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESMAD — As Minhas Tutorias</title>
+  <title>ESMAD</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="favicon.ico">
   <style>
@@ -156,6 +156,14 @@
     .badge-cand-estado.aceite::before { background: var(--verde); }
     .badge-cand-estado.rejeitada { background: var(--vermelho-light); color: var(--vermelho); }
     .badge-cand-estado.rejeitada::before { background: var(--vermelho); }
+
+    /* Aviso de conflito orientador = tutor entidade */
+    .aviso-conflito {
+      background: #FFF3CD; border: 1.5px solid #FFCC00;
+      border-radius: 8px; padding: 10px 14px;
+      font-size: 0.78rem; color: #7a5800; font-weight: 600;
+      margin-top: 10px; display: flex; align-items: center; gap: 8px;
+    }
   </style>
 </head>
 <body>
@@ -165,14 +173,12 @@
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo"><span>ESMAD</span></div>
-  <nav class="sidebar-nav">
-    <a class="nav-item" href="dashboard-entidade.html">As Minhas Propostas</a>
-    <a class="nav-item activo">As Minhas Tutorias</a>
-    <a class="nav-item" href="entrevistas.html">Entrevistas</a>
+  <nav class="sidebar-nav" id="sidebarNav">
+    <!-- preenchido via JS conforme perfil -->
   </nav>
   <div class="sidebar-footer">
     <div class="nome" id="sidebarNome">—</div>
-    <div class="perfil">Docente</div>
+    <div class="perfil" id="sidebarPerfilLabel">—</div>
   </div>
 </aside>
 
@@ -180,8 +186,8 @@
   <div class="topbar">
     <div class="topbar-left"></div>
     <div class="topbar-centro">
-      <div class="titulo">As Minhas Tutorias</div>
-      <div class="subtitulo">Propostas em que és tutor CCA</div>
+      <div class="titulo">As Minhas Orientações</div>
+      <div class="subtitulo">Propostas em que é orientador</div>
     </div>
     <div class="avatar" id="avatar">?</div>
   </div>
@@ -248,9 +254,22 @@
   if (!token || !user) { window.location.href = 'login.html'; }
 
   const utilizador = JSON.parse(user);
-  if (utilizador.perfil !== 'docente') { window.location.href = 'login.html'; }
+  if (!['docente','comissao','admin'].includes(utilizador.perfil)) { window.location.href = 'login.html'; }
 
   document.getElementById('sidebarNome').textContent = utilizador.nome;
+  document.getElementById('sidebarPerfilLabel').textContent =
+    utilizador.perfil === 'docente' ? 'Docente'
+    : utilizador.perfil === 'comissao' ? 'Comissão CCA'
+    : 'Administrador';
+
+  // Nav links consoante o perfil
+  const eCCA = ['comissao','admin'].includes(utilizador.perfil);
+  document.getElementById('sidebarNav').innerHTML = eCCA
+    ? `<a class="nav-item" href="gestao-cca.html">Painel CCA</a>
+       <a class="nav-item activo">As Minhas Orientações</a>`
+    : `<a class="nav-item" href="dashboard-entidade.html">As Minhas Propostas</a>
+       <a class="nav-item activo">As Minhas Orientações</a>
+       <a class="nav-item" href="entrevistas.html">Entrevistas</a>`;
   document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
   document.getElementById('avatar').addEventListener('click', () => {
     if (confirm('Tens a certeza que queres fazer logout?')) { localStorage.clear(); window.location.href = 'login.html'; }
@@ -293,7 +312,7 @@
       document.getElementById('statsGrid').innerHTML = `
         <div class="stat-card azul">
           <div class="num">${propostasRich.length}</div>
-          <div class="label">Total de Tutorias</div>
+          <div class="label">Total de Orientações</div>
         </div>
         <div class="stat-card verde">
           <div class="num">${comEstudante}</div>
@@ -310,14 +329,14 @@
         lista.innerHTML = `
           <div class="vazio">
             <div class="emoji">👨‍🏫</div>
-            <p>Ainda não foste atribuído como tutor a nenhuma proposta.</p>
-            <p style="margin-top:8px;font-size:0.8rem">A CCA atribui tutores às propostas aprovadas.</p>
+            <p>Ainda não foi atribuído como orientador a nenhuma proposta.</p>
+            <p style="margin-top:8px;font-size:0.8rem">A CCA atribui orientadores às propostas aprovadas.</p>
           </div>`;
         return;
       }
 
       lista.innerHTML = `<div class="tutorias-grid">${propostasRich.map(p => {
-        const tipo = p.tipo === 'estagio' ? 'Estágio' : 'Projecto';
+        const tipo = p.tipo === 'estagio' ? 'Estágio' : 'Projeto';
         const estado = p.estado;
         const estadoLabel = { atribuida: 'Atribuída', aprovada: 'Aprovada' };
         const areas = (p.areas || []).slice(0, 3).map(a => `<span class="area-tag">${a}</span>`).join('');
@@ -341,6 +360,11 @@
                     <div class="sec-label">Tutor na Entidade</div>
                     <div class="sec-valor ${p.tutorNome ? '' : 'sem'}">${p.tutorNome ? `${p.tutorNome}${p.tutorCargo ? ' · ' + p.tutorCargo : ''}` : 'Não definido'}</div>
                   </div>
+                  ${(p.tutorEmail && utilizador.email && p.tutorEmail.toLowerCase() === utilizador.email.toLowerCase())
+                    ? `<div class="aviso-conflito" style="grid-column:1/-1">
+                        ⚠️ Atenção: és simultaneamente orientador e tutor na entidade desta proposta — estes papéis devem ser desempenhados por pessoas diferentes.
+                       </div>`
+                    : ''}
                   <div class="tutoria-secao">
                     <div class="sec-label">Candidatos</div>
                     <div class="sec-valor">${p.totalCandidatos || 0} candidato${p.totalCandidatos !== 1 ? 's' : ''}</div>

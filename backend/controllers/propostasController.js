@@ -95,22 +95,31 @@ exports.obter = async (req, res) => {
 // POST /api/propostas
 exports.criar = async (req, res) => {
   try {
+    // Se quem submete é um docente, é automaticamente orientador da proposta.
+    // Não há necessidade de a CCA fazer a atribuição manualmente depois.
+    const eDocente = req.utilizador.perfil === 'docente';
+
     const proposta = await Proposta.create({
       ...req.body,
       proponenteId:   req.utilizador._id,
       tipoProponente: req.utilizador.perfil,
-      estado: 'pendente'
+      estado:         eDocente ? 'aprovada' : 'pendente',
+      orientadorId:   eDocente ? req.utilizador._id : undefined
     });
 
     // Notificar membros da CCA
+    const Notificacao = require('../models/Notificacao');
     const membros = await Utilizador.find({ perfil: 'comissao', ativo: true });
     if (membros.length) {
-      const Notificacao = require('../models/Notificacao');
+      const tipoNotif = eDocente ? 'proposta_aprovada' : 'nova_proposta';
+      const msgNotif  = eDocente
+        ? `O docente ${req.utilizador.nome} submeteu e ficou automaticamente como orientador da proposta "${proposta.titulo}".`
+        : `Nova proposta submetida: "${proposta.titulo}"`;
       await Notificacao.insertMany(membros.map(m => ({
         destinatarioId: m._id,
-        tipo: 'nova_proposta',
-        mensagem: `Nova proposta submetida: "${proposta.titulo}"`,
-        referenciaId: proposta._id
+        tipo:           tipoNotif,
+        mensagem:       msgNotif,
+        referenciaId:   proposta._id
       })));
     }
 

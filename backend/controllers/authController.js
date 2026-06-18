@@ -71,10 +71,13 @@ exports.registo = async (req, res) => {
     }
 
     if (perfil === 'estudante') {
+      const cursoFinal = curso || 'TeSP DTAM';
+      const eLicenciatura = cursoFinal === 'Lic. TSI Web';
       await Estudante.create({
         utilizadorId: utilizador._id,
-        curso: curso || 'TeSP DTAM',
-        ano: 1
+        curso: cursoFinal,
+        ano: 2,  // sempre 2 — DTAM fica sempre no 2º, Licenciatura começa no 2º
+        dataInicioLicenciatura: eLicenciatura ? new Date() : null
       });
     } else if (perfil === 'entidade') {
       await Entidade.create({

@@ -206,9 +206,21 @@ exports.atribuirOrientador = async (req, res) => {
 };
 
 // GET /api/cca/docentes — para dropdown de atribuir orientador
+// GET /api/cca/docentes — docentes E membros CCA disponíveis como orientadores
 exports.listarDocentes = async (req, res) => {
   try {
-    const docentes = await Utilizador.find({ perfil: 'docente', ativo: true }, 'nome email');
+    // Orientador pode ser docente ou membro da comissão
+    const candidatos = await Utilizador.find(
+      { perfil: { $in: ['docente', 'comissao', 'admin'] }, ativo: true },
+      'nome email perfil'
+    ).sort({ perfil: 1, nome: 1 });
+    // Devolver com rótulo de perfil para o select ficar mais legível
+    const docentes = candidatos.map(u => ({
+      _id:   u._id,
+      nome:  u.nome,
+      email: u.email,
+      tipo:  u.perfil === 'docente' ? 'Docente' : 'CCA'
+    }));
     res.json({ sucesso: true, docentes });
   } catch (err) {
     res.status(500).json({ sucesso: false, mensagem: err.message });

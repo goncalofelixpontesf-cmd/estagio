@@ -14,10 +14,14 @@ const estudanteSchema = new mongoose.Schema({
   },
   ano: {
     type: Number,
-    min: 1,
+    min: 2,
     max: 3,
-    default: 1
+    default: 2   // mínimo é sempre 2 — nenhum estudante entra no 1º ano
   },
+  // Guarda a data em que o estudante de Licenciatura criou conta.
+  // Ao fim de 6 meses, o ano é automaticamente atualizado de 2 para 3
+  // quando o perfil é carregado (ver utilizadoresController.js → perfil).
+  dataInicioLicenciatura: { type: Date, default: null },
   mediaFinal: {
     type: Number,
     min: 0,
@@ -32,7 +36,8 @@ const estudanteSchema = new mongoose.Schema({
   disciplinas: [{
     nome:   { type: String, required: true },
     nota:   { type: Number, default: null },
-    estado: { type: String, enum: ['concluida', 'em_curso', 'reprovada', 'pendente'], default: 'pendente' }
+    estado: { type: String, enum: ['concluida', 'em_curso', 'reprovada', 'pendente'], default: 'pendente' },
+    ano:    { type: Number, default: 1 }
   }],
 
   // Ficheiro PDF do CV — guarda apenas o nome do ficheiro (ex: cv-<id>-<timestamp>.pdf)

@@ -240,8 +240,8 @@
   <nav class="sidebar-nav">
     <a class="nav-item activo" id="navPropostas" onclick="mostrarSecao('propostas')">As Minhas Propostas</a>
     <a class="nav-item" href="estudantes-interessados.html">Estudantes Interessados</a>
-    <a class="nav-item" href="minhas-tutorias.html" id="navTutorias" style="display:none">As Minhas Tutorias</a>
-    <a class="nav-item" href="entrevistas.html">Entrevistas</a>
+    <a class="nav-item" href="minhas-tutorias.html" id="navTutorias" style="display:none">As Minhas Orientações</a>
+    <a class="nav-item" href="entrevistas-entidade.html">Entrevistas</a>
   </nav>
   <div class="sidebar-footer">
     <div class="nome" id="sidebarNome">—</div>
@@ -686,6 +686,14 @@
     mpDados = { nomeEntidade:'', emailContacto:'', moradaEntidade:'', moradaLocal:'', tutorNome:'', tutorEmail:'', tutorCargo:'', curso: mpCurso, tipo:'estagio', areas:[], titulo:'', objetivos:'', resultados:'', plano:'', perfilCand:'', plugIN: false };
     req('/utilizadores/perfil').then(r => {
       if (r.sucesso && r.dadosExtra?.curso) { mpCurso = r.dadosExtra.curso; mpDados.curso = mpCurso; }
+      // Docente que submete é automaticamente orientador — pré-preencher os campos
+      // do tutor na entidade com os dados do próprio docente (e torná-los readonly).
+      if (utilizador.perfil === 'docente') {
+        const u = r.utilizador || {};
+        mpDados.tutorNome  = u.nome  || utilizador.nome  || '';
+        mpDados.tutorEmail = u.email || utilizador.email || '';
+        mpDados.tutorCargo = 'Docente ESMAD';
+      }
       mpIniciarModal();
     }).catch(() => mpIniciarModal());
   }
@@ -761,11 +769,15 @@
         <div class="form-campo"><label>Morada da entidade <span class="obg">*</span></label><input class="mp-input" type="text" id="f2" value="${esc(mpDados.moradaEntidade)}" placeholder="Rua, n.º, Cidade"></div>
         <div class="form-campo"><label>Morada do local de estágio</label><input class="mp-input" type="text" id="f3" value="${esc(mpDados.moradaLocal)}" placeholder="Se diferente da entidade"></div>
         </div>`;
-      case 1: return `<div class="form-grid">
-        <div class="form-campo"><label>Nome do tutor <span class="obg">*</span></label><input class="mp-input" type="text" id="f0" value="${esc(mpDados.tutorNome)}" placeholder="Nome completo"></div>
-        <div class="form-campo"><label>Email do tutor <span class="obg">*</span></label><input class="mp-input" type="email" id="f1" value="${esc(mpDados.tutorEmail)}" placeholder="tutor@empresa.pt"></div>
+      case 1: {
+        const eDocTutor = utilizador.perfil === 'docente';
+        return `<div class="form-grid">
+        <div class="form-campo"><label>Nome do orientador <span class="obg">*</span></label><input class="mp-input${eDocTutor ? ' readonly' : ''}" type="text" id="f0" value="${esc(mpDados.tutorNome)}" placeholder="Nome completo"${eDocTutor ? ' readonly' : ''}></div>
+        <div class="form-campo"><label>Email do orientador <span class="obg">*</span></label><input class="mp-input${eDocTutor ? ' readonly' : ''}" type="email" id="f1" value="${esc(mpDados.tutorEmail)}" placeholder="orientador@esmad.ipp.pt"${eDocTutor ? ' readonly' : ''}></div>
         </div>
-        <div class="form-campo" style="margin-top:14px"><label>Cargo do tutor</label><input class="mp-input" type="text" id="f2" value="${esc(mpDados.tutorCargo)}" placeholder="Ex: Diretor de Tecnologia"></div>`;
+        <div class="form-campo" style="margin-top:14px"><label>Cargo</label><input class="mp-input${eDocTutor ? ' readonly' : ''}" type="text" id="f2" value="${esc(mpDados.tutorCargo)}" placeholder="Ex: Diretor de Tecnologia"${eDocTutor ? ' readonly' : ''}></div>
+        ${eDocTutor ? '<p style="margin-top:12px;font-size:0.78rem;color:var(--cinza-texto);font-style:italic">👨‍🏫 Como docente que submete esta proposta, fica automaticamente como orientador.</p>' : ''}`;
+      }
       case 2: return `<div class="form-grid" style="margin-bottom:16px">
         <div class="form-campo"><label>Curso destinatário <span class="obg">*</span></label><input class="mp-input readonly" type="text" readonly value="${esc(mpDados.curso)}"><p class="campo-nota">Definido pelo curso do proponente.</p></div>
         <div class="form-campo"><label>Tipo de proposta <span class="obg">*</span></label><select class="mp-select" id="f0"><option value="estagio"${mpDados.tipo==='estagio'?' selected':''}>Estágio</option><option value="projecto"${mpDados.tipo==='projecto'?' selected':''}>Projecto</option></select></div>
@@ -854,15 +866,15 @@
       case 0:
         if (!mpDados.nomeEntidade)  return err('O nome da entidade é obrigatório.');
         if (!mpDados.emailContacto) return err('O email de contacto é obrigatório.');
-        if (!emailValido(mpDados.emailContacto)) return err('Introduz um email de contacto válido (ex: info@empresa.pt).');
+        if (!emailValido(mpDados.emailContacto)) return err('Introduza um email de contacto válido (ex: info@empresa.pt).');
         if (!mpDados.moradaEntidade) return err('A morada da entidade é obrigatória.');
         break;
       case 1:
         if (!mpDados.tutorNome)  return err('O nome do tutor é obrigatório.');
         if (!mpDados.tutorEmail) return err('O email do tutor é obrigatório.');
-        if (!emailValido(mpDados.tutorEmail)) return err('Introduz um email de tutor válido (ex: tutor@empresa.pt).');
+        if (!emailValido(mpDados.tutorEmail)) return err('Introduza um email de tutor válido (ex: tutor@empresa.pt).');
         break;
-      case 2: if (!mpDados.areas.length) return err('Seleciona pelo menos uma área.'); if (!mpDados.titulo) return err('O título da proposta é obrigatório.'); break;
+      case 2: if (!mpDados.areas.length) return err('Selecione pelo menos uma área.'); if (!mpDados.titulo) return err('O título da proposta é obrigatório.'); break;
       case 3: if (!mpDados.objetivos) return err('Os objetivos são obrigatórios.'); break;
       case 4: if (!mpDados.resultados) return err('Os resultados esperados são obrigatórios.'); break;
     }
