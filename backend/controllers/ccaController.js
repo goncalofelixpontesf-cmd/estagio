@@ -315,52 +315,70 @@ exports.actualizarCursosMembro = async (req, res) => {
   }
 };
 
-// POST /api/cca/convite — convidar por email
+// POST /api/cca/convite — convidar docente para a CCA
 exports.enviarConvite = async (req, res) => {
   try {
     const { email, cursosCCA } = req.body;
     if (!email) return res.status(400).json({ sucesso: false, mensagem: 'Email obrigatório.' });
-    if (!cursosCCA || cursosCCA.length === 0) return res.status(400).json({ sucesso: false, mensagem: 'Selecciona pelo menos um curso.' });
+    if (!cursosCCA || cursosCCA.length === 0) return res.status(400).json({ sucesso: false, mensagem: 'Selecione pelo menos um curso.' });
 
+    // Só aceitar endereços @esmad.ipp.pt
     const emailLower = email.toLowerCase();
+    if (!emailLower.endsWith('@esmad.ipp.pt')) {
+      return res.status(400).json({ sucesso: false, mensagem: 'Apenas são aceites endereços @esmad.ipp.pt.' });
+    }
 
-    // Se já tem conta, promover directamente
+    // Se o docente já tem conta, promovê-lo diretamente sem enviar email
     const existe = await Utilizador.findOne({ email: emailLower });
     if (existe) {
-      if (existe.perfil === 'comissao') return res.status(400).json({ sucesso: false, mensagem: 'Já é membro da CCA.' });
+      if (existe.perfil === 'estudante') {
+        return res.status(400).json({ sucesso: false, mensagem: 'Este endereço pertence a uma conta de estudante e não pode ser adicionado à CCA.' });
+      }
+      if (existe.perfil === 'comissao') {
+        return res.status(400).json({ sucesso: false, mensagem: 'Este docente já é membro da CCA.' });
+      }
       existe.perfil    = 'comissao';
       existe.cursosCCA = cursosCCA;
       await existe.save();
-      return res.json({ sucesso: true, mensagem: `${existe.nome} já tinha conta e foi adicionado à CCA.`, utilizador: existe });
+      return res.json({
+        sucesso: true,
+        jaExistia: true,
+        mensagem: `${existe.nome} já tinha conta e foi adicionado à CCA diretamente.`,
+        utilizador: existe
+      });
     }
 
-    // Sem conta — guardar convite pendente (promoção automática quando se registar)
+    // Sem conta — guardar convite para promoção automática quando se registar
     await Convite.findOneAndUpdate(
       { email: emailLower },
       { email: emailLower, cursosCCA, convidadoPor: req.utilizador._id },
       { upsert: true, new: true }
     );
 
-    // Enviar email real com link para a página de registo
-    // FRONTEND_URL deve apontar para a pasta "pages" (ex: http://127.0.0.1:5500/pages)
-    const baseUrl = (process.env.FRONTEND_URL || 'http://127.0.0.1:5500/pages').replace(/\/$/, '');
+    // Enviar email via Outlook (SMTP Office365)
+    const baseUrl = (process.env.FRONTEND_URL || '').replace(/\/$/, '');
     const linkRegisto = `${baseUrl}/registo.html?email=${encodeURIComponent(emailLower)}&perfil=docente`;
 
     try {
       await enviarEmail({
         to: emailLower,
-        subject: 'Convite para a Comissão de Acompanhamento — ESMAD',
+        subject: 'Convite para a Comissão de Coordenação Académica — ESMAD',
         html: templateConviteCCA({ cursosCCA, linkRegisto })
       });
-    } catch (emailErr) {
-      // O convite ficou guardado mesmo que o email falhe — o docente é promovido ao registar-se
       return res.json({
         sucesso: true,
-        mensagem: `Convite guardado para ${email}, mas o email não pôde ser enviado (${emailErr.message}). Quando o docente se registar com este email, será automaticamente adicionado à CCA.`
+        jaExistia: false,
+        mensagem: `Email de convite enviado para ${email} via Outlook. Quando o docente criar conta será automaticamente adicionado à CCA.`
+      });
+    } catch (emailErr) {
+      // Convite guardado mas email falhou — informar sem bloquear
+      return res.json({
+        sucesso: true,
+        jaExistia: false,
+        erroEmail: true,
+        mensagem: `Convite registado para ${email}, mas o email não pôde ser enviado (${emailErr.message}). Verifique as credenciais Outlook no .env.`
       });
     }
-
-    res.json({ sucesso: true, mensagem: `Email de convite enviado para ${email}. Quando o docente criar conta, será automaticamente adicionado à CCA.` });
   } catch (err) {
     res.status(500).json({ sucesso: false, mensagem: err.message });
   }

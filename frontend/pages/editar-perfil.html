@@ -298,7 +298,7 @@
     <div class="topbar-left"></div>
     <div class="topbar-centro">
       <div class="titulo">Editar Perfil</div>
-      <div class="subtitulo">Atualiza os teus dados pessoais e académicos</div>
+      <div class="subtitulo">Atualize os seus dados pessoais e académicos</div>
     </div>
     <div class="avatar" id="avatar">?</div>
   </div>
@@ -331,7 +331,7 @@
   <div class="modal-confirm">
     <div class="icone">🗑️</div>
     <h3>Remover CV?</h3>
-    <p>Tens a certeza que queres remover o teu CV? Esta ação não pode ser desfeita.</p>
+    <p>Tem a certeza que quer remover o seu CV? Esta ação não pode ser desfeita.</p>
     <div class="modal-confirm-acoes">
       <button class="btn-modal-cancelar" onclick="fecharModalRemoverCV()">Cancelar</button>
       <button class="btn-modal-confirmar" id="btnConfirmarRemoverCV" onclick="confirmarRemoverCV()">Remover</button>
@@ -358,10 +358,7 @@
   document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
 
   document.getElementById('avatar').addEventListener('click', () => {
-    if (confirm('Tens a certeza que queres fazer logout?')) {
-      localStorage.clear();
-      window.location.href = 'login.html';
-    }
+    abrirModalLogout();
   });
 
   const sidebar = document.getElementById('sidebar');
@@ -472,15 +469,16 @@
 
       <!-- CV -->
       <div class="painel-secao">
-        <div class="secao-titulo">CV</div>
-        <div class="upload-zona ${cvNome ? 'tem' : ''}" id="zonaCV" onclick="document.getElementById('inputCV').click()">
+        <div class="secao-titulo">Curriculum Vitae</div>
+        <div class="upload-zona ${cvNome ? 'tem' : ''}" id="zonaCV" onclick="document.getElementById('inputCV').value=''; document.getElementById('inputCV').click()">
           <div class="icone">${cvNome ? '✅' : '📄'}</div>
           <div class="texto">
             ${cvNome
-              ? `<strong>${cvNome}</strong>Clica para substituir`
-              : `<strong>Clica para fazer upload do teu CV</strong>PDF, máx. 5MB`}
+              ? `<strong>${cvNome}</strong>Clique para substituir`
+              : `<strong>Clique para fazer o upload do seu CV</strong>PDF · máx. 5MB`}
           </div>
         </div>
+        ${cvNome ? `<button type="button" class="btn-remover-cv" id="btnRemoverCV" onclick="removerCV()">🗑️ Remover CV</button>` : ''}
       </div>
 
       <!-- Footer -->
@@ -504,7 +502,7 @@
     const zona = document.getElementById('zonaCV');
     if (zona) {
       zona.className = 'upload-zona tem';
-      zona.innerHTML = `<div class="icone">✅</div><div class="texto"><strong>${file.name}</strong>Clica para substituir</div>`;
+      zona.innerHTML = `<div class="icone">✅</div><div class="texto"><strong>${file.name}</strong>Clique para substituir</div>`;
     }
   }
 
@@ -599,6 +597,36 @@
   }
 
   carregar();
+
+  function abrirModalLogout() {
+    const m = document.getElementById('modalLogout');
+    m.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+  function fecharModalLogout() {
+    const m = document.getElementById('modalLogout');
+    m.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  function confirmarLogout() {
+    localStorage.clear();
+    window.location.href = 'login.html';
+  }
 </script>
+
+<!-- MODAL LOGOUT -->
+<div class="modal-overlay" id="modalLogout" onclick="if(event.target===this) fecharModalLogout()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;padding:0;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.2);overflow:hidden">
+    <div style="height:5px;background:#C00000;border-radius:14px 14px 0 0"></div>
+    <div style="padding:26px 26px 0">
+      <div style="font-size:1rem;font-weight:800;margin-bottom:8px">Terminar Sessão</div>
+      <p style="font-size:0.86rem;color:#888;line-height:1.6">Tem a certeza que quer terminar a sessão? Terá de voltar a iniciar sessão para aceder à plataforma.</p>
+    </div>
+    <div style="padding:20px 26px 24px;display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="fecharModalLogout()" style="background:#F0F0F0;color:#555;border:none;border-radius:8px;padding:10px 20px;font-family:Inter,sans-serif;font-size:0.84rem;font-weight:500;cursor:pointer">Cancelar</button>
+      <button onclick="confirmarLogout()" style="background:#C00000;color:#fff;border:none;border-radius:8px;padding:10px 22px;font-family:Inter,sans-serif;font-size:0.84rem;font-weight:700;cursor:pointer">Terminar Sessão</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

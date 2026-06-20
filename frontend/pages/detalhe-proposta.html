@@ -464,7 +464,7 @@
   <div class="sidebar-logo"><span>ESMAD</span></div>
   <nav class="sidebar-nav">
     <a class="nav-item activo" href="lista-propostas.html">Propostas</a>
-    <a class="nav-item" href="candidaturas.html">As Minhas Candidaturas</a>
+    <a class="nav-item" href="entrevistas.html">As Minhas Candidaturas</a>
     <a class="nav-item" href="perfil-estudante.html">O Meu Perfil</a>
   </nav>
   <div class="sidebar-footer">
@@ -547,10 +547,7 @@
 
   // Avatar logout
   document.getElementById('avatar').addEventListener('click', () => {
-    if (confirm('Tens a certeza que queres fazer logout?')) {
-      localStorage.clear();
-      window.location.href = 'login.html';
-    }
+    abrirModalLogout();
   });
 
   // Mobile sidebar
@@ -770,7 +767,7 @@
 
       <div class="card-acao">
         <h3>Tens interesse?</h3>
-        <p>Clica para manifestares o teu interesse nesta proposta.</p>
+        <p>Clique para manifestar o seu interesse nesta proposta.</p>
         <div id="alertaAcao" class="alerta"></div>
         ${btnInteresseHtml}
         ${btnGuardarHtml}
@@ -850,6 +847,36 @@
 
   // ── Iniciar ──
   carregar();
+
+  function abrirModalLogout() {
+    const m = document.getElementById('modalLogout');
+    m.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+  function fecharModalLogout() {
+    const m = document.getElementById('modalLogout');
+    m.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  function confirmarLogout() {
+    localStorage.clear();
+    window.location.href = 'login.html';
+  }
 </script>
+
+<!-- MODAL LOGOUT -->
+<div class="modal-overlay" id="modalLogout" onclick="if(event.target===this) fecharModalLogout()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;padding:0;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.2);overflow:hidden">
+    <div style="height:5px;background:#C00000;border-radius:14px 14px 0 0"></div>
+    <div style="padding:26px 26px 0">
+      <div style="font-size:1rem;font-weight:800;margin-bottom:8px">Terminar Sessão</div>
+      <p style="font-size:0.86rem;color:#888;line-height:1.6">Tem a certeza que quer terminar a sessão? Terá de voltar a iniciar sessão para aceder à plataforma.</p>
+    </div>
+    <div style="padding:20px 26px 24px;display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="fecharModalLogout()" style="background:#F0F0F0;color:#555;border:none;border-radius:8px;padding:10px 20px;font-family:Inter,sans-serif;font-size:0.84rem;font-weight:500;cursor:pointer">Cancelar</button>
+      <button onclick="confirmarLogout()" style="background:#C00000;color:#fff;border:none;border-radius:8px;padding:10px 22px;font-family:Inter,sans-serif;font-size:0.84rem;font-weight:700;cursor:pointer">Terminar Sessão</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

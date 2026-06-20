@@ -263,7 +263,7 @@
     <div class="topbar-left"></div>
     <div class="topbar-centro">
       <div class="titulo">As Minhas Candidaturas</div>
-      <div class="subtitulo">Acompanha o estado das tuas candidaturas</div>
+      <div class="subtitulo">Acompanhe o estado das suas candidaturas</div>
     </div>
     <div class="avatar" id="avatar">?</div>
   </div>
@@ -337,7 +337,7 @@
   document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
 
   document.getElementById('avatar').addEventListener('click', () => {
-    if (confirm('Tens a certeza que queres fazer logout?')) { localStorage.clear(); window.location.href = 'login.html'; }
+    abrirModalLogout();
   });
 
   const sidebar = document.getElementById('sidebar');
@@ -437,7 +437,7 @@
         <div class="vazio">
           <div class="emoji">📭</div>
           <p>${filtroActivo === 'todas'
-            ? 'Ainda não te candidataste a nenhuma proposta.'
+            ? 'Ainda não se candidatou a nenhuma proposta.'
             : 'Não há candidaturas com este estado.'}</p>
           ${filtroActivo === 'todas'
             ? `<a href="lista-propostas.html" class="btn-ir-propostas">Ver Propostas Disponíveis →</a>`
@@ -488,17 +488,17 @@
       const decisaoHtml = estado === 'aceite'
         ? `<div class="aceite-box">
             <div class="icone">🎉</div>
-            <p>Foste aceite nesta proposta! Decide no painel do topo da página qual estágio vais escolher.</p>
+            <p>Foi aceite nesta proposta! Decida no painel do topo da página qual estágio vai escolher.</p>
           </div>`
         : estado === 'confirmada'
         ? `<div class="aceite-box">
             <div class="icone">✅</div>
-            <p>Confirmaste este estágio! Aguarda contacto do orientador para os próximos passos.</p>
+            <p>Confirmou este estágio! Aguarde contacto do orientador para os próximos passos.</p>
           </div>`
         : estado === 'recusada'
         ? `<div class="aceite-box" style="background:#F0F0F0">
             <div class="icone">↩️</div>
-            <p style="color:var(--cinza-texto)">Optaste por outra proposta — esta candidatura foi automaticamente recusada.</p>
+            <p style="color:var(--cinza-texto)">Optou por outra proposta — esta candidatura foi automaticamente recusada.</p>
           </div>`
         : '';
 
@@ -556,8 +556,8 @@
             <div class="emoji">🎉</div>
             <h2>${plural ? 'Foste aceite em mais do que uma proposta!' : 'Foste aceite nesta proposta!'}</h2>
             <p>${plural
-              ? 'Escolhe em qual delas vais realizar o teu estágio. As restantes serão automaticamente recusadas.'
-              : 'Confirma que vais realizar o teu estágio nesta proposta para avançar para os próximos passos.'}</p>
+              ? 'Escolha em qual delas vai realizar o seu estágio. As restantes serão automaticamente recusadas.'
+              : 'Confirme que vai realizar o seu estágio nesta proposta para avançar para os próximos passos.'}</p>
           </div>
           <div class="escolha-cards">
             ${pendentes.map(c => {
@@ -568,7 +568,7 @@
                   <div class="ec-titulo">${p?.titulo || '—'}</div>
                   <div class="ec-meta">
                     <span>🏢 ${p?.nomeEntidade || '—'}</span>
-                    <span class="tag-tipo ${p?.tipo || 'estagio'}">${p?.tipo === 'projecto' ? 'Projeto' : 'Estágio'}</span>
+                    <span class="tag-tipo ${p?.tipo || 'estagio'}">${p?.tipo === 'projecto' ? 'Projecto' : 'Estágio'}</span>
                   </div>
                   ${p?.tutorNome ? `<div class="ec-tutor">Tutor na entidade: ${p.tutorNome}</div>` : ''}
                   <div class="ec-acoes">
@@ -592,7 +592,7 @@
         <div class="escolha-painel">
           <div class="escolha-header">
             <div class="emoji">✅</div>
-            <h2>Vais realizar o teu estágio aqui!</h2>
+            <h2>Vai realizar o seu estágio aqui!</h2>
             <p>Confirmaste esta proposta. Aguarda contacto do orientador para os próximos passos.</p>
           </div>
           <div class="escolha-cards" style="max-width:420px;margin:0 auto">
@@ -600,7 +600,7 @@
               <div class="ec-titulo">${p?.titulo || '—'}</div>
               <div class="ec-meta">
                 <span>🏢 ${p?.nomeEntidade || '—'}</span>
-                <span class="tag-tipo ${p?.tipo || 'estagio'}">${p?.tipo === 'projecto' ? 'Projeto' : 'Estágio'}</span>
+                <span class="tag-tipo ${p?.tipo || 'estagio'}">${p?.tipo === 'projecto' ? 'Projecto' : 'Estágio'}</span>
               </div>
               ${p?.tutorNome ? `<div class="ec-tutor">Tutor na entidade: ${p.tutorNome}</div>` : ''}
               <div class="ec-acoes">
@@ -626,7 +626,7 @@
 
   async function escolherProposta(candidaturaId, titulo, btn) {
     const confirmar = confirm(
-      `Confirmas que vais realizar o estágio em "${titulo}"?\n\nEsta escolha não pode ser desfeita e as outras propostas em que foste aceite serão automaticamente recusadas.`
+      `Confirma que vai realizar o estágio em "${titulo}"?\n\nEsta escolha não pode ser desfeita e as outras propostas em que foi aceite serão automaticamente recusadas.`
     );
     if (!confirmar) return;
 
@@ -688,6 +688,36 @@
   }
 
   carregar();
+
+  function abrirModalLogout() {
+    const m = document.getElementById('modalLogout');
+    m.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+  function fecharModalLogout() {
+    const m = document.getElementById('modalLogout');
+    m.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  function confirmarLogout() {
+    localStorage.clear();
+    window.location.href = 'login.html';
+  }
 </script>
+
+<!-- MODAL LOGOUT -->
+<div class="modal-overlay" id="modalLogout" onclick="if(event.target===this) fecharModalLogout()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;padding:0;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.2);overflow:hidden">
+    <div style="height:5px;background:#C00000;border-radius:14px 14px 0 0"></div>
+    <div style="padding:26px 26px 0">
+      <div style="font-size:1rem;font-weight:800;margin-bottom:8px">Terminar Sessão</div>
+      <p style="font-size:0.86rem;color:#888;line-height:1.6">Tem a certeza que quer terminar a sessão? Terá de voltar a iniciar sessão para aceder à plataforma.</p>
+    </div>
+    <div style="padding:20px 26px 24px;display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="fecharModalLogout()" style="background:#F0F0F0;color:#555;border:none;border-radius:8px;padding:10px 20px;font-family:Inter,sans-serif;font-size:0.84rem;font-weight:500;cursor:pointer">Cancelar</button>
+      <button onclick="confirmarLogout()" style="background:#C00000;color:#fff;border:none;border-radius:8px;padding:10px 22px;font-family:Inter,sans-serif;font-size:0.84rem;font-weight:700;cursor:pointer">Terminar Sessão</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

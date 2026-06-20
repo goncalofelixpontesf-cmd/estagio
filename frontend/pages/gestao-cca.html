@@ -424,9 +424,9 @@
       </div>
       <div id="painelConvite" style="display:none">
         <label class="campo-label">Email do docente <span style="color:var(--laranja)">*</span></label>
-        <input type="email" class="campo-input" id="emailConvite" placeholder="docente@esmad.ipp.pt" style="margin-bottom:10px">
+        <input type="email" class="campo-input" id="emailConvite" placeholder="nome@esmad.ipp.pt" style="margin-bottom:10px">
         <div style="background:var(--azul-light);border-radius:8px;padding:11px 14px;font-size:0.79rem;color:var(--azul);line-height:1.5;margin-bottom:18px">
-          📧 Se já tiver conta é adicionado diretamente. Caso contrário receberá um email de convite.
+          📧 Apenas são aceites endereços <strong>@esmad.ipp.pt</strong>. Se o docente já tiver conta é adicionado diretamente. Caso contrário, o Outlook abrirá com o convite pré-preenchido para enviar.
         </div>
       </div>
       <label class="campo-label">Cursos na CCA <span style="color:var(--laranja)">*</span></label>
@@ -530,7 +530,7 @@
   document.getElementById('sidebarNome').textContent = utilizador.nome;
   document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
   document.getElementById('avatar').addEventListener('click', () => {
-    if (confirm('Tem a certeza que quer fazer logout?')) { localStorage.clear(); window.location.href = 'login.html'; }
+    abrirModalLogout();
   });
 
   const sidebar = document.getElementById('sidebar');
@@ -1135,15 +1135,25 @@
         setTimeout(() => { fecharModal('modalDocente'); btn.disabled = false; btn.textContent = 'Adicionar à CCA'; carregarDocentes(); }, 1200);
       } catch (err) { al.textContent = err.message; al.className = 'alerta-modal erro'; btn.disabled = false; btn.textContent = 'Adicionar à CCA'; }
     } else {
-      const email = document.getElementById('emailConvite').value.trim();
-      if (!email || !emailValido(email)) { al.textContent = 'Introduz um email válido (ex: docente@esmad.ipp.pt).'; al.className = 'alerta-modal erro'; return; }
+      const email = document.getElementById('emailConvite').value.trim().toLowerCase();
+
+      if (!email || !emailValido(email)) {
+        al.textContent = 'Introduza um email válido.';
+        al.className = 'alerta-modal erro'; return;
+      }
+      if (!email.endsWith('@esmad.ipp.pt')) {
+        al.textContent = 'Apenas são aceites endereços @esmad.ipp.pt.';
+        al.className = 'alerta-modal erro'; return;
+      }
+
       btn.disabled = true; btn.innerHTML = '<span class="spin"></span>A enviar convite…';
       try {
         const dados = await req('/cca/convite', { method: 'POST', body: JSON.stringify({ email, cursosCCA }) });
         if (!dados.sucesso) throw new Error(dados.mensagem);
-        al.textContent = dados.mensagem; al.className = 'alerta-modal sucesso';
-        btn.innerHTML = '✔ Enviado';
-        setTimeout(() => { fecharModal('modalDocente'); btn.disabled = false; btn.textContent = 'Enviar Convite'; carregarDocentes(); }, 1800);
+        al.textContent = dados.mensagem;
+        al.className = dados.erroEmail ? 'alerta-modal erro' : 'alerta-modal sucesso';
+        btn.innerHTML = dados.erroEmail ? '⚠️ Convite registado' : '✔ Convite enviado';
+        setTimeout(() => { fecharModal('modalDocente'); btn.disabled = false; btn.textContent = 'Enviar Convite'; carregarDocentes(); }, 2000);
       } catch (err) { al.textContent = err.message; al.className = 'alerta-modal erro'; btn.disabled = false; btn.textContent = 'Enviar Convite'; }
     }
   }
@@ -1175,12 +1185,16 @@
   }
 
   async function removerMembro(id, nome) {
-    if (!confirm(`Remover ${nome} da CCA?`)) return;
-    try {
-      const dados = await req('/cca/membros/' + id, { method: 'DELETE' });
-      if (!dados.sucesso) throw new Error(dados.mensagem);
-      carregarDocentes();
-    } catch (err) { alert('Erro: ' + err.message); }
+    abrirModalRemocao(
+      'Remover Membro da CCA',
+      nome,
+      `Tem a certeza que quer remover <strong>${nome}</strong> da CCA? O docente perderá o acesso ao painel.`,
+      async () => {
+        const dados = await req('/cca/membros/' + id, { method: 'DELETE' });
+        if (!dados.sucesso) throw new Error(dados.mensagem);
+        carregarDocentes();
+      }
+    );
   }
 
   // ══ CURSOS ══
@@ -1198,7 +1212,15 @@
     al.textContent='Curso adicionado.';al.className='alerta-modal sucesso';
     setTimeout(()=>{fecharModal('modalCurso');renderCursos();},900);
   }
-  function removerCurso(id){if(!confirm('Remover este curso?'))return;saveCursos(getCursos().filter(c=>c.id!==id));renderCursos();}
+  function removerCurso(id) {
+    const curso = getCursos().find(c => c.id === id);
+    abrirModalRemocao(
+      'Remover Curso',
+      curso?.sigla || '',
+      `Tem a certeza que quer remover o curso <strong>${curso?.nome || id}</strong>?`,
+      () => { saveCursos(getCursos().filter(c => c.id !== id)); renderCursos(); }
+    );
+  }
 
   // ══ ÁREAS ══
   const AREAS_DEFAULT=['UI/UX','Developer Front-end','Developer Back-end','Developer Full-stack','Developer Mobile','Developer Games/Graphics','Marketing Digital','Outro'];
@@ -1215,7 +1237,14 @@
     areas.push(nome);saveAreas(areas);al.textContent='Área adicionada.';al.className='alerta-modal sucesso';
     setTimeout(()=>{fecharModal('modalArea');renderAreas();},900);
   }
-  function removerArea(idx,nome){if(!confirm(`Remover "${nome}"?`))return;const areas=getAreas();areas.splice(idx,1);saveAreas(areas);renderAreas();}
+  function removerArea(idx, nome) {
+    abrirModalRemocao(
+      'Remover Área',
+      nome,
+      `Tem a certeza que quer remover a área <strong>${nome}</strong>?`,
+      () => { const areas = getAreas(); areas.splice(idx, 1); saveAreas(areas); renderAreas(); }
+    );
+  }
 
   // ══ DATAS ══
   const getDatas=()=>{const s=localStorage.getItem('esmad_datas');return s?JSON.parse(s):{};};
@@ -1234,6 +1263,88 @@
   const urlParams = new URLSearchParams(window.location.search);
   const tabParam  = urlParams.get('tab');
   mudarTab(['pendentes','todas','docentes','cursos','areas','datas'].includes(tabParam) ? tabParam : 'pendentes');
+
+  // ══ MODAL GENÉRICO DE REMOÇÃO ══
+  let _remocaoCallback = null;
+
+  function abrirModalRemocao(titulo, sub, mensagem, callback) {
+    _remocaoCallback = callback;
+    document.getElementById('remocaoTitulo').textContent    = titulo;
+    document.getElementById('remocaoSub').textContent       = sub || '';
+    document.getElementById('remocaoMensagem').innerHTML    = mensagem;
+    const btn = document.getElementById('btnConfirmarRemocao');
+    btn.disabled  = false;
+    btn.textContent = 'Remover';
+    btn.onclick = async () => {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin"></span>A remover…';
+      try {
+        await _remocaoCallback();
+        fecharModalRemocao();
+      } catch (err) {
+        alert('Erro: ' + err.message);
+        btn.disabled = false;
+        btn.textContent = 'Remover';
+      }
+    };
+    abrirModal('modalConfirmarRemocao');
+  }
+
+  function fecharModalRemocao() {
+    fecharModal('modalConfirmarRemocao');
+  }
+
+  function abrirModalLogout() {
+    const m = document.getElementById('modalLogout');
+    m.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+  function fecharModalLogout() {
+    const m = document.getElementById('modalLogout');
+    m.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  function confirmarLogout() {
+    localStorage.clear();
+    window.location.href = 'login.html';
+  }
 </script>
+
+<!-- MODAL CONFIRMAR REMOÇÃO -->
+<div class="modal-overlay" id="modalConfirmarRemocao" onclick="if(event.target===this) fecharModalRemocao()">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-topo-vm"></div>
+    <div class="modal-header">
+      <div>
+        <h2 id="remocaoTitulo">Confirmar Remoção</h2>
+        <div class="sub" id="remocaoSub">—</div>
+      </div>
+      <button class="btn-fechar" onclick="fecharModalRemocao()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="linha-modal"></div>
+      <p id="remocaoMensagem" style="font-size:0.86rem;color:#444;line-height:1.6"></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-m-cancelar" onclick="fecharModalRemocao()">Cancelar</button>
+      <button class="btn-m-vermelho" id="btnConfirmarRemocao">Remover</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL LOGOUT -->
+<div class="modal-overlay" id="modalLogout" onclick="if(event.target===this) fecharModalLogout()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;padding:0;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.2);overflow:hidden">
+    <div style="height:5px;background:#C00000;border-radius:14px 14px 0 0"></div>
+    <div style="padding:26px 26px 0">
+      <div style="font-size:1rem;font-weight:800;margin-bottom:8px">Terminar Sessão</div>
+      <p style="font-size:0.86rem;color:#888;line-height:1.6">Tem a certeza que quer terminar a sessão? Terá de voltar a iniciar sessão para aceder à plataforma.</p>
+    </div>
+    <div style="padding:20px 26px 24px;display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="fecharModalLogout()" style="background:#F0F0F0;color:#555;border:none;border-radius:8px;padding:10px 20px;font-family:Inter,sans-serif;font-size:0.84rem;font-weight:500;cursor:pointer">Cancelar</button>
+      <button onclick="confirmarLogout()" style="background:#C00000;color:#fff;border:none;border-radius:8px;padding:10px 22px;font-family:Inter,sans-serif;font-size:0.84rem;font-weight:700;cursor:pointer">Terminar Sessão</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

@@ -364,9 +364,8 @@
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo"><span>ESMAD</span></div>
   <nav class="sidebar-nav">
-    <a class="nav-item" href="dashboard-estudante.html">Início</a>
     <a class="nav-item" href="lista-propostas.html">Propostas</a>
-    <a class="nav-item" href="dashboard-estudante.html">As Minhas Candidaturas</a>
+    <a class="nav-item" href="candidaturas.html">As Minhas Candidaturas</a>
     <a class="nav-item activo">O Meu Perfil</a>
   </nav>
   <div class="sidebar-footer">
@@ -382,7 +381,7 @@
     <div class="topbar-left"></div>
     <div class="topbar-centro">
       <div class="titulo">O Meu Perfil</div>
-      <div class="subtitulo">Gere o teu perfil e CV académico</div>
+      <div class="subtitulo">Gira o seu perfil e CV académico</div>
     </div>
     <div class="avatar" id="avatar">?</div>
   </div>
@@ -456,10 +455,7 @@
 
   // Avatar logout
   document.getElementById('avatar').addEventListener('click', () => {
-    if (confirm('Tens a certeza que queres fazer logout?')) {
-      localStorage.clear();
-      window.location.href = 'login.html';
-    }
+    abrirModalLogout();
   });
 
   // Mobile sidebar
@@ -535,7 +531,7 @@
       const cands = dados2.candidaturas || [];
       const tbCand = document.getElementById('tabelaCandidaturas');
       if (!cands.length) {
-        tbCand.innerHTML = `<tr><td colspan="3"><div class="vazio"><div class="emoji">📭</div>Ainda não te candidataste a nenhuma proposta.<br><a href="lista-propostas.html">Ver propostas →</a></div></td></tr>`;
+        tbCand.innerHTML = `<tr><td colspan="3"><div class="vazio"><div class="emoji">📭</div>Ainda não se candidatou a nenhuma proposta.<br><a href="lista-propostas.html">Ver propostas →</a></div></td></tr>`;
       } else {
         tbCand.innerHTML = cands.map(c => {
           const p = c.propostaId;
@@ -714,7 +710,7 @@
     const zona = document.getElementById('domusZona');
     if (!disciplinas || !disciplinas.length) {
       mostrarToast('Não foram encontradas disciplinas no documento.', 'erro');
-      if (zona) zona.innerHTML = `<div class="icone">✅</div><div class="texto"><strong>${fileName}</strong>Clica para substituir</div>`;
+      if (zona) zona.innerHTML = `<div class="icone">✅</div><div class="texto"><strong>${fileName}</strong>Clique para substituir</div>`;
       return;
     }
 
@@ -809,7 +805,7 @@
     if (!container) return;
 
     if (!disciplinas.length) {
-      container.innerHTML = '<div class="vazio"><div class="emoji">📚</div>Ainda não tens disciplinas registadas.<br><small>Carrega o PDF do DOMUS ou vai a <a href="editar-perfil.html">Editar Perfil</a>.</small></div>';
+      container.innerHTML = '<div class="vazio"><div class="emoji">📚</div>Ainda não tem disciplinas registadas.<br><small>Carrega o PDF do DOMUS ou vai a <a href="editar-perfil.html">Editar Perfil</a>.</small></div>';
       return;
     }
 
@@ -887,6 +883,36 @@
 
     // ── Iniciar ──
   carregar();
+
+  function abrirModalLogout() {
+    const m = document.getElementById('modalLogout');
+    m.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+  function fecharModalLogout() {
+    const m = document.getElementById('modalLogout');
+    m.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  function confirmarLogout() {
+    localStorage.clear();
+    window.location.href = 'login.html';
+  }
 </script>
+
+<!-- MODAL LOGOUT -->
+<div class="modal-overlay" id="modalLogout" onclick="if(event.target===this) fecharModalLogout()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;padding:0;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.2);overflow:hidden">
+    <div style="height:5px;background:#C00000;border-radius:14px 14px 0 0"></div>
+    <div style="padding:26px 26px 0">
+      <div style="font-size:1rem;font-weight:800;margin-bottom:8px">Terminar Sessão</div>
+      <p style="font-size:0.86rem;color:#888;line-height:1.6">Tem a certeza que quer terminar a sessão? Terá de voltar a iniciar sessão para aceder à plataforma.</p>
+    </div>
+    <div style="padding:20px 26px 24px;display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="fecharModalLogout()" style="background:#F0F0F0;color:#555;border:none;border-radius:8px;padding:10px 20px;font-family:Inter,sans-serif;font-size:0.84rem;font-weight:500;cursor:pointer">Cancelar</button>
+      <button onclick="confirmarLogout()" style="background:#C00000;color:#fff;border:none;border-radius:8px;padding:10px 22px;font-family:Inter,sans-serif;font-size:0.84rem;font-weight:700;cursor:pointer">Terminar Sessão</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

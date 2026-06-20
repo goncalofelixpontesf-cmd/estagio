@@ -252,7 +252,7 @@
   <div class="topbar">
     <div class="topbar-info">
       <div class="titulo" id="topbarTitulo">Propostas</div>
-      <div class="subtitulo" id="topbarSub">Encontra o teu próximo projeto ou estágio</div>
+      <div class="subtitulo" id="topbarSub">Encontre o seu próximo projeto ou estágio</div>
     </div>
     <div class="avatar" id="avatar">?</div>
   </div>
@@ -328,7 +328,7 @@
   document.getElementById('sidebarNome').textContent = utilizador.nome;
   document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
   document.getElementById('avatar').addEventListener('click', () => {
-    if (confirm('Tens a certeza que queres fazer logout?')) { localStorage.clear(); window.location.href = 'login.html'; }
+    abrirModalLogout();
   });
 
   const sidebar = document.getElementById('sidebar');
@@ -376,7 +376,7 @@
     document.getElementById('tabDisp').className   = tab === 'disponiveis' ? 'tab activo' : 'tab inactivo';
     document.getElementById('tabMinhas').className = tab === 'minhas'      ? 'tab activo' : 'tab inactivo';
     document.getElementById('topbarTitulo').textContent = tab === 'disponiveis' ? 'Propostas' : 'As Minhas Propostas';
-    document.getElementById('topbarSub').textContent    = tab === 'disponiveis' ? 'Encontra o teu próximo projeto ou estágio' : 'Acompanha o estado das tuas propostas submetidas';
+    document.getElementById('topbarSub').textContent    = tab === 'disponiveis' ? 'Encontre o seu próximo projeto ou estágio' : 'Acompanha o estado das tuas propostas submetidas';
     if (tab === 'disponiveis') renderTabDisp();
     else                       carregarMinhasPropostas();
   }
@@ -730,7 +730,7 @@
         <div class="form-campo"><label>Email do tutor <span class="obg">*</span></label><input class="mp-input" type="email" id="f1" value="${esc(mpDados.tutorEmail)}" placeholder="tutor@empresa.pt"></div></div>
         <div class="form-campo" style="margin-top:14px"><label>Cargo do tutor</label><input class="mp-input" type="text" id="f2" value="${esc(mpDados.tutorCargo)}" placeholder="Ex: Diretor de Tecnologia"></div>`;
       case 2: return `<div class="form-grid" style="margin-bottom:16px">
-        <div class="form-campo"><label>Curso destinatário <span class="obg">*</span></label><input class="mp-input readonly" type="text" readonly value="${esc(mpDados.curso)}"><p class="campo-nota">A proposta será submetida para o teu curso.</p></div>
+        <div class="form-campo"><label>Curso destinatário <span class="obg">*</span></label><input class="mp-input readonly" type="text" readonly value="${esc(mpDados.curso)}"><p class="campo-nota">A proposta será submetida para o seu curso.</p></div>
         <div class="form-campo"><label>Tipo de proposta <span class="obg">*</span></label><select class="mp-select" id="f0"><option value="estagio"${mpDados.tipo==='estagio'?' selected':''}>Estágio</option><option value="projecto"${mpDados.tipo==='projecto'?' selected':''}>Projecto</option></select></div></div>
         <div class="form-campo" style="margin-bottom:16px"><label>Área(s) de actuação <span class="obg">*</span></label>
         <div class="areas-grid">${areas.map(a=>`<label class="area-check${mpDados.areas.includes(a)?' marcada':''}"><input type="checkbox" value="${a}" class="area-cb"${mpDados.areas.includes(a)?' checked':''}> ${a}</label>`).join('')}</div></div>
@@ -887,6 +887,36 @@
 
   // ── Iniciar ──
   mudarTab('disponiveis');
+
+  function abrirModalLogout() {
+    const m = document.getElementById('modalLogout');
+    m.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+  function fecharModalLogout() {
+    const m = document.getElementById('modalLogout');
+    m.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  function confirmarLogout() {
+    localStorage.clear();
+    window.location.href = 'login.html';
+  }
 </script>
+
+<!-- MODAL LOGOUT -->
+<div class="modal-overlay" id="modalLogout" onclick="if(event.target===this) fecharModalLogout()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;padding:0;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.2);overflow:hidden">
+    <div style="height:5px;background:#C00000;border-radius:14px 14px 0 0"></div>
+    <div style="padding:26px 26px 0">
+      <div style="font-size:1rem;font-weight:800;margin-bottom:8px">Terminar Sessão</div>
+      <p style="font-size:0.86rem;color:#888;line-height:1.6">Tem a certeza que quer terminar a sessão? Terá de voltar a iniciar sessão para aceder à plataforma.</p>
+    </div>
+    <div style="padding:20px 26px 24px;display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="fecharModalLogout()" style="background:#F0F0F0;color:#555;border:none;border-radius:8px;padding:10px 20px;font-family:Inter,sans-serif;font-size:0.84rem;font-weight:500;cursor:pointer">Cancelar</button>
+      <button onclick="confirmarLogout()" style="background:#C00000;color:#fff;border:none;border-radius:8px;padding:10px 22px;font-family:Inter,sans-serif;font-size:0.84rem;font-weight:700;cursor:pointer">Terminar Sessão</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
