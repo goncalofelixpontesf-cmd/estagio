@@ -266,10 +266,13 @@
   const eCCA = ['comissao','admin'].includes(utilizador.perfil);
   document.getElementById('sidebarNav').innerHTML = eCCA
     ? `<a class="nav-item" href="gestao-cca.html">Painel CCA</a>
-       <a class="nav-item activo">As Minhas Orientações</a>`
-    : `<a class="nav-item" href="dashboard-entidade.html">As Minhas Propostas</a>
        <a class="nav-item activo">As Minhas Orientações</a>
-       <a class="nav-item" href="entrevistas.html">Entrevistas</a>`;
+       <a class="nav-item" href="prazos.html">Prazos</a>`
+    : `<a class="nav-item" href="dashboard-entidade.html">As Minhas Propostas</a>
+      <a class="nav-item" href="estudantes-interessados.html">Estudantes Interessados</a>
+       <a class="nav-item activo">As Minhas Orientações</a>
+       <a class="nav-item" href="entrevistas-entidade.html">Entrevistas</a>
+       <a class="nav-item" href="prazos.html">Prazos</a>`;
   document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
   document.getElementById('avatar').addEventListener('click', () => {
     abrirModalLogout();
