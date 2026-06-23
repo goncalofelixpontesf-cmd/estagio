@@ -1,8 +1,9 @@
-const Proposta     = require('../models/Proposta');
-const AprovacaoCCA = require('../models/AprovacaoCCA');
-const Utilizador   = require('../models/Utilizador');
-const Notificacao  = require('../models/Notificacao');
-const Convite      = require('../models/Convite');
+const Proposta           = require('../models/Proposta');
+const AprovacaoCCA       = require('../models/AprovacaoCCA');
+const Utilizador         = require('../models/Utilizador');
+const Notificacao        = require('../models/Notificacao');
+const Convite            = require('../models/Convite');
+const ConfiguracaoDatas  = require('../models/ConfiguracaoDatas');
 const { enviarEmail, templateConviteCCA } = require('../utils/email');
 
 // ── Helper: filtro de curso para o membro autenticado ──
@@ -77,7 +78,7 @@ exports.aprovar = async (req, res) => {
     // Verificar se o membro tem acesso ao curso desta proposta
     const cursosM = req.utilizador.cursosCCA;
     if (cursosM && Array.isArray(cursosM) && cursosM.length > 0 && !cursosM.includes(proposta.curso)) {
-      return res.status(403).json({ sucesso: false, mensagem: `Não tens permissão para aprovar propostas do curso "${proposta.curso}".` });
+      return res.status(403).json({ sucesso: false, mensagem: `Não tem permissão para aprovar propostas do curso "${proposta.curso}".` });
     }
 
     await AprovacaoCCA.findOneAndUpdate(
@@ -122,7 +123,7 @@ exports.rejeitar = async (req, res) => {
 
     const cursosM = req.utilizador.cursosCCA;
     if (cursosM && Array.isArray(cursosM) && cursosM.length > 0 && !cursosM.includes(proposta.curso)) {
-      return res.status(403).json({ sucesso: false, mensagem: `Não tens permissão para rejeitar propostas do curso "${proposta.curso}".` });
+      return res.status(403).json({ sucesso: false, mensagem: `Não tem permissão para rejeitar propostas do curso "${proposta.curso}".` });
     }
 
     proposta.estado    = 'rejeitada';
@@ -379,6 +380,40 @@ exports.enviarConvite = async (req, res) => {
         mensagem: `Convite registado para ${email}, mas o email não pôde ser enviado (${emailErr.message}). Verifique as credenciais Outlook no .env.`
       });
     }
+  } catch (err) {
+    res.status(500).json({ sucesso: false, mensagem: err.message });
+  }
+};
+// ══ DATAS DO PROCESSO ══
+
+// GET /api/cca/datas
+exports.obterDatas = async (req, res) => {
+  try {
+    const datas = await ConfiguracaoDatas.findOne({ chave: 'datas_processo' });
+    res.json({ sucesso: true, datas: datas || {} });
+  } catch (err) {
+    res.status(500).json({ sucesso: false, mensagem: err.message });
+  }
+};
+
+// PUT /api/cca/datas
+exports.guardarDatas = async (req, res) => {
+  try {
+    const { prop_inicio, prop_fim, int_inicio, int_fim, tut_inicio, tut_fim } = req.body;
+    const datas = await ConfiguracaoDatas.findOneAndUpdate(
+      { chave: 'datas_processo' },
+      {
+        prop_inicio: prop_inicio || null,
+        prop_fim:    prop_fim    || null,
+        int_inicio:  int_inicio  || null,
+        int_fim:     int_fim     || null,
+        tut_inicio:  tut_inicio  || null,
+        tut_fim:     tut_fim     || null,
+        atualizadoPor: req.utilizador._id
+      },
+      { upsert: true, new: true }
+    );
+    res.json({ sucesso: true, datas });
   } catch (err) {
     res.status(500).json({ sucesso: false, mensagem: err.message });
   }

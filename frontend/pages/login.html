@@ -198,14 +198,14 @@
       <button type="button" class="btn-principal" id="btnEntrar" onclick="entrar()">ENTRAR</button>
 
       <p class="link-redirecao">
-        Não tens conta? <a href="registo.html">Regista-te aqui</a>
+        Não tem conta? <a href="registo.html">Registe-se aqui</a>
       </p>
 
     </div>
   </div>
 
   <script>
-    const API = 'http://192.168.1.66:5000/api';
+    const API = 'http://127.0.0.1:5000/api';
 
     // Se já tem sessão activa, redirecionar para a página correcta
     (function verificarSessao() {
@@ -223,7 +223,7 @@
       if (perfil === 'estudante') {
         window.location.replace('lista-propostas.html');
       } else if (perfil === 'docente' || perfil === 'entidade') {
-        window.location.replace('dashboard-entidade.html');
+        window.location.replace('dashboard-docente.html');
       } else if (perfil === 'comissao' || perfil === 'admin') {
         window.location.replace('gestao-cca.html');
       }
@@ -253,8 +253,8 @@
 
       const email    = document.getElementById('email').value.trim();
       const password = inputPass.value;
-      if (!email)    { mostrarAlerta('Introduz o teu email.');    return; }
-      if (!password) { mostrarAlerta('Introduz a tua password.'); return; }
+      if (!email)    { mostrarAlerta('Introduza o seu email.');    return; }
+      if (!password) { mostrarAlerta('Introduza a sua password.'); return; }
 
       btnEntrar.disabled = true;
       btnEntrar.innerHTML = '<span class="spin"></span>A entrar…';

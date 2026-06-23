@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESMAD</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.ico">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --laranja: #F15A24; --laranja-hover: #d94d1c; --laranja-light: #FEE8DF;
+      --preto: #1A1A1A; --cinza-bg: #F4F4F4; --cinza-texto: #888888;
+      --cinza-linha: #EEEEEE; --branco: #FFFFFF;
+      --azul: #2E75B6; --azul-light: #EBF3FB;
+      --verde: #70AD47; --verde-light: #E2EFDA;
+      --amarelo: #BF8F00; --amarelo-light: #FFF2CC;
+      --vermelho: #C00000; --sidebar-w: 220px;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--cinza-bg); color: var(--preto); min-height: 100vh; display: flex; }
+
+    .sidebar { width: var(--sidebar-w); background: var(--laranja); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
+    .sidebar-logo { padding: 22px 0 18px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.18); }
+    .sidebar-logo span { color: #fff; font-size: 1.35rem; font-weight: 800; letter-spacing: 2px; }
+    .sidebar-nav { flex: 1; padding: 12px 0; }
+    .nav-item { display: block; padding: 13px 28px; color: rgba(255,255,255,0.82); font-size: 0.88rem; font-weight: 500; text-decoration: none; transition: background 0.15s, color 0.15s; }
+    .nav-item:hover  { background: rgba(0,0,0,0.12); color: #fff; }
+    .nav-item.activo { background: rgba(0,0,0,0.18); color: #fff; font-weight: 700; }
+    .sidebar-footer { padding: 18px 28px; border-top: 1px solid rgba(255,255,255,0.18); }
+    .sidebar-footer .nome   { color: #fff; font-size: 0.82rem; font-weight: 600; }
+    .sidebar-footer .perfil { color: rgba(255,255,255,0.65); font-size: 0.75rem; margin-top: 2px; }
+
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { background: var(--branco); padding: 18px 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--cinza-linha); position: sticky; top: 0; z-index: 50; }
+    .topbar-centro { text-align: center; flex: 1; }
+    .topbar-centro .titulo    { font-size: 1rem; font-weight: 700; }
+    .topbar-centro .subtitulo { font-size: 0.78rem; color: var(--cinza-texto); margin-top: 1px; }
+    .avatar { width: 38px; height: 38px; background: var(--laranja); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 0.95rem; cursor: pointer; flex-shrink: 0; }
+    .topbar-left { width: 38px; }
+    .content { padding: 32px; flex: 1; max-width: 740px; margin: 0 auto; width: 100%; }
+
+    /* ══ PRAZOS ══ */
+    .prazos-header { margin-bottom: 28px; }
+    .prazos-header h1 { font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; }
+    .prazos-header p  { font-size: 0.86rem; color: var(--cinza-texto); line-height: 1.6; }
+
+    .fase-card {
+      background: var(--branco); border-radius: 14px;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.07); overflow: hidden;
+      margin-bottom: 16px; transition: box-shadow 0.18s;
+    }
+    .fase-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.10); }
+
+    .fase-barra { height: 5px; }
+    .fase-barra.laranja { background: var(--laranja); }
+    .fase-barra.azul    { background: var(--azul); }
+    .fase-barra.verde   { background: var(--verde); }
+
+    .fase-body { padding: 22px 26px; display: flex; align-items: flex-start; gap: 20px; }
+
+    .fase-icone {
+      font-size: 2rem; flex-shrink: 0;
+      width: 52px; height: 52px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .fase-icone.laranja { background: var(--laranja-light); }
+    .fase-icone.azul    { background: var(--azul-light); }
+    .fase-icone.verde   { background: var(--verde-light); }
+
+    .fase-info { flex: 1; }
+    .fase-titulo { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+    .fase-desc   { font-size: 0.8rem; color: var(--cinza-texto); margin-bottom: 14px; line-height: 1.5; }
+
+    .fase-datas { display: flex; gap: 12px; flex-wrap: wrap; }
+    .fase-data-item {
+      background: var(--cinza-bg); border-radius: 10px; padding: 12px 18px;
+      min-width: 160px; flex: 1;
+    }
+    .fase-data-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--cinza-texto); margin-bottom: 4px; }
+    .fase-data-valor { font-size: 0.96rem; font-weight: 700; color: var(--preto); }
+    .fase-data-valor.vazia { font-size: 0.84rem; font-weight: 400; color: var(--cinza-texto); font-style: italic; }
+
+    /* Estado da fase */
+    .fase-estado {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 20px; font-size: 0.74rem; font-weight: 700;
+      margin-top: 10px;
+    }
+    .fase-estado::before { content: ''; width: 7px; height: 7px; border-radius: 50%; }
+    .fase-estado.a-decorrer { background: var(--verde-light); color: var(--verde); }
+    .fase-estado.a-decorrer::before { background: var(--verde); }
+    .fase-estado.futuro     { background: var(--azul-light);   color: var(--azul); }
+    .fase-estado.futuro::before     { background: var(--azul); }
+    .fase-estado.terminado  { background: #F0F0F0; color: var(--cinza-texto); }
+    .fase-estado.terminado::before  { background: var(--cinza-texto); }
+    .fase-estado.sem-data   { background: var(--amarelo-light); color: var(--amarelo); }
+    .fase-estado.sem-data::before   { background: var(--amarelo); }
+
+    .skeleton { background: linear-gradient(90deg,#ececec 25%,#f5f5f5 50%,#ececec 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 8px; }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    .vazio { padding: 60px 20px; text-align: center; color: var(--cinza-texto); }
+    .vazio .emoji { font-size: 2.5rem; margin-bottom: 12px; }
+    .vazio p { font-size: 0.86rem; }
+
+    .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 8px; font-size: 0.84rem; font-weight: 500; transform: translateY(80px); opacity: 0; transition: transform 0.3s, opacity 0.3s; z-index: 500; color: #fff; background: var(--preto); }
+    .toast.visivel { transform: translateY(0); opacity: 1; }
+
+    .menu-toggle { display: none; position: fixed; top: 14px; left: 14px; z-index: 200; background: var(--laranja); border: none; border-radius: 8px; padding: 8px 10px; cursor: pointer; color: white; font-size: 1.1rem; }
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 90; }
+
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
+      .sidebar.aberta { transform: translateX(0); }
+      .sidebar-overlay.visivel { display: block; }
+      .main { margin-left: 0; }
+      .menu-toggle { display: block; }
+      .topbar { padding-left: 56px; }
+      .content { padding: 20px 16px; }
+      .fase-body { flex-direction: column; gap: 14px; }
+      .fase-datas { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="menu-toggle" id="menuToggle">☰</button>
+<div class="sidebar-overlay" id="overlay"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><span>ESMAD</span></div>
+  <nav class="sidebar-nav" id="sidebarNav"><!-- preenchido via JS --></nav>
+  <div class="sidebar-footer">
+    <div class="nome" id="sidebarNome">—</div>
+    <div class="perfil" id="sidebarPerfil">—</div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left"></div>
+    <div class="topbar-centro">
+      <div class="titulo">Prazos do Processo</div>
+      <div class="subtitulo">Calendário das fases do ano letivo</div>
+    </div>
+    <div class="avatar" id="avatar">?</div>
+  </div>
+
+  <div class="content">
+    <div class="prazos-header">
+      <h1>📅 Calendário do Processo</h1>
+      <p>Acompanhe os prazos de cada fase — submissão de propostas, manifestação de interesse dos estudantes e atribuição de orientadores.</p>
+    </div>
+    <div id="conteudoPrazos">
+      <div class="fase-card"><div class="fase-barra laranja"></div><div class="fase-body"><div class="skeleton" style="width:52px;height:52px;border-radius:12px;flex-shrink:0"></div><div style="flex:1"><div class="skeleton" style="height:18px;width:60%;margin-bottom:10px"></div><div class="skeleton" style="height:12px;width:90%;margin-bottom:16px"></div><div style="display:flex;gap:12px"><div class="skeleton" style="height:62px;flex:1;border-radius:10px"></div><div class="skeleton" style="height:62px;flex:1;border-radius:10px"></div></div></div></div></div>
+      <div class="fase-card"><div class="fase-barra azul"></div><div class="fase-body"><div class="skeleton" style="width:52px;height:52px;border-radius:12px;flex-shrink:0"></div><div style="flex:1"><div class="skeleton" style="height:18px;width:55%;margin-bottom:10px"></div><div class="skeleton" style="height:12px;width:85%;margin-bottom:16px"></div><div style="display:flex;gap:12px"><div class="skeleton" style="height:62px;flex:1;border-radius:10px"></div><div class="skeleton" style="height:62px;flex:1;border-radius:10px"></div></div></div></div></div>
+      <div class="fase-card"><div class="fase-barra verde"></div><div class="fase-body"><div class="skeleton" style="width:52px;height:52px;border-radius:12px;flex-shrink:0"></div><div style="flex:1"><div class="skeleton" style="height:18px;width:65%;margin-bottom:10px"></div><div class="skeleton" style="height:12px;width:80%;margin-bottom:16px"></div><div style="display:flex;gap:12px"><div class="skeleton" style="height:62px;flex:1;border-radius:10px"></div><div class="skeleton" style="height:62px;flex:1;border-radius:10px"></div></div></div></div></div>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL LOGOUT -->
+<div class="modal-overlay" id="modalLogout" onclick="if(event.target===this) fecharModalLogout()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;padding:0;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.2);overflow:hidden">
+    <div style="height:5px;background:#C00000;border-radius:14px 14px 0 0"></div>
+    <div style="padding:26px 26px 0">
+      <div style="font-size:1rem;font-weight:800;margin-bottom:8px">Terminar Sessão</div>
+      <p style="font-size:0.86rem;color:#888;line-height:1.6">Tem a certeza que quer terminar a sessão? Terá de voltar a iniciar sessão para aceder à plataforma.</p>
+    </div>
+    <div style="padding:20px 26px 24px;display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="fecharModalLogout()" style="background:#F0F0F0;color:#555;border:none;border-radius:8px;padding:10px 20px;font-family:Inter,sans-serif;font-size:0.84rem;font-weight:500;cursor:pointer">Cancelar</button>
+      <button onclick="confirmarLogout()" style="background:#C00000;color:#fff;border:none;border-radius:8px;padding:10px 22px;font-family:Inter,sans-serif;font-size:0.84rem;font-weight:700;cursor:pointer">Terminar Sessão</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const API   = 'http://127.0.0.1:5000/api';
+  const token = localStorage.getItem('esmad_token');
+  const user  = localStorage.getItem('esmad_user');
+  if (!token || !user) { window.location.href = 'login.html'; }
+
+  const utilizador = JSON.parse(user);
+  const perfil = utilizador.perfil;
+
+  document.getElementById('sidebarNome').textContent = utilizador.nome;
+  document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
+
+  // Labels de perfil
+  const perfilLabel = {
+    estudante: 'Estudante', docente: 'Docente',
+    entidade: 'Entidade', comissao: 'Comissão CCA', admin: 'Administrador'
+  };
+  document.getElementById('sidebarPerfil').textContent = perfilLabel[perfil] || perfil;
+
+  // Nav links conforme perfil
+  const navLinks = {
+    estudante: `
+      <a class="nav-item" href="lista-propostas.html">Propostas</a>
+      <a class="nav-item" href="candidaturas.html">As Minhas Candidaturas</a>
+      <a class="nav-item" href="perfil-estudante.html">O Meu Perfil</a>
+      <a class="nav-item activo" href="prazos.html">Prazos</a>`,
+    docente: `
+      <a class="nav-item" href="dashboard-entidade.html">As Minhas Propostas</a>
+      <a class="nav-item" href="estudantes-interessados.html">Estudantes Interessados</a>
+      <a class="nav-item" href="minhas-tutorias.html">As Minhas Orientações</a>
+      <a class="nav-item" href="entrevistas-entidade.html">Entrevistas</a>
+      <a class="nav-item activo" href="prazos.html">Prazos</a>`,
+    entidade: `
+      <a class="nav-item" href="dashboard-entidade.html">As Minhas Propostas</a>
+      <a class="nav-item" href="estudantes-interessados.html">Estudantes Interessados</a>
+      <a class="nav-item" href="entrevistas-entidade.html">Entrevistas</a>
+      <a class="nav-item activo" href="prazos.html">Prazos</a>`,
+    comissao: `
+      <a class="nav-item" href="gestao-cca.html">Painel CCA</a>
+      <a class="nav-item" href="minhas-tutorias.html">As Minhas Orientações</a>
+      <a class="nav-item activo" href="prazos.html">Prazos</a>`,
+    admin: `
+      <a class="nav-item" href="gestao-cca.html">Painel CCA</a>
+      <a class="nav-item activo" href="prazos.html">Prazos</a>`,
+  };
+  document.getElementById('sidebarNav').innerHTML = navLinks[perfil] || navLinks.estudante;
+
+  document.getElementById('avatar').addEventListener('click', () => abrirModalLogout());
+
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  document.getElementById('menuToggle').addEventListener('click', () => { sidebar.classList.toggle('aberta'); overlay.classList.toggle('visivel'); });
+  overlay.addEventListener('click', () => { sidebar.classList.remove('aberta'); overlay.classList.remove('visivel'); });
+
+  function fmtDataVisual(str) {
+    if (!str) return null;
+    return new Date(str).toLocaleDateString('pt-PT', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+
+  function estadoFase(inicio, fim) {
+    if (!inicio && !fim) return { classe: 'sem-data', texto: 'Datas por definir' };
+    const agora = new Date();
+    const i = inicio ? new Date(inicio) : null;
+    const f = fim    ? new Date(fim)    : null;
+    if (f && agora > f)  return { classe: 'terminado',   texto: 'Fase concluída' };
+    if (i && agora < i)  return { classe: 'futuro',      texto: 'Ainda não iniciou' };
+    return { classe: 'a-decorrer', texto: 'A decorrer agora' };
+  }
+
+  async function carregar() {
+    try {
+      const resp  = await fetch(`${API}/cca/datas`, { headers: { 'Authorization': `Bearer ${token}` } });
+      const dados = await resp.json();
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+      const d = dados.datas || {};
+
+      const fases = [
+        {
+          cor: 'laranja', emoji: '📋',
+          titulo: 'Aceitação de Propostas',
+          desc: 'Período em que as entidades e docentes podem submeter propostas de estágio e projetos finais para aprovação da CCA.',
+          inicio: d.prop_inicio, fim: d.prop_fim
+        },
+        {
+          cor: 'azul', emoji: '🙋',
+          titulo: 'Manifestação de Interesse',
+          desc: 'Período em que os estudantes podem consultar as propostas aprovadas e manifestar interesse nas que pretendem realizar.',
+          inicio: d.int_inicio, fim: d.int_fim
+        },
+        {
+          cor: 'verde', emoji: '👨‍🏫',
+          titulo: 'Atribuição de Orientadores',
+          desc: 'Fase em que a CCA atribui os orientadores académicos às propostas aprovadas e com estudantes selecionados.',
+          inicio: d.tut_inicio, fim: d.tut_fim
+        }
+      ];
+
+      const v = (str) => str
+        ? `<div class="fase-data-valor">${fmtDataVisual(str)}</div>`
+        : `<div class="fase-data-valor vazia">Por definir</div>`;
+
+      document.getElementById('conteudoPrazos').innerHTML = fases.map(f => {
+        const estado = estadoFase(f.inicio, f.fim);
+        return `
+          <div class="fase-card">
+            <div class="fase-barra ${f.cor}"></div>
+            <div class="fase-body">
+              <div class="fase-icone ${f.cor}">${f.emoji}</div>
+              <div class="fase-info">
+                <div class="fase-titulo">${f.titulo}</div>
+                <div class="fase-desc">${f.desc}</div>
+                <div class="fase-datas">
+                  <div class="fase-data-item">
+                    <div class="fase-data-label">Início</div>
+                    ${v(f.inicio)}
+                  </div>
+                  <div class="fase-data-item">
+                    <div class="fase-data-label">Fim</div>
+                    ${v(f.fim)}
+                  </div>
+                </div>
+                <div class="fase-estado ${estado.classe}">${estado.texto}</div>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+
+    } catch (err) {
+      document.getElementById('conteudoPrazos').innerHTML = `
+        <div class="vazio">
+          <div class="emoji">⚠️</div>
+          <p>${err.message}</p>
+        </div>`;
+    }
+  }
+
+  function abrirModalLogout() {
+    const m = document.getElementById('modalLogout');
+    m.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+  function fecharModalLogout() {
+    document.getElementById('modalLogout').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  function confirmarLogout() {
+    localStorage.clear();
+    window.location.href = 'login.html';
+  }
+
+  carregar();
+</script>
+</body>
+</html>

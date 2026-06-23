@@ -367,6 +367,7 @@
     <a class="nav-item" href="lista-propostas.html">Propostas</a>
     <a class="nav-item" href="candidaturas.html">As Minhas Candidaturas</a>
     <a class="nav-item activo">O Meu Perfil</a>
+    <a class="nav-item" href="prazos.html">Prazos</a>
   </nav>
   <div class="sidebar-footer">
     <div class="nome" id="sidebarNome">—</div>
@@ -442,7 +443,7 @@
 <input type="file" id="inputDomus" accept=".pdf">
 
 <script>
-  const API = 'http://192.168.1.66:5000/api';
+  const API = 'http://127.0.0.1:5000/api';
   const token = localStorage.getItem('esmad_token');
   const user  = localStorage.getItem('esmad_user');
   if (!token || !user) { window.location.href = 'login.html'; }

@@ -113,19 +113,48 @@
     .voto-badge.rejeitado { background: var(--vermelho-light); color: var(--vermelho); }
     .voto-badge.pendente  { background: var(--amarelo-light);  color: var(--amarelo); }
 
-    .datas-form { padding: 22px 24px; }
-    .datas-grupo { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--cinza-linha); }
-    .datas-grupo:last-of-type { border-bottom: none; margin-bottom: 0; }
-    .datas-grupo-titulo { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 14px; }
-    .datas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    /* ══ DATAS DO PROCESSO ══ */
+    .datas-painel { display: flex; flex-direction: column; gap: 14px; }
+    .data-secao-card {
+      background: var(--branco); border-radius: 12px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06); overflow: hidden;
+    }
+    .data-secao-header {
+      padding: 14px 20px; display: flex; align-items: center;
+      justify-content: space-between; border-bottom: 1px solid var(--cinza-linha);
+    }
+    .data-secao-titulo { font-size: 0.88rem; font-weight: 700; }
+    .data-secao-body {
+      padding: 16px 20px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+    .data-item { }
+    .data-item-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--cinza-texto); margin-bottom: 4px; }
+    .data-item-valor {
+      font-size: 0.92rem; font-weight: 700; color: var(--preto);
+      background: var(--cinza-input); border-radius: 8px; padding: 10px 14px;
+    }
+    .data-item-valor.vazia { color: var(--cinza-texto); font-weight: 400; font-style: italic; font-size: 0.84rem; }
+    .btn-editar-datas {
+      background: var(--laranja-light); color: var(--laranja); border: none;
+      border-radius: 6px; padding: 7px 14px; font-family: 'Inter', sans-serif;
+      font-size: 0.78rem; font-weight: 700; cursor: pointer; white-space: nowrap;
+    }
+    .btn-editar-datas:hover { background: var(--laranja); color: var(--branco); }
+
+    /* Modal datas */
+    .datas-form { padding: 4px 0; }
+    .datas-grupo { margin-bottom: 20px; }
+    .datas-grupo:last-child { margin-bottom: 0; }
+    .datas-grupo-titulo { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 12px; color: var(--preto); }
+    .datas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .data-campo label { display: block; font-size: 0.72rem; font-weight: 700; color: var(--cinza-texto); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 7px; }
     .data-campo input[type="date"] { width: 100%; background: var(--cinza-input); border: 1.5px solid transparent; border-radius: 8px; padding: 11px 14px; font-family: 'Inter', sans-serif; font-size: 0.86rem; color: var(--preto); outline: none; transition: border-color 0.18s; }
     .data-campo input[type="date"]:focus { background: var(--branco); border-color: var(--laranja); box-shadow: 0 0 0 3px rgba(241,90,36,0.10); }
-    .datas-footer { padding: 16px 24px; border-top: 1px solid var(--cinza-linha); display: flex; justify-content: flex-end; }
-    .btn-guardar-datas { background: var(--laranja); color: var(--branco); border: none; border-radius: 8px; padding: 10px 24px; font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 700; cursor: pointer; }
-    .btn-guardar-datas:hover { background: var(--laranja-hover); }
-    .alerta-datas { display: none; margin: 0 24px 14px; border-radius: 8px; padding: 10px 14px; font-size: 0.82rem; font-weight: 500; }
-    .alerta-datas.sucesso { background: var(--verde-light); color: var(--verde); display: block; }
+    @media (max-width: 768px) {
+      .data-secao-body { grid-template-columns: 1fr; }
+      .datas-grid { grid-template-columns: 1fr; }
+    }
 
     .skeleton { background: linear-gradient(90deg,#ececec 25%,#f5f5f5 50%,#ececec 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 6px; }
     @keyframes shimmer { to { background-position: -200% 0; } }
@@ -518,7 +547,7 @@
 </div>
 
 <script>
-  const API = 'http://192.168.1.66:5000/api';
+  const API = 'http://127.0.0.1:5000/api';
   const token = localStorage.getItem('esmad_token');
   const user  = localStorage.getItem('esmad_user');
   if (!token || !user) { window.location.href = 'login.html'; }
@@ -1247,16 +1276,94 @@
   }
 
   // ══ DATAS ══
-  const getDatas=()=>{const s=localStorage.getItem('esmad_datas');return s?JSON.parse(s):{};};
-  const saveDatas=o=>localStorage.setItem('esmad_datas',JSON.stringify(o));
-  function renderDatas(){
-    const d=getDatas();
-    document.getElementById('conteudoTab').innerHTML=`<div class="painel"><div class="painel-header"><h2>Datas do Processo</h2></div><div id="alertaDatas" class="alerta-datas"></div><div class="datas-form"><div class="datas-grupo"><div class="datas-grupo-titulo">📋 Aceitação de Propostas</div><div class="datas-grid"><div class="data-campo"><label>Início</label><input type="date" id="d_prop_inicio" value="${d.prop_inicio||''}"></div><div class="data-campo"><label>Fim</label><input type="date" id="d_prop_fim" value="${d.prop_fim||''}"></div></div></div><div class="datas-grupo"><div class="datas-grupo-titulo">🙋 Manifestação de Interesse</div><div class="datas-grid"><div class="data-campo"><label>Início</label><input type="date" id="d_int_inicio" value="${d.int_inicio||''}"></div><div class="data-campo"><label>Fim</label><input type="date" id="d_int_fim" value="${d.int_fim||''}"></div></div></div><div class="datas-grupo"><div class="datas-grupo-titulo">👨‍🏫 Atribuição de Tutores</div><div class="datas-grid"><div class="data-campo"><label>Início</label><input type="date" id="d_tut_inicio" value="${d.tut_inicio||''}"></div><div class="data-campo"><label>Fim</label><input type="date" id="d_tut_fim" value="${d.tut_fim||''}"></div></div></div></div><div class="datas-footer"><button class="btn-guardar-datas" onclick="guardarDatas()">Guardar Datas</button></div></div>`;
+  // ══ DATAS DO PROCESSO ══
+  let _datasActuais = {};
+
+  function fmtData(str) {
+    if (!str) return '';
+    return new Date(str).toISOString().split('T')[0];
   }
-  function guardarDatas(){
-    saveDatas({prop_inicio:document.getElementById('d_prop_inicio').value,prop_fim:document.getElementById('d_prop_fim').value,int_inicio:document.getElementById('d_int_inicio').value,int_fim:document.getElementById('d_int_fim').value,tut_inicio:document.getElementById('d_tut_inicio').value,tut_fim:document.getElementById('d_tut_fim').value});
-    const al=document.getElementById('alertaDatas');al.textContent='Datas guardadas!';al.className='alerta-datas sucesso';
-    setTimeout(()=>{al.className='alerta-datas';},3000);
+
+  function fmtDataVisual(str) {
+    if (!str) return null;
+    return new Date(str).toLocaleDateString('pt-PT', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+
+  async function renderDatas() {
+    document.getElementById('conteudoTab').innerHTML = `
+      <div class="datas-painel" id="datasContainer">
+        <div class="skeleton" style="height:120px;border-radius:12px;margin-bottom:14px"></div>
+        <div class="skeleton" style="height:120px;border-radius:12px;margin-bottom:14px"></div>
+        <div class="skeleton" style="height:120px;border-radius:12px"></div>
+      </div>`;
+    try {
+      const dados = await req('/cca/datas');
+      _datasActuais = dados.datas || {};
+      renderDatasVista();
+    } catch (err) {
+      document.getElementById('datasContainer').innerHTML =
+        `<div class="vazio"><div class="emoji">⚠️</div>${err.message}</div>`;
+    }
+  }
+
+  function renderDatasVista() {
+    const d = _datasActuais;
+    const v = str => str
+      ? `<div class="data-item-valor">${fmtDataVisual(str)}</div>`
+      : `<div class="data-item-valor vazia">Por definir</div>`;
+    const secao = (emoji, titulo, keyI, keyF) => `
+      <div class="data-secao-card">
+        <div class="data-secao-header">
+          <div class="data-secao-titulo">${emoji} ${titulo}</div>
+          <button class="btn-editar-datas" onclick="abrirEditarDatas()">✏️ Editar</button>
+        </div>
+        <div class="data-secao-body">
+          <div class="data-item"><div class="data-item-label">Início</div>${v(d[keyI])}</div>
+          <div class="data-item"><div class="data-item-label">Fim</div>${v(d[keyF])}</div>
+        </div>
+      </div>`;
+    document.getElementById('datasContainer').innerHTML =
+      secao('📋', 'Aceitação de Propostas',     'prop_inicio', 'prop_fim') +
+      secao('🙋', 'Manifestação de Interesse',   'int_inicio',  'int_fim') +
+      secao('👨‍🏫', 'Atribuição de Orientadores', 'tut_inicio', 'tut_fim');
+  }
+
+  function abrirEditarDatas() {
+    const d = _datasActuais;
+    ['prop_inicio','prop_fim','int_inicio','int_fim','tut_inicio','tut_fim'].forEach(k => {
+      const el = document.getElementById('d_' + k);
+      if (el) el.value = d[k] ? fmtData(d[k]) : '';
+    });
+    document.getElementById('alertaDatas').className = 'alerta-modal';
+    const btn = document.getElementById('btnGuardarDatas');
+    btn.disabled = false; btn.textContent = 'Guardar Datas';
+    abrirModal('modalDatas');
+  }
+
+  async function guardarDatas() {
+    const al  = document.getElementById('alertaDatas');
+    const btn = document.getElementById('btnGuardarDatas');
+    al.className = 'alerta-modal';
+    btn.disabled = true; btn.innerHTML = '<span class="spin"></span>A guardar…';
+    const payload = {
+      prop_inicio: document.getElementById('d_prop_inicio').value || null,
+      prop_fim:    document.getElementById('d_prop_fim').value    || null,
+      int_inicio:  document.getElementById('d_int_inicio').value  || null,
+      int_fim:     document.getElementById('d_int_fim').value     || null,
+      tut_inicio:  document.getElementById('d_tut_inicio').value  || null,
+      tut_fim:     document.getElementById('d_tut_fim').value     || null,
+    };
+    try {
+      const dados = await req('/cca/datas', { method: 'PUT', body: JSON.stringify(payload) });
+      if (!dados.sucesso) throw new Error(dados.mensagem);
+      _datasActuais = dados.datas;
+      al.textContent = '✔ Datas guardadas com sucesso!'; al.className = 'alerta-modal sucesso';
+      btn.innerHTML = '✔ Guardado';
+      setTimeout(() => { fecharModal('modalDatas'); renderDatasVista(); }, 1200);
+    } catch (err) {
+      al.textContent = err.message; al.className = 'alerta-modal erro';
+      btn.disabled = false; btn.textContent = 'Guardar Datas';
+    }
   }
 
   // ── Iniciar ──
@@ -1309,6 +1416,48 @@
     window.location.href = 'login.html';
   }
 </script>
+
+<!-- MODAL EDITAR DATAS DO PROCESSO -->
+<div class="modal-overlay" id="modalDatas">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-topo"></div>
+    <div class="modal-header">
+      <div><h2>Datas do Processo</h2><div class="sub">Defina os períodos de cada fase</div></div>
+      <button class="btn-fechar" onclick="fecharModal('modalDatas')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="alertaDatas" class="alerta-modal"></div>
+      <div class="linha-modal"></div>
+      <div class="datas-form">
+        <div class="datas-grupo">
+          <div class="datas-grupo-titulo">📋 Aceitação de Propostas</div>
+          <div class="datas-grid">
+            <div class="data-campo"><label>Início</label><input type="date" id="d_prop_inicio"></div>
+            <div class="data-campo"><label>Fim</label><input type="date" id="d_prop_fim"></div>
+          </div>
+        </div>
+        <div class="datas-grupo">
+          <div class="datas-grupo-titulo">🙋 Manifestação de Interesse</div>
+          <div class="datas-grid">
+            <div class="data-campo"><label>Início</label><input type="date" id="d_int_inicio"></div>
+            <div class="data-campo"><label>Fim</label><input type="date" id="d_int_fim"></div>
+          </div>
+        </div>
+        <div class="datas-grupo">
+          <div class="datas-grupo-titulo">👨‍🏫 Atribuição de Orientadores</div>
+          <div class="datas-grid">
+            <div class="data-campo"><label>Início</label><input type="date" id="d_tut_inicio"></div>
+            <div class="data-campo"><label>Fim</label><input type="date" id="d_tut_fim"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-m-cancelar" onclick="fecharModal('modalDatas')">Cancelar</button>
+      <button class="btn-m-laranja" id="btnGuardarDatas" onclick="guardarDatas()">Guardar Datas</button>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL CONFIRMAR REMOÇÃO -->
 <div class="modal-overlay" id="modalConfirmarRemocao" onclick="if(event.target===this) fecharModalRemocao()">

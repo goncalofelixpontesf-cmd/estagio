@@ -248,7 +248,7 @@
 </div>
 
 <script>
-  const API   = 'http://192.168.1.66:5000/api';
+  const API   = 'http://127.0.0.1:5000/api';
   const token = localStorage.getItem('esmad_token');
   const user  = localStorage.getItem('esmad_user');
   if (!token || !user) { window.location.href = 'login.html'; }
@@ -268,9 +268,8 @@
     ? `<a class="nav-item" href="gestao-cca.html">Painel CCA</a>
        <a class="nav-item activo">As Minhas Orientações</a>`
     : `<a class="nav-item" href="dashboard-entidade.html">As Minhas Propostas</a>
-       <a class="nav-item" href="estudantes-interessados.html">Estudantes Interessados</a>
        <a class="nav-item activo">As Minhas Orientações</a>
-       <a class="nav-item" href="entrevistas-entidade.html">Entrevistas</a>`;
+       <a class="nav-item" href="entrevistas.html">Entrevistas</a>`;
   document.getElementById('avatar').textContent = utilizador.nome.charAt(0).toUpperCase();
   document.getElementById('avatar').addEventListener('click', () => {
     abrirModalLogout();
@@ -337,7 +336,7 @@
       }
 
       lista.innerHTML = `<div class="tutorias-grid">${propostasRich.map(p => {
-        const tipo = p.tipo === 'estagio' ? 'Estágio' : 'Projeto';
+        const tipo = p.tipo === 'estagio' ? 'Estágio' : 'Projecto';
         const estado = p.estado;
         const estadoLabel = { atribuida: 'Atribuída', aprovada: 'Aprovada' };
         const areas = (p.areas || []).slice(0, 3).map(a => `<span class="area-tag">${a}</span>`).join('');

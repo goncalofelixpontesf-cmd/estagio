@@ -229,8 +229,8 @@
   <nav class="sidebar-nav">
     <a class="nav-item" href="dashboard-entidade.html">As Minhas Propostas</a>
     <a class="nav-item activo">Estudantes Interessados</a>
-    <a class="nav-item" href="minhas-tutorias.html" id="navTutorias">As Minhas Orientações</a>
     <a class="nav-item" href="entrevistas-entidade.html">Entrevistas</a>
+    <a class="nav-item" href="prazos.html">📅 Prazos</a>
   </nav>
   <div class="sidebar-footer">
     <div class="nome" id="sidebarNome">—</div>
@@ -364,7 +364,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  const API = 'http://192.168.1.66:5000/api';
+  const API = 'http://127.0.0.1:5000/api';
   const token = localStorage.getItem('esmad_token');
   const user  = localStorage.getItem('esmad_user');
   if (!token || !user) { window.location.href = 'login.html'; }
@@ -545,7 +545,7 @@
       <div class="perfil-linha"><span class="pl-label">Média</span><span class="pl-valor">${media ? parseFloat(media).toFixed(1) : '—'}</span></div>
       ${portfolio ? `<div class="perfil-linha"><span class="pl-label">Portefólio</span><span class="pl-valor"><a href="${portfolio.startsWith('http') ? portfolio : 'https://'+portfolio}" target="_blank" style="color:var(--azul)">🔗 ver portefólio</a></span></div>` : ''}
       ${linkedin  ? `<div class="perfil-linha"><span class="pl-label">LinkedIn</span><span class="pl-valor"><a href="${linkedin.startsWith('http') ? linkedin : 'https://'+linkedin}" target="_blank" style="color:var(--azul)">🔗 ver LinkedIn</a></span></div>` : ''}
-      ${cv ? `<div class="perfil-linha"><span class="pl-label">Curriculum Vitae</span><span class="pl-valor"><a href="${cv.startsWith('http') ? cv : 'http://192.168.1.66:5000/cv/'+cv}" target="_blank" style="color:var(--azul)">📄 descarregar CV</a></span></div>` : '<div class="perfil-linha"><span class="pl-label">Curriculum Vitae</span><span class="pl-valor" style="color:var(--cinza-texto)">Não disponível</span></div>'}
+      ${cv ? `<div class="perfil-linha"><span class="pl-label">Curriculum Vitae</span><span class="pl-valor"><a href="${cv.startsWith('http') ? cv : 'http://127.0.0.1:5000/cv/'+cv}" target="_blank" style="color:var(--azul)">📄 descarregar CV</a></span></div>` : '<div class="perfil-linha"><span class="pl-label">Curriculum Vitae</span><span class="pl-valor" style="color:var(--cinza-texto)">Não disponível</span></div>'}
     `;
   }
 

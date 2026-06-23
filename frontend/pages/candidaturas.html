@@ -250,6 +250,7 @@
     <a class="nav-item" href="lista-propostas.html">Propostas</a>
     <a class="nav-item activo">As Minhas Candidaturas</a>
     <a class="nav-item" href="perfil-estudante.html">O Meu Perfil</a>
+    <a class="nav-item" href="prazos.html">Prazos</a>
   </nav>
   <div class="sidebar-footer">
     <div class="nome" id="sidebarNome">—</div>
@@ -324,7 +325,7 @@
 </main>
 
 <script>
-  const API = 'http://192.168.1.66:5000/api';
+  const API = 'http://127.0.0.1:5000/api';
   const token = localStorage.getItem('esmad_token');
   const user  = localStorage.getItem('esmad_user');
   if (!token || !user) { window.location.href = 'login.html'; }
@@ -568,7 +569,7 @@
                   <div class="ec-titulo">${p?.titulo || '—'}</div>
                   <div class="ec-meta">
                     <span>🏢 ${p?.nomeEntidade || '—'}</span>
-                    <span class="tag-tipo ${p?.tipo || 'estagio'}">${p?.tipo === 'projecto' ? 'Projecto' : 'Estágio'}</span>
+                    <span class="tag-tipo ${p?.tipo || 'estagio'}">${p?.tipo === 'projecto' ? 'Projeto' : 'Estágio'}</span>
                   </div>
                   ${p?.tutorNome ? `<div class="ec-tutor">Tutor na entidade: ${p.tutorNome}</div>` : ''}
                   <div class="ec-acoes">
@@ -600,7 +601,7 @@
               <div class="ec-titulo">${p?.titulo || '—'}</div>
               <div class="ec-meta">
                 <span>🏢 ${p?.nomeEntidade || '—'}</span>
-                <span class="tag-tipo ${p?.tipo || 'estagio'}">${p?.tipo === 'projecto' ? 'Projecto' : 'Estágio'}</span>
+                <span class="tag-tipo ${p?.tipo || 'estagio'}">${p?.tipo === 'projecto' ? 'Projeto' : 'Estágio'}</span>
               </div>
               ${p?.tutorNome ? `<div class="ec-tutor">Tutor na entidade: ${p.tutorNome}</div>` : ''}
               <div class="ec-acoes">

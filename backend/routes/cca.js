@@ -4,6 +4,11 @@ const ctrl    = require('../controllers/ccaController');
 const { proteger, restringir } = require('../middleware/auth');
 
 router.use(proteger);
+
+// Leitura dos prazos — acessível a todos os utilizadores autenticados
+router.get('/datas', ctrl.obterDatas);
+
+// Todas as rotas abaixo exigem perfil comissao ou admin
 router.use(restringir('comissao', 'admin'));
 
 // Propostas
@@ -28,6 +33,10 @@ router.put('/membros/:id/cursos',          ctrl.actualizarCursosMembro);
 router.delete('/membros/:id',              ctrl.removerMembro);
 
 // Convite por email
-router.post('/convite',                    ctrl.enviarConvite);
+router.post('/convite', ctrl.enviarConvite);
+
+// Datas do processo
+router.get('/datas',  ctrl.obterDatas);
+router.put('/datas',  ctrl.guardarDatas);
 
 module.exports = router;
