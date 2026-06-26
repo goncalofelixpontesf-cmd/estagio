@@ -40,21 +40,45 @@ exports.manifestarInteresse = async (req, res) => {
 
     const proposta = await Proposta.findById(req.params.propostaId);
     if (!proposta) return res.status(404).json({ sucesso: false, mensagem: 'Proposta não encontrada.' });
-    if (proposta.estado !== 'aprovada') return res.status(400).json({ sucesso: false, mensagem: 'Só é possível candidatar a propostas aprovadas.' });
+    if (!['aprovada', 'atribuida'].includes(proposta.estado)) return res.status(400).json({ sucesso: false, mensagem: 'Só é possível candidatar a propostas aprovadas.' });
 
     const jaExiste = await Candidatura.findOne({ propostaId: proposta._id, estudanteId: estudante._id });
     if (jaExiste) return res.status(400).json({ sucesso: false, mensagem: 'Já te candidataste a esta proposta.' });
 
-    const candidatura = await Candidatura.create({ propostaId: proposta._id, estudanteId: estudante._id });
+    // Bloquear se o estudante já tem uma candidatura confirmada noutras propostas
+    const jaConfirmada = await Candidatura.findOne({ estudanteId: estudante._id, estado: 'confirmada' });
+    if (jaConfirmada) return res.status(400).json({ sucesso: false, mensagem: 'Já foi selecionado para um estágio. Não é possível manifestar interesse em novas propostas.' });
 
-    await Notificacao.create({
-      destinatarioId: proposta.proponenteId,
-      tipo: 'novo_interesse',
-      mensagem: `Um estudante manifestou interesse na proposta "${proposta.titulo}".`,
-      referenciaId: proposta._id
+    // Verificar se o estudante é o proponente da proposta
+    const eProponente = proposta.proponenteId?.toString() === req.utilizador._id.toString();
+
+    const candidatura = await Candidatura.create({
+      propostaId: proposta._id,
+      estudanteId: estudante._id,
+      // Se for o proponente, fica automaticamente confirmado
+      estado: eProponente ? 'confirmada' : 'pendente'
     });
 
-    res.status(201).json({ sucesso: true, candidatura });
+    if (eProponente) {
+      // Marcar todas as outras candidaturas desta proposta como recusadas
+      await Candidatura.updateMany(
+        { propostaId: proposta._id, _id: { $ne: candidatura._id } },
+        { estado: 'recusada' }
+      );
+      // Atualizar a proposta para atribuída com este estudante
+      proposta.estado = 'atribuida';
+      proposta.estudanteEscolhidoId = estudante._id;
+      await proposta.save();
+    } else {
+      await Notificacao.create({
+        destinatarioId: proposta.proponenteId,
+        tipo: 'novo_interesse',
+        mensagem: `Um estudante manifestou interesse na proposta "${proposta.titulo}".`,
+        referenciaId: proposta._id
+      });
+    }
+
+    res.status(201).json({ sucesso: true, candidatura, autoSelecionado: eProponente });
   } catch (err) {
     res.status(500).json({ sucesso: false, mensagem: err.message });
   }

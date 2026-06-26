@@ -464,8 +464,9 @@
   <div class="sidebar-logo"><span>ESMAD</span></div>
   <nav class="sidebar-nav">
     <a class="nav-item activo" href="lista-propostas.html">Propostas</a>
-    <a class="nav-item" href="entrevistas.html">As Minhas Candidaturas</a>
+    <a class="nav-item" href="candidaturas.html">As Minhas Candidaturas</a>
     <a class="nav-item" href="perfil-estudante.html">O Meu Perfil</a>
+    <a class="nav-item" href="prazos.html">Prazos</a>
   </nav>
   <div class="sidebar-footer">
     <div class="nome" id="sidebarNome">—</div>
@@ -587,7 +588,7 @@
 
   const estadoLabels = {
     aprovada: 'Aprovada', pendente: 'Pendente',
-    rejeitada: 'Rejeitada', atribuida: 'Atribuída'
+    rejeitada: 'Rejeitada', atribuida: 'Aprovada'
   };
 
   // ── Estado local ──
@@ -750,7 +751,7 @@
         </div>
         <div class="info-linha">
           <span class="info-label">Estado</span>
-          <span class="info-estado ${p.estado}">${estadoLabels[p.estado] || p.estado}</span>
+          <span class="info-estado ${p.estado === 'atribuida' ? 'aprovada' : p.estado}">${estadoLabels[p.estado] || p.estado}</span>
         </div>
         ${p.tutorNome ? `
         <hr style="border:none;border-top:1px solid var(--cinza-linha);margin:12px 0">

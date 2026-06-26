@@ -4,27 +4,27 @@ const bcrypt = require('bcryptjs');
 const utilizadorSchema = new mongoose.Schema({
   nome: {
     type: String,
-    required: [true, 'O nome e obrigatorio'],
+    required: [true, 'O nome e obrigatório'],
     trim: true
   },
   email: {
     type: String,
-    required: [true, 'O email e obrigatorio'],
+    required: [true, 'O email e obrigatório'],
     unique: true,
     lowercase: true,
     trim: true,
-    match: [/^\S+@\S+\.\S+$/, 'Email invalido']
+    match: [/^\S+@\S+\.\S+$/, 'Email inválido']
   },
   password: {
     type: String,
-    required: [true, 'A password e obrigatoria'],
-    minlength: [6, 'Minimo 6 caracteres'],
+    required: [true, 'A password e obrigatória'],
+    minlength: [6, 'Mínimo 6 caracteres'],
     select: false
   },
   perfil: {
     type: String,
     enum: ['estudante', 'docente', 'entidade', 'comissao', 'admin'],
-    required: [true, 'O perfil e obrigatorio']
+    required: [true, 'O perfil e obrigatório']
   },
   // Só relevante quando perfil === 'comissao'
   // Array vazio ou ausente = acesso a todos os cursos

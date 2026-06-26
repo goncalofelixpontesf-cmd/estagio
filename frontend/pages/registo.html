@@ -88,7 +88,7 @@
         <label for="perfil">Perfil</label>
         <div class="select-wrap">
           <select id="perfil">
-            <option value="" disabled selected>Selecciona o teu perfil</option>
+            <option value="" disabled selected>Selecione o seu perfil</option>
             <option value="estudante">Estudante</option>
             <option value="docente">Docente</option>
             <option value="entidade">Entidade</option>
@@ -100,7 +100,7 @@
       <div class="campo">
         <label for="email">Email</label>
         <input type="email" id="email" placeholder="exemplo@esmad.ipp.pt" autocomplete="email" inputmode="email">
-        <p class="nota" id="notaEmail">Introduz o teu email institucional.</p>
+        <p class="nota" id="notaEmail">Introduza o seu email institucional.</p>
       </div>
 
       <div class="campo">
@@ -139,7 +139,7 @@
 </div>
 
 <script>
-  const API_URL = 'http://192.168.1.66:5000/api';
+  const API_URL = 'http://127.0.0.1:5000/api';
 
   // Já autenticado → redirecionar
   (() => {
@@ -170,7 +170,7 @@
     },
     docente: {
       placeholder: 'nome@esmad.ipp.pt',
-      nota:        'Usa o teu email institucional: nome@esmad.ipp.pt',
+      nota:        'Use o seu email institucional: nome@esmad.ipp.pt',
       regex:       /^[a-zA-Z][a-zA-Z0-9.]+@esmad\.ipp\.pt$/i,
       erroFormato: 'O email de docente deve ser: (ex: nome@esmad.ipp.pt)'
     },
@@ -257,10 +257,10 @@
     const perfil   = perfilSelect.value;
 
     // Validações básicas
-    if (!nome)     { mostrarAlerta('Introduz o teu nome completo.'); return; }
-    if (!perfil)   { mostrarAlerta('Selecciona o teu perfil.'); return; }
-    if (!email)    { mostrarAlerta('Introduz o teu email.'); return; }
-    if (!password) { mostrarAlerta('Introduz uma password.'); return; }
+    if (!nome)     { mostrarAlerta('Introduza o seu nome completo.'); return; }
+    if (!perfil)   { mostrarAlerta('Selecione o seu perfil.'); return; }
+    if (!email)    { mostrarAlerta('Introduza o seu email.'); return; }
+    if (!password) { mostrarAlerta('Introduza uma password.'); return; }
     if (password.length < 6) { mostrarAlerta('A password deve ter pelo menos 6 caracteres.'); return; }
 
     // Validar formato de email conforme perfil (validação local antes de enviar)
@@ -277,7 +277,7 @@
     if (perfil === 'estudante') corpo.curso = document.getElementById('curso').value;
     if (perfil === 'entidade') {
       const nomeEnt = document.getElementById('nomeEntidade').value.trim();
-      if (!nomeEnt) { mostrarAlerta('Introduz o nome da empresa ou organização.'); return; }
+      if (!nomeEnt) { mostrarAlerta('Introduza o nome da empresa ou organização.'); return; }
       corpo.nomeEntidade = nomeEnt;
     }
 

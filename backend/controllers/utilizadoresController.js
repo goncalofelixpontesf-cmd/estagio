@@ -271,7 +271,7 @@ exports.minhasTutorias = async (req, res) => {
 
     const resultado = await Promise.all(propostas.map(async p => {
       const cands = await Candidatura.find({ propostaId: p._id });
-      const candAceite = cands.find(function(cd) { return cd.estado === 'aceite'; });
+      const candAceite = cands.find(function(cd) { return cd.estado === 'aceite' || cd.estado === 'confirmada'; });
 
       let estudanteAceite = null;
       if (candAceite) {

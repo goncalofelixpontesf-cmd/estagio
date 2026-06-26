@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESMAD</title>
+  <title>ESMAD — As Minhas Orientações</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="favicon.ico">
   <style>
@@ -156,6 +156,8 @@
     .badge-cand-estado.aceite::before { background: var(--verde); }
     .badge-cand-estado.rejeitada { background: var(--vermelho-light); color: var(--vermelho); }
     .badge-cand-estado.rejeitada::before { background: var(--vermelho); }
+    .badge-cand-estado.confirmada { background: var(--verde-light); color: var(--verde); }
+    .badge-cand-estado.confirmada::before { background: var(--verde); }
 
     /* Aviso de conflito orientador = tutor entidade */
     .aviso-conflito {
@@ -266,10 +268,9 @@
   const eCCA = ['comissao','admin'].includes(utilizador.perfil);
   document.getElementById('sidebarNav').innerHTML = eCCA
     ? `<a class="nav-item" href="gestao-cca.html">Painel CCA</a>
-       <a class="nav-item activo">As Minhas Orientações</a>
-       <a class="nav-item" href="prazos.html">Prazos</a>`
+       <a class="nav-item activo">As Minhas Orientações</a>`
     : `<a class="nav-item" href="dashboard-entidade.html">As Minhas Propostas</a>
-      <a class="nav-item" href="estudantes-interessados.html">Estudantes Interessados</a>
+       <a class="nav-item" href="estudantes-interessados.html">Estudantes Interessados</a>
        <a class="nav-item activo">As Minhas Orientações</a>
        <a class="nav-item" href="entrevistas-entidade.html">Entrevistas</a>
        <a class="nav-item" href="prazos.html">Prazos</a>`;
@@ -339,7 +340,7 @@
       }
 
       lista.innerHTML = `<div class="tutorias-grid">${propostasRich.map(p => {
-        const tipo = p.tipo === 'estagio' ? 'Estágio' : 'Projecto';
+        const tipo = p.tipo === 'estagio' ? 'Estágio' : 'Projeto';
         const estado = p.estado;
         const estadoLabel = { atribuida: 'Atribuída', aprovada: 'Aprovada' };
         const areas = (p.areas || []).slice(0, 3).map(a => `<span class="area-tag">${a}</span>`).join('');
@@ -365,7 +366,7 @@
                   </div>
                   ${(p.tutorEmail && utilizador.email && p.tutorEmail.toLowerCase() === utilizador.email.toLowerCase())
                     ? `<div class="aviso-conflito" style="grid-column:1/-1">
-                        ⚠️ Atenção: és simultaneamente orientador e tutor na entidade desta proposta — estes papéis devem ser desempenhados por pessoas diferentes.
+                        ⚠️ Atenção: é simultaneamente orientador e tutor na entidade desta proposta — estes papéis devem ser desempenhados por pessoas diferentes.
                        </div>`
                     : ''}
                   <div class="tutoria-secao">
@@ -428,7 +429,7 @@
     if (e.target.id === 'modalCandidatos') fecharModalCand();
   });
 
-  const estadoCandLabel = { pendente: 'Pendente', entrevista_agendada: 'Entrevista Agendada', aceite: 'Aceite', rejeitada: 'Rejeitada' };
+  const estadoCandLabel = { pendente: 'Pendente', entrevista_agendada: 'Entrevista Agendada', aceite: 'Aceite', rejeitada: 'Rejeitada', confirmada: '✔ Estudante Escolhido' };
 
   async function carregarCandidatos(propostaId) {
     try {

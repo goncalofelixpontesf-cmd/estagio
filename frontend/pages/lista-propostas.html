@@ -238,7 +238,7 @@
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo"><span>ESMAD</span></div>
   <nav class="sidebar-nav">
-    <a class="nav-item activo">Propostas</a>
+    <a class="nav-item activo" href="lista-propostas.html">Propostas</a>
     <a class="nav-item" href="candidaturas.html">As Minhas Candidaturas</a>
     <a class="nav-item" href="perfil-estudante.html">O Meu Perfil</a>
     <a class="nav-item" href="prazos.html">Prazos</a>
@@ -259,13 +259,7 @@
   </div>
   <div class="content">
 
-    <div class="tabs">
-      <button class="tab activo"   id="tabDisp"   onclick="mudarTab('disponiveis')">Propostas Disponíveis</button>
-      <button class="tab inactivo" id="tabMinhas" onclick="mudarTab('minhas')">
-        As Minhas Propostas
-        <span class="badge-tab" id="badgeRejeicoes" style="display:none">!</span>
-      </button>
-    </div>
+
 
     <!-- CONTEÚDO DA TAB -->
     <div id="conteudoTab"></div>
@@ -363,7 +357,6 @@
   });
 
   // ── Estado ──
-  let tabActiva       = 'disponiveis';
   let todasPropostas  = [];
   let mpModoEdicao    = false;
   let mpPropostaId    = null;
@@ -372,15 +365,7 @@
   // ══════════════════════════════════════════════
   // TABS
   // ══════════════════════════════════════════════
-  function mudarTab(tab) {
-    tabActiva = tab;
-    document.getElementById('tabDisp').className   = tab === 'disponiveis' ? 'tab activo' : 'tab inactivo';
-    document.getElementById('tabMinhas').className = tab === 'minhas'      ? 'tab activo' : 'tab inactivo';
-    document.getElementById('topbarTitulo').textContent = tab === 'disponiveis' ? 'Propostas' : 'As Minhas Propostas';
-    document.getElementById('topbarSub').textContent    = tab === 'disponiveis' ? 'Encontre o seu próximo projeto ou estágio' : 'Acompanha o estado das tuas propostas submetidas';
-    if (tab === 'disponiveis') renderTabDisp();
-    else                       carregarMinhasPropostas();
-  }
+
 
   // ══════════════════════════════════════════════
   // TAB: PROPOSTAS DISPONÍVEIS
@@ -439,11 +424,12 @@
     }, 0);
   }
 
+
   async function carregarPropostas() {
     try {
       const dados = await req('/propostas');
       if (!dados.sucesso) throw new Error(dados.mensagem);
-      todasPropostas = (dados.propostas || []).filter(p => p.estado === 'aprovada');
+      todasPropostas = dados.propostas || [];
       renderPropostas(todasPropostas);
     } catch {
       const g = document.getElementById('grelha');
@@ -455,9 +441,9 @@
     const g = document.getElementById('grelha');
     if (!g) return;
     if (!lista.length) { g.innerHTML = '<div class="vazio"><div class="emoji">📭</div><p>Não há propostas disponíveis.</p></div>'; return; }
-    const estadoLabels = { aprovada:'Aprovada', pendente:'Pendente', rejeitada:'Rejeitada', entrevista_agendada:'Entrevista', aceite:'Aceite' };
+    const estadoLabels = { aprovada:'Aprovada', atribuida:'Aprovada', pendente:'Pendente', rejeitada:'Rejeitada', entrevista_agendada:'Entrevista', aceite:'Aceite' };
     g.innerHTML = lista.map(p => {
-      const tipo = p.tipo === 'estagio' ? 'Estágio' : 'Projecto';
+      const tipo = p.tipo === 'estagio' ? 'Estágio' : 'Projeto';
       return `<div class="proposta-card" onclick="window.location.href='detalhe-proposta.html?id=${p._id}'">
         <div class="card-topo"><span class="card-tipo${p.tipo==='projecto'?' projecto':''}">${tipo}</span></div>
         <div class="card-body">
@@ -467,7 +453,7 @@
           <div class="card-descricao">${p.descricao||''}</div>
         </div>
         <div class="card-footer">
-          <span class="estado ${p.estado}">${estadoLabels[p.estado]||p.estado}</span>
+          <span class="estado aprovada">${estadoLabels[p.estado]||p.estado}</span>
           <span class="card-data">${formatarData(p.criadaEm)}</span>
         </div>
       </div>`;
@@ -493,74 +479,19 @@
   }
 
   // ══════════════════════════════════════════════
-  // TAB: AS MINHAS PROPOSTAS
-  // ══════════════════════════════════════════════
-  async function carregarMinhasPropostas() {
-    document.getElementById('conteudoTab').innerHTML = `
-      <div class="painel">
-        <div class="painel-header">
-          <h2>As Minhas Propostas</h2>
-          <button class="btn-nova" onclick="abrirModalProposta()">Nova Proposta <span>+</span></button>
-        </div>
-        <table>
-          <thead><tr><th>Título</th><th>Tipo</th><th>Estado</th><th>Submetida</th><th>Ações</th></tr></thead>
-          <tbody id="tbMinhas"><tr><td colspan="5"><div class="vazio-tabela"><div class="emoji">⏳</div><p>A carregar…</p></div></td></tr></tbody>
-        </table>
-      </div>`;
-
-    try {
-      const dados = await req('/propostas');
-      if (!dados.sucesso) throw new Error(dados.mensagem);
-
-      const minhas = (dados.propostas || []).filter(p =>
-        (p.proponenteId?._id || p.proponenteId) === utilizador.id ||
-        p.proponenteId?.toString() === utilizador.id
-      );
-
-      // Badge de rejeições
-      const rejeicoes = minhas.filter(p => p.estado === 'rejeitada').length;
-      const badge = document.getElementById('badgeRejeicoes');
-      badge.textContent = rejeicoes;
-      badge.style.display = rejeicoes > 0 ? '' : 'none';
-
-      const tbody = document.getElementById('tbMinhas');
-      if (!minhas.length) {
-        tbody.innerHTML = `<tr><td colspan="5"><div class="vazio-tabela"><div class="emoji">📭</div><p>Ainda não submeteste nenhuma proposta.<br><button class="btn-nova" style="margin-top:12px;display:inline-flex" onclick="abrirModalProposta()">Submeter Proposta +</button></p></div></td></tr>`;
-        return;
-      }
-
-      const estadoLabel = { aprovada:'Aprovada', pendente:'Pendente', rejeitada:'Rejeitada', atribuida:'Atribuída' };
-      tbody.innerHTML = minhas.map(p => `
-        <tr>
-          <td>
-            <span class="titulo-link" onclick="abrirDetalhesProposta('${p._id}')">${p.titulo}</span>
-            <div style="font-size:0.74rem;color:var(--cinza-texto);margin-top:2px">${p.curso||''}</div>
-          </td>
-          <td><span class="tag ${p.tipo}">${p.tipo === 'estagio' ? 'Estágio' : 'Projecto'}</span></td>
-          <td><span class="estado ${p.estado}">${estadoLabel[p.estado]||p.estado}</span></td>
-          <td style="color:var(--cinza-texto)">${formatarData(p.criadaEm)}</td>
-          <td>
-            <div class="acoes-tabela">
-              <button class="btn-detalhes" onclick="abrirDetalhesProposta('${p._id}')">📋 Detalhes</button>
-              ${p.estado === 'rejeitada'
-                ? `<button class="btn-editar-proposta" onclick="abrirEditarProposta('${p._id}')">✏️ Editar</button>`
-                : ''}
-            </div>
-          </td>
-        </tr>`).join('');
-
-    } catch (err) {
-      document.getElementById('tbMinhas').innerHTML = `<tr><td colspan="5"><div class="vazio-tabela"><div class="emoji">⚠️</div><p>${err.message}</p></div></td></tr>`;
-    }
-  }
-
-  // ══════════════════════════════════════════════
   // MODAL DETALHES
   // ══════════════════════════════════════════════
   async function abrirDetalhesProposta(id) {
     document.getElementById('detalhesTitulo').textContent = '—';
     document.getElementById('detalhesSub').textContent    = '—';
-    document.getElementById('detalhesBody').innerHTML     = '<div class="vazio-tabela"><div class="emoji">⏳</div>A carregar…</div>';
+    document.getElementById('detalhesBody').innerHTML     = `
+      <div style="display:flex;flex-direction:column;gap:12px;padding:8px 0">
+        <div class="skeleton" style="height:80px;border-radius:10px"></div>
+        <div class="skeleton" style="height:14px;width:60%"></div>
+        <div class="skeleton" style="height:14px;width:80%"></div>
+        <div class="skeleton" style="height:14px;width:70%"></div>
+        <div class="skeleton" style="height:100px;border-radius:10px;margin-top:8px"></div>
+      </div>`;
     document.getElementById('detalhesFooter').innerHTML   = '<button class="btn-m-cancelar" onclick="fecharModalBase(\'modalDetalhesProposta\')">Fechar</button>';
     abrirModalBase('modalDetalhesProposta');
 
@@ -572,59 +503,78 @@
       const topoCores = { aprovada: 'var(--verde)', pendente: 'var(--amarelo)', rejeitada: 'var(--vermelho)', atribuida: 'var(--azul)' };
       document.getElementById('detalhesTopoBarra').style.background = topoCores[p.estado] || 'var(--laranja)';
       document.getElementById('detalhesTitulo').textContent = p.titulo;
-      document.getElementById('detalhesSub').textContent    = `${p.tipo === 'estagio' ? 'Estágio' : 'Projecto'} · ${p.curso||''} · submetido em ${new Date(p.criadaEm).toLocaleDateString('pt-PT')}`;
+      document.getElementById('detalhesSub').textContent = `${p.tipo === 'estagio' ? 'Estágio' : 'Projeto'} · ${p.curso || ''} · ${p.nomeEntidade || '—'}`;
 
-      const estadoLabel = { aprovada:'Aprovada', pendente:'Pendente a aprovação', rejeitada:'Rejeitada', atribuida:'Atribuída' };
-      let html = '<hr class="linha-modal">';
+      const estadoLabel  = { aprovada:'Aprovada', pendente:'Pendente', rejeitada:'Rejeitada', atribuida:'Atribuída' };
+      const estadoCor    = { aprovada:'var(--verde)', pendente:'var(--amarelo)', rejeitada:'var(--vermelho)', atribuida:'var(--azul)' };
+      const estadoBg     = { aprovada:'var(--verde-light)', pendente:'var(--amarelo-light)', rejeitada:'var(--vermelho-light)', atribuida:'var(--azul-light)' };
 
-      html += `<div class="detalhe-meta-grid">
-        <div class="detalhe-bloco"><div class="db-label">Estado</div><div class="db-valor"><span class="estado ${p.estado}">${estadoLabel[p.estado]||p.estado}</span></div></div>
-        <div class="detalhe-bloco"><div class="db-label">Entidade</div><div class="db-valor">${p.nomeEntidade||'—'}</div></div>
-        ${p.tutorNome ? `
-        <div class="detalhe-bloco"><div class="db-label">Tutor</div><div class="db-valor">${p.tutorNome}${p.tutorCargo?' · '+p.tutorCargo:''}</div></div>
-        <div class="detalhe-bloco"><div class="db-label">Email do Tutor</div><div class="db-valor">${p.tutorEmail||'—'}</div></div>` : ''}
-      </div>`;
+      let html = `
+        <!-- Chips de estado e tipo -->
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:18px;padding-top:4px">
+          <span style="display:inline-flex;align-items:center;gap:6px;background:${estadoBg[p.estado]};color:${estadoCor[p.estado]};border-radius:20px;padding:5px 14px;font-size:0.78rem;font-weight:700">
+            <span style="width:7px;height:7px;border-radius:50%;background:${estadoCor[p.estado]};display:inline-block"></span>
+            ${estadoLabel[p.estado] || p.estado}
+          </span>
+          <span style="background:${p.tipo==='estagio'?'var(--laranja-light)':'var(--azul-light)'};color:${p.tipo==='estagio'?'var(--laranja)':'var(--azul)'};border-radius:20px;padding:5px 14px;font-size:0.78rem;font-weight:700">
+            ${p.tipo === 'estagio' ? 'Estágio' : 'Projeto'}
+          </span>
+          ${(p.areas||[]).map(a=>`<span style="background:var(--azul-light);color:var(--azul);border-radius:20px;padding:5px 12px;font-size:0.72rem;font-weight:600">${a}</span>`).join('')}
+        </div>
 
-      // Feedback de rejeição
+        <!-- Meta info grid -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">
+          <div class="detalhe-bloco"><div class="db-label">Entidade</div><div class="db-valor">${p.nomeEntidade||'—'}</div></div>
+          <div class="detalhe-bloco"><div class="db-label">Curso</div><div class="db-valor">${p.curso||'—'}</div></div>
+          ${p.tutorNome ? `
+          <div class="detalhe-bloco"><div class="db-label">Tutor na Entidade</div><div class="db-valor">${p.tutorNome}${p.tutorCargo?' · '+p.tutorCargo:''}</div></div>
+          <div class="detalhe-bloco"><div class="db-label">Email do Tutor</div><div class="db-valor" style="word-break:break-all">${p.tutorEmail||'—'}</div></div>` : ''}
+          ${p.moradaEntidade ? `
+          <div class="detalhe-bloco" style="grid-column:1/-1"><div class="db-label">Morada</div><div class="db-valor">${p.moradaEntidade}</div></div>` : ''}
+        </div>`;
+
+      // Avisos de estado
       if (p.estado === 'rejeitada' && p.feedbackCCA) {
-        html += `<div class="detalhe-bloco vermelho">
+        html += `<div class="detalhe-bloco vermelho" style="margin-bottom:14px">
           <div class="db-label">⚠️ Motivo de rejeição pela CCA</div>
           <div class="db-valor">${p.feedbackCCA}</div>
         </div>`;
       }
-
-      // Sugestão da CCA
       if (p.sugestaoCCA) {
-        html += `<div class="detalhe-bloco amarelo">
+        html += `<div class="detalhe-bloco amarelo" style="margin-bottom:14px">
           <div class="db-label">💡 Sugestão de melhoria da CCA</div>
           <div class="db-valor">${p.sugestaoCCA}</div>
         </div>`;
       }
-
-      // Estado pendente
       if (p.estado === 'pendente') {
-        html += `<div class="detalhe-bloco" style="background:var(--amarelo-light)">
+        html += `<div class="detalhe-bloco" style="background:var(--amarelo-light);margin-bottom:14px">
           <div class="db-label" style="color:var(--amarelo)">⏳ A aguardar aprovação</div>
-          <div class="db-valor" style="color:#5a4000;font-weight:500">A proposta está a ser analisada pela CCA. Receberás uma notificação quando houver uma decisão.</div>
+          <div class="db-valor" style="color:#5a4000;font-weight:500">A proposta está a ser analisada pela CCA. Receberá uma notificação quando houver uma decisão.</div>
         </div>`;
       }
-
-      // Estado aprovado
       if (p.estado === 'aprovada') {
-        html += `<div class="detalhe-bloco verde">
+        html += `<div class="detalhe-bloco verde" style="margin-bottom:14px">
           <div class="db-label">✅ Aprovada pela CCA</div>
-          <div class="db-valor">A proposta foi aprovada. Os estudantes já podem manifestar interesse.</div>
+          <div class="db-valor">A proposta está disponível para os estudantes manifestarem interesse.</div>
         </div>`;
       }
 
-      // Conteúdo
-      if (p.objetivos || p.descricao) {
-        html += `<div style="margin-top:14px"><div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--cinza-texto);margin-bottom:6px">Objetivos</div>
-          <p style="font-size:0.86rem;color:#444;line-height:1.7">${(p.objetivos||p.descricao||'').replace(/\n/g,'<br>')}</p></div>`;
-      }
-      if (p.resultadosEsperados) {
-        html += `<div style="margin-top:14px"><div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--cinza-texto);margin-bottom:6px">Resultados Esperados</div>
-          <p style="font-size:0.86rem;color:#444;line-height:1.7">${p.resultadosEsperados.replace(/\n/g,'<br>')}</p></div>`;
+      // Conteúdo principal — secções com divisores
+      const secao = (titulo, texto) => texto ? `
+        <div style="margin-bottom:18px">
+          <div style="font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.6px;color:var(--cinza-texto);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--cinza-linha)">${titulo}</div>
+          <p style="font-size:0.86rem;color:#444;line-height:1.75">${texto.replace(/\n/g,'<br>')}</p>
+        </div>` : '';
+
+      html += secao('Objetivos', p.objetivos || p.descricao);
+      html += secao('Resultados Esperados', p.resultadosEsperados);
+      html += secao('Plano Provisório de Trabalho', p.planoTrabalho);
+      html += secao('Perfil do Candidato', p.perfilCandidato);
+
+      if (p.plugIN) {
+        html += `<div style="background:var(--laranja-light);border-radius:8px;padding:10px 14px;font-size:0.82rem;color:var(--laranja);font-weight:600">
+          🔌 Esta proposta participa no Plug-IN
+        </div>`;
       }
 
       document.getElementById('detalhesBody').innerHTML = html;
@@ -732,7 +682,7 @@
         <div class="form-campo" style="margin-top:14px"><label>Cargo do tutor</label><input class="mp-input" type="text" id="f2" value="${esc(mpDados.tutorCargo)}" placeholder="Ex: Diretor de Tecnologia"></div>`;
       case 2: return `<div class="form-grid" style="margin-bottom:16px">
         <div class="form-campo"><label>Curso destinatário <span class="obg">*</span></label><input class="mp-input readonly" type="text" readonly value="${esc(mpDados.curso)}"><p class="campo-nota">A proposta será submetida para o seu curso.</p></div>
-        <div class="form-campo"><label>Tipo de proposta <span class="obg">*</span></label><select class="mp-select" id="f0"><option value="estagio"${mpDados.tipo==='estagio'?' selected':''}>Estágio</option><option value="projecto"${mpDados.tipo==='projecto'?' selected':''}>Projecto</option></select></div></div>
+        <div class="form-campo"><label>Tipo de proposta <span class="obg">*</span></label><select class="mp-select" id="f0"><option value="estagio"${mpDados.tipo==='estagio'?' selected':''}>Estágio</option><option value="projecto"${mpDados.tipo==='projecto'?' selected':''}>Projeto</option></select></div></div>
         <div class="form-campo" style="margin-bottom:16px"><label>Área(s) de actuação <span class="obg">*</span></label>
         <div class="areas-grid">${areas.map(a=>`<label class="area-check${mpDados.areas.includes(a)?' marcada':''}"><input type="checkbox" value="${a}" class="area-cb"${mpDados.areas.includes(a)?' checked':''}> ${a}</label>`).join('')}</div></div>
         <div class="form-campo"><label>Título da proposta <span class="obg">*</span> <span style="font-size:0.7rem;color:var(--cinza-texto);text-transform:none;font-weight:400">(máx. 50 car.)</span></label>
@@ -887,7 +837,7 @@
   }
 
   // ── Iniciar ──
-  mudarTab('disponiveis');
+  renderTabDisp();
 
   function abrirModalLogout() {
     const m = document.getElementById('modalLogout');

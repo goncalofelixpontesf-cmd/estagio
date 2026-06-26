@@ -11,17 +11,20 @@ exports.listar = async (req, res) => {
     const { tipo, area, empresa, pesquisa } = req.query;
     const filtro = {};
 
-    // Estudantes só vêem propostas aprovadas do seu curso
     if (req.utilizador.perfil === 'estudante') {
-      filtro.estado = 'aprovada';
       const estudante = await Estudante.findOne({ utilizadorId: req.utilizador._id });
-      if (estudante) filtro.curso = estudante.curso;
+      if (req.query.minhas === 'true') {
+        filtro.proponenteId = req.utilizador._id;
+      } else {
+        // Estudantes vêem propostas aprovadas e atribuídas do seu curso
+        filtro.estado = { $in: ['aprovada', 'atribuida'] };
+        if (estudante) filtro.curso = estudante.curso;
+      }
     }
 
     // Docentes e entidades vêem só as suas próprias propostas
     if (['docente','entidade'].includes(req.utilizador.perfil)) {
       if (req.query.orientador === 'me') {
-        // Propostas onde é tutor atribuído
         filtro.orientadorId = req.utilizador._id;
         delete filtro.proponenteId;
       } else {

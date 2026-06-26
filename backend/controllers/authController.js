@@ -13,19 +13,17 @@ function validarEmail(email, perfil) {
 
   if (perfil === 'estudante') {
     // Número de estudante (só dígitos) + @esmad.ipp.pt
-    // Ex: 40240310@esmad.ipp.pt
     const regex = /^\d+@esmad\.ipp\.pt$/;
     if (!regex.test(emailLower)) {
-      return 'O email de estudante deve ter o formato: número@esmad.ipp.pt (ex: 40240310@esmad.ipp.pt)';
+      return 'O email de estudante deve ter o formato: número@esmad.ipp.pt (ex: 00000000@esmad.ipp.pt)';
     }
   }
 
   if (perfil === 'docente') {
     // Nome (começa por letras, pode ter pontos) + @esmad.ipp.pt
-    // Ex: linooliveira@esmad.ipp.pt ou lino.oliveira@esmad.ipp.pt
     const regex = /^[a-zA-Z][a-zA-Z0-9.]+@esmad\.ipp\.pt$/;
     if (!regex.test(emailLower)) {
-      return 'O email de docente deve ter o formato: nome@esmad.ipp.pt (ex: linooliveira@esmad.ipp.pt)';
+      return 'O email de docente deve ter o formato: nome@esmad.ipp.pt (ex: nome@esmad.ipp.pt)';
     }
   }
 
@@ -39,7 +37,7 @@ exports.registo = async (req, res) => {
     const { nome, email, password, perfil, curso, nomeEntidade } = req.body;
 
     if (!nome || !email || !password || !perfil) {
-      return res.status(400).json({ sucesso: false, mensagem: 'Preenche todos os campos obrigatórios.' });
+      return res.status(400).json({ sucesso: false, mensagem: 'Preencha todos os campos obrigatórios.' });
     }
 
     if (!['estudante', 'docente', 'entidade'].includes(perfil)) {
@@ -112,7 +110,7 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res.status(400).json({ sucesso: false, mensagem: 'Introduz o email e a password.' });
+      return res.status(400).json({ sucesso: false, mensagem: 'Introduza o email e a password.' });
     }
 
     const utilizador = await Utilizador.findOne({ email }).select('+password');
