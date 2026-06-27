@@ -38,7 +38,7 @@ async function enviarEmail({ to, subject, html }) {
     throw new Error('Email não configurado. Define SMTP_HOST, SMTP_USER e SMTP_PASS no .env (ver instruções abaixo).');
   }
   await t.sendMail({
-    from: `"ESMAD — Gestão de Propostas" <${process.env.SMTP_USER}>`,
+    from: `"ESMAD — Gestão de Propostas" <goncalofelixpontes@gmail.com>`,
     to,
     subject,
     html
